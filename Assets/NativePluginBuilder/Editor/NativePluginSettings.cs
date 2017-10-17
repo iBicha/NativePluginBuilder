@@ -6,7 +6,7 @@ namespace iBicha
 {
     public class NativePluginSettings
     {
-        private const string pluginsPath = "Assets/UnityNativePluginBuilder/Editor/Assets";
+        private const string pluginsPath = "Assets/NativePluginBuilder/Editor/Assets";
 
         public static List<NativePlugin> plugins = new List<NativePlugin>();
 

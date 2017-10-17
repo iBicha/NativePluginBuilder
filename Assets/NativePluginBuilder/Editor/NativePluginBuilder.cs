@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.Events;
 namespace iBicha
 {
-    public class UnityNativePluginBuilder : EditorWindow
+    public class NativePluginBuilder : EditorWindow
     {
         private bool createNewPlugin = false;
         private NativePlugin newPlugin;
@@ -29,12 +29,12 @@ namespace iBicha
 
         public static string lastLogLine;
 
-        [MenuItem("Window/Unity Native Plugin Builder")]
+        [MenuItem("Window/Native Plugin Builder")]
         static void Init()
         {
             // Get existing open window or if none, make a new one:
-            UnityNativePluginBuilder window = (UnityNativePluginBuilder)EditorWindow.GetWindow(typeof(UnityNativePluginBuilder));
-            window.titleContent.text = "Unity Native Plugin Builder";
+            NativePluginBuilder window = (NativePluginBuilder)EditorWindow.GetWindow(typeof(NativePluginBuilder));
+            window.titleContent.text = "Native Plugin Builder";
             window.Show();
         }
 

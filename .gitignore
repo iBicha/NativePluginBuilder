@@ -32,4 +32,4 @@ sysinfo.txt
 # Builds
 *.apk
 *.unitypackage
-Assets/UnityNativePluginBuilder/Boilerplate~/Build/
+Assets/NativePluginBuilder/Boilerplate~/Build/

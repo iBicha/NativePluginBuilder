@@ -5,7 +5,7 @@ using System.Text;
 using UnityEngine;
 namespace iBicha
 {
-    public class CMake
+    public class CMakeHelper
     {
         public static string GetCMakeVersion()
         {
@@ -50,7 +50,7 @@ namespace iBicha
             cmake.StartInfo.FileName = "cmake";
             cmake.StartInfo.Arguments = argsBuilder.ToString();
             cmake.StartInfo.WorkingDirectory = plugin.buildFolder;
-            
+
             cmake.StartInfo.UseShellExecute = false;
             cmake.StartInfo.CreateNoWindow = true;
             cmake.StartInfo.RedirectStandardOutput = true;
@@ -59,9 +59,9 @@ namespace iBicha
             cmake.Start();
             while (!cmake.StandardOutput.EndOfStream)
             {
-                UnityNativePluginBuilder.lastLogLine = cmake.StandardOutput.ReadLine();
+                NativePluginBuilder.lastLogLine = cmake.StandardOutput.ReadLine();
             }
-            
+
             string err = cmake.StandardError.ReadToEnd();
             if (!string.IsNullOrEmpty(err))
             {

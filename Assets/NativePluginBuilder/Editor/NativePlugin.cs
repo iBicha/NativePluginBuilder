@@ -38,7 +38,7 @@ namespace iBicha
 
         public void Build()
         {
-            CMake.Build(this);
+            CMakeHelper.Build(this);
         }
     }
 }
