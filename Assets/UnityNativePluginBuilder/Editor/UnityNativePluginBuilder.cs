@@ -68,9 +68,12 @@ namespace iBicha
             OnGuiNewPlugin();
 
             GUILayout.FlexibleSpace();
+            EditorGUILayout.Separator();
 
             EditorGUILayout.LabelField(lastLogLine);
+
         }
+
 
         void OnGuiPlugins()
         {
@@ -171,7 +174,8 @@ namespace iBicha
             }
             EditorGUILayout.EndHorizontal();
 
-            plugin.pluginBinaryFolder = EditorGUILayout.TextField("Plugin Folder", plugin.pluginBinaryFolder);
+            plugin.pluginBinaryFolder = EditorGUILayout.ObjectField("Plugins folder", plugin.pluginBinaryFolder, typeof(DefaultAsset), false);
+
         }
 
         private bool BeginSettingsBox(int nr, GUIContent header)

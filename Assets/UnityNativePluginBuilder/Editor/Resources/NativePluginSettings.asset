@@ -14,6 +14,7 @@ MonoBehaviour:
   plugins:
   - Name: MyPlugin
     Version: 1.0.0.0
-    pluginBinaryFolder: 
+    pluginBinaryFolder: {fileID: 102900000, guid: 53d401ad7b18ce64b9154799c39423e5,
+      type: 3}
     sourceFolder: C:/Users/bhadriche/Desktop/UnityNativePluginBuilder/Assets/UnityNativePluginBuilder/Boilerplate~/Source
     buildFolder: C:/Users/bhadriche/Desktop/UnityNativePluginBuilder/Assets/UnityNativePluginBuilder/Boilerplate~/Build

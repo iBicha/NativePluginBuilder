@@ -1,7 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UnityEditor;
+using UnityEngine;
 
 namespace iBicha
 {
@@ -19,7 +20,19 @@ namespace iBicha
         public string Name;
         public string Version;
 
-        public string pluginBinaryFolder;
+        public Object pluginBinaryFolder;
+        public string pluginBinaryFolderPath
+        {
+            get
+            {
+                if(pluginBinaryFolder == null)
+                {
+                    return "";
+                }
+                return AssetDatabase.GetAssetPath(pluginBinaryFolder);
+            }
+        }
+
         public string sourceFolder;
         public string buildFolder;
 
