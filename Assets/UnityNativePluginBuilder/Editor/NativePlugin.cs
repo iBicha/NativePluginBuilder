@@ -7,11 +7,11 @@ using UnityEngine;
 namespace iBicha
 {
     [System.Serializable]
-    public class NativePlugin
+    public class NativePlugin : ScriptableObject
     {
         public static NativePlugin GetDefault()
         {
-            NativePlugin plugin = new NativePlugin();
+            NativePlugin plugin = CreateInstance<NativePlugin>();
             plugin.Name = "MyPlugin";
             plugin.Version = "1.0.0.0";
             return plugin;

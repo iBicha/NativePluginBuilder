@@ -9,7 +9,7 @@ namespace iBicha
     public class UnityNativePluginBuilder : EditorWindow
     {
         private bool createNewPlugin = false;
-        private NativePlugin newPlugin = NativePlugin.GetDefault();
+        private NativePlugin newPlugin;
 
         private static GUIStyle _categoryBox;
         private static GUIStyle categoryBox
@@ -42,17 +42,21 @@ namespace iBicha
         {
             NativePluginSettings.Load();
             ResizeSectionAnimators();
+            if (newPlugin == null)
+            {
+                newPlugin = NativePlugin.GetDefault();
+            }
         }
 
         private void OnDisable()
         {
-            NativePluginSettings.Save();
+            NativePluginSettings.Save(); 
         }
 
 
         void ResizeSectionAnimators()
         {
-            SectionAnimators = new AnimBool[NativePluginSettings.Get.plugins.Count];
+            SectionAnimators = new AnimBool[NativePluginSettings.plugins.Count];
 
             for (int j = 0; j < SectionAnimators.Length; j++)
             {
@@ -81,11 +85,11 @@ namespace iBicha
 
             EditorGUILayout.Space();
 
-            for (int i = 0; i < NativePluginSettings.Get.plugins.Count; i++)
+            for (int i = 0; i < NativePluginSettings.plugins.Count; i++)
             {
-                if (BeginSettingsBox(i, new GUIContent(NativePluginSettings.Get.plugins[i].Name)))
+                if (BeginSettingsBox(i, new GUIContent(NativePluginSettings.plugins[i].Name)))
                 {
-                    NativePlugin plugin = NativePluginSettings.Get.plugins[i];
+                    NativePlugin plugin = NativePluginSettings.plugins[i];
                     OnGuiNativePlugin(plugin);
 
                     EditorGUILayout.BeginHorizontal();
@@ -98,7 +102,7 @@ namespace iBicha
                     {
                         if (EditorUtility.DisplayDialog("Remove " + plugin.Name + "?", "This will remove the plugin from the builder. Source files will not be deleted.", "Remove", "Cancel"))
                         {
-                            NativePluginSettings.Get.plugins.Remove(plugin);
+                            NativePluginSettings.plugins.Remove(plugin);
                             i--;
                         }
                     }
@@ -128,7 +132,7 @@ namespace iBicha
                 EditorGUILayout.BeginHorizontal();
                 if (GUILayout.Button("Create"))
                 {
-                    NativePluginSettings.Get.plugins.Add(newPlugin);
+                    NativePluginSettings.plugins.Add(newPlugin);
                     newPlugin = NativePlugin.GetDefault();
                     ResizeSectionAnimators();
                     createNewPlugin = false;
@@ -144,7 +148,7 @@ namespace iBicha
             EditorGUILayout.Space();
 
         }
-
+         
         void OnGuiNativePlugin(NativePlugin plugin)
         {
             plugin.Name = EditorGUILayout.TextField("Plugin name", plugin.Name);
@@ -154,7 +158,7 @@ namespace iBicha
             plugin.sourceFolder = EditorGUILayout.TextField("Source Folder", plugin.sourceFolder);
             if (GUILayout.Button("Browse...", GUILayout.Width(90)))
             {
-                string folder = EditorUtility.OpenFolderPanel("Select Source Folder", "", "");
+                string folder = EditorUtility.OpenFolderPanel("Select Source Folder", plugin.sourceFolder, "");
                 if (!string.IsNullOrEmpty(folder) && System.IO.Directory.Exists(folder))
                 {
                     plugin.sourceFolder = folder;
@@ -166,7 +170,7 @@ namespace iBicha
             plugin.buildFolder = EditorGUILayout.TextField("Build Folder", plugin.buildFolder);
             if (GUILayout.Button("Browse...", GUILayout.Width(90)))
             {
-                string folder = EditorUtility.OpenFolderPanel("Select Build Folder", "", "");
+                string folder = EditorUtility.OpenFolderPanel("Select Build Folder", plugin.buildFolder, "");
                 if (!string.IsNullOrEmpty(folder) && System.IO.Directory.Exists(folder))
                 {
                     plugin.buildFolder = folder;

@@ -1,57 +1,42 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 namespace iBicha
 {
-    [System.Serializable]
-    public class NativePluginSettings : ScriptableObject
+    public class NativePluginSettings
     {
-        //TODO: separate plugin files
-        private const string settingsFile = "Assets/UnityNativePluginBuilder/Editor/Resources/NativePluginSettings.asset";
+        private const string pluginsPath = "Assets/UnityNativePluginBuilder/Editor/Assets";
 
-        public List<NativePlugin> plugins = new List<NativePlugin>();
+        public static List<NativePlugin> plugins = new List<NativePlugin>();
 
-        private static NativePluginSettings get;
-        public static NativePluginSettings Get
-        {
-            get
+
+        public static void Load()
+        { 
+            plugins.Clear();
+            string[] pluginFiles = Directory.GetFiles(Path.GetFullPath(pluginsPath));
+            foreach (string pluginfile in pluginFiles)
             {
-                if (get == null)
+                UnityEngine.Object[] array = UnityEditorInternal.InternalEditorUtility.LoadSerializedFileAndForget(pluginfile);
+                if (array.Length > 0 && array[0] != null)
                 {
-                    Load();
+                    NativePlugin plugin = array[0] as NativePlugin;
+                    plugins.Add(plugin) ;
                 }
-                return get;
+
             }
         }
 
-        public static void Load(string fromFile = "")
+        public static void Save()
         {
-            if (string.IsNullOrEmpty(fromFile))
+            foreach (NativePlugin plugin in plugins)
             {
-                fromFile = settingsFile;
-            }
-            UnityEngine.Object[] array = UnityEditorInternal.InternalEditorUtility.LoadSerializedFileAndForget(fromFile);
-            if (array.Length > 0 && array[0] != null)
-            {
-                get = array[0] as NativePluginSettings;
-            }
-            if (get == null)
-            {
-                get = ScriptableObject.CreateInstance<NativePluginSettings>();
-            }
-        }
+                string savePath = Path.Combine(pluginsPath, plugin.Name + ".asset");
+                UnityEditorInternal.InternalEditorUtility.SaveToSerializedFileAndForget(new Object[] { plugin }, savePath, false);
 
-        public static void Save(string toFile = "")
-        {
-            if (string.IsNullOrEmpty(toFile))
-            {
-                toFile = settingsFile;
             }
-            UnityEditorInternal.InternalEditorUtility.SaveToSerializedFileAndForget(new UnityEngine.Object[] { Get }, toFile, false);
             AssetDatabase.Refresh();
         }
 
     }
-
 }
