@@ -7,6 +7,7 @@ namespace iBicha
     [System.Serializable]
     public class NativePluginSettings : ScriptableObject
     {
+        //TODO: separate plugin files
         private const string settingsFile = "Assets/UnityNativePluginBuilder/Editor/Resources/NativePluginSettings.asset";
 
         public List<NativePlugin> plugins = new List<NativePlugin>();
@@ -51,28 +52,6 @@ namespace iBicha
             AssetDatabase.Refresh();
         }
 
-        [System.Serializable]
-        public class NativePlugin
-        {
-            public static NativePlugin GetDefault()
-            {
-                NativePlugin plugin = new NativePlugin();
-                plugin.Name = "MyPlugin";
-                plugin.Version = "1.0.0.0";
-                return plugin;
-            }
-
-            public string Name;
-            public string Version;
-
-            public string pluginBinaryFolder;
-            public string sourceFolder;
-
-            public void Build()
-            {
-                throw new System.NotImplementedException();
-            }
-        }
     }
 
 }

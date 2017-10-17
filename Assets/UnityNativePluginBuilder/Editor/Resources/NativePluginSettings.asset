@@ -15,4 +15,5 @@ MonoBehaviour:
   - Name: MyPlugin
     Version: 1.0.0.0
     pluginBinaryFolder: 
-    sourceFolder: C:/Users/bhadriche/Desktop/UnityNativePluginBuilder/Library
+    sourceFolder: C:/Users/bhadriche/Desktop/UnityNativePluginBuilder/Assets/UnityNativePluginBuilder/Boilerplate~/Source
+    buildFolder: C:/Users/bhadriche/Desktop/UnityNativePluginBuilder/Assets/UnityNativePluginBuilder/Boilerplate~/Build

@@ -9,7 +9,7 @@ namespace iBicha
     public class UnityNativePluginBuilder : EditorWindow
     {
         private bool createNewPlugin = false;
-        private NativePluginSettings.NativePlugin newPlugin = NativePluginSettings.NativePlugin.GetDefault();
+        private NativePlugin newPlugin = NativePlugin.GetDefault();
 
         private static GUIStyle _categoryBox;
         private static GUIStyle categoryBox
@@ -26,6 +26,8 @@ namespace iBicha
         }
         private static int selectedSection = -1;
         private static AnimBool[] SectionAnimators;
+
+        public static string lastLogLine;
 
         [MenuItem("Window/Unity Native Plugin Builder")]
         static void Init()
@@ -65,6 +67,9 @@ namespace iBicha
 
             OnGuiNewPlugin();
 
+            GUILayout.FlexibleSpace();
+
+            EditorGUILayout.LabelField(lastLogLine);
         }
 
         void OnGuiPlugins()
@@ -77,7 +82,7 @@ namespace iBicha
             {
                 if (BeginSettingsBox(i, new GUIContent(NativePluginSettings.Get.plugins[i].Name)))
                 {
-                    NativePluginSettings.NativePlugin plugin = NativePluginSettings.Get.plugins[i];
+                    NativePlugin plugin = NativePluginSettings.Get.plugins[i];
                     OnGuiNativePlugin(plugin);
 
                     EditorGUILayout.BeginHorizontal();
@@ -121,7 +126,7 @@ namespace iBicha
                 if (GUILayout.Button("Create"))
                 {
                     NativePluginSettings.Get.plugins.Add(newPlugin);
-                    newPlugin = NativePluginSettings.NativePlugin.GetDefault();
+                    newPlugin = NativePlugin.GetDefault();
                     ResizeSectionAnimators();
                     createNewPlugin = false;
                 }
@@ -137,11 +142,11 @@ namespace iBicha
 
         }
 
-
-        void OnGuiNativePlugin(NativePluginSettings.NativePlugin plugin)
+        void OnGuiNativePlugin(NativePlugin plugin)
         {
             plugin.Name = EditorGUILayout.TextField("Plugin name", plugin.Name);
             plugin.Version = EditorGUILayout.TextField("Version", plugin.Version);
+
             EditorGUILayout.BeginHorizontal();
             plugin.sourceFolder = EditorGUILayout.TextField("Source Folder", plugin.sourceFolder);
             if (GUILayout.Button("Browse...", GUILayout.Width(90)))
@@ -153,6 +158,19 @@ namespace iBicha
                 }
             }
             EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            plugin.buildFolder = EditorGUILayout.TextField("Build Folder", plugin.buildFolder);
+            if (GUILayout.Button("Browse...", GUILayout.Width(90)))
+            {
+                string folder = EditorUtility.OpenFolderPanel("Select Build Folder", "", "");
+                if (!string.IsNullOrEmpty(folder) && System.IO.Directory.Exists(folder))
+                {
+                    plugin.buildFolder = folder;
+                }
+            }
+            EditorGUILayout.EndHorizontal();
+
             plugin.pluginBinaryFolder = EditorGUILayout.TextField("Plugin Folder", plugin.pluginBinaryFolder);
         }
 
