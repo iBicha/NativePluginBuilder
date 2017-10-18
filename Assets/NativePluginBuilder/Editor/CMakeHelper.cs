@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Text;
 using UnityEngine;
 namespace iBicha
@@ -40,9 +41,9 @@ namespace iBicha
 
 
         public static bool Build(NativePlugin plugin)
-        {
+        { 
             StringBuilder argsBuilder = new StringBuilder();
-            argsBuilder.Append("../CMake ");
+            argsBuilder.AppendFormat("{0} ", "../CMake");
             argsBuilder.AppendFormat("-DPLUGIN_NAME:STRING={0} ", plugin.Name);
             argsBuilder.AppendFormat("-DSOURCE_FOLDER:PATH={0} ", plugin.sourceFolder);
 
@@ -50,13 +51,22 @@ namespace iBicha
             cmake.StartInfo.FileName = "cmake";
             cmake.StartInfo.Arguments = argsBuilder.ToString();
             cmake.StartInfo.WorkingDirectory = plugin.buildFolder;
-
             cmake.StartInfo.UseShellExecute = false;
             cmake.StartInfo.CreateNoWindow = true;
             cmake.StartInfo.RedirectStandardOutput = true;
             cmake.StartInfo.RedirectStandardError = true;
 
-            cmake.Start();
+            try
+            {
+                cmake.Start();
+            }
+            catch (System.Exception ex)
+            {
+                UnityEngine.Debug.LogException(ex);
+                return false;
+                //throw ex;
+            }
+
             while (!cmake.StandardOutput.EndOfStream)
             {
                 NativePluginBuilder.lastLogLine = cmake.StandardOutput.ReadLine();
