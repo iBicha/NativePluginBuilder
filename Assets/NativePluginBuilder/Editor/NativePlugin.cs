@@ -1,4 +1,5 @@
 ﻿ using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using UnityEditor;
@@ -29,7 +30,7 @@ namespace iBicha
                 {
                     return "";
                 }
-                return AssetDatabase.GetAssetPath(pluginBinaryFolder);
+                return Path.GetFullPath(AssetDatabase.GetAssetPath(pluginBinaryFolder));
             }
         }
 

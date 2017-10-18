@@ -46,6 +46,7 @@ namespace iBicha
             argsBuilder.AppendFormat("{0} ", "../CMake");
             argsBuilder.AppendFormat("-DPLUGIN_NAME:STRING={0} ", plugin.Name);
             argsBuilder.AppendFormat("-DSOURCE_FOLDER:PATH={0} ", plugin.sourceFolder);
+            argsBuilder.AppendFormat("-DPLUGIN_BINARY_FOLDER:PATH={0} ", plugin.pluginBinaryFolderPath);
 
             Process cmake = new Process();
 			cmake.StartInfo.FileName = FindBinary("cmake");
