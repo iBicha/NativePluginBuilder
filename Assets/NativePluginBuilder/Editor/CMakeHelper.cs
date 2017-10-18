@@ -11,7 +11,7 @@ namespace iBicha
         public static string GetCMakeVersion()
         {
             Process cmake = new Process();
-            cmake.StartInfo.FileName = "cmake";
+			cmake.StartInfo.FileName = FindBinary("cmake");
             cmake.StartInfo.Arguments = "--version";
             cmake.StartInfo.UseShellExecute = false;
             cmake.StartInfo.CreateNoWindow = true;
@@ -48,7 +48,7 @@ namespace iBicha
             argsBuilder.AppendFormat("-DSOURCE_FOLDER:PATH={0} ", plugin.sourceFolder);
 
             Process cmake = new Process();
-            cmake.StartInfo.FileName = "cmake";
+			cmake.StartInfo.FileName = FindBinary("cmake");
             cmake.StartInfo.Arguments = argsBuilder.ToString();
             cmake.StartInfo.WorkingDirectory = plugin.buildFolder;
             cmake.StartInfo.UseShellExecute = false;
@@ -81,6 +81,28 @@ namespace iBicha
 
             return cmake.ExitCode == 0;
         }
+
+		private static string FindBinary(string command) {
+			if (!IsOSX) {
+				return command;
+			}
+			//temp hack
+			return "/usr/local/bin/" + command;
+		}
+
+
+		public static bool IsOSX
+		{
+			get
+			{
+				#if UNITY_EDITOR_OSX
+				return true;
+				#else
+				return false;
+				#endif
+			}
+		}
+
     }
 
 }
