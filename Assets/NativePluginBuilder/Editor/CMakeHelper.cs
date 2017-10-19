@@ -40,7 +40,7 @@ namespace iBicha
         }
 
 
-        public static bool Build(NativePlugin plugin, bool release = true, string arch=null)
+        public static bool Build(NativePlugin plugin, BuildType buildType = BuildType.Debug, Architecture arch = Architecture.Any)
         {
             //cmake --build . --clean-first
             StringBuilder argsBuilder = new StringBuilder();
@@ -49,12 +49,29 @@ namespace iBicha
             argsBuilder.AppendFormat("-DSOURCE_FOLDER:PATH={0} ", plugin.sourceFolder);
             argsBuilder.AppendFormat("-DPLUGIN_BINARY_FOLDER:PATH={0} ", plugin.pluginBinaryFolderPath);
             argsBuilder.AppendFormat("-DPLUGIN_BINARY_FOLDER:PATH={0} ", plugin.pluginBinaryFolderPath);
-            argsBuilder.AppendFormat("-DCMAKE_BUILD_TYPE={0} ", release ? "Debug" : "Release");
-            if(!string.IsNullOrEmpty(arch))
+            if(buildType != BuildType.Empty)
             {
-                argsBuilder.AppendFormat("-DARCH={0} ", arch);
+                argsBuilder.AppendFormat("-DCMAKE_BUILD_TYPE={0} ", buildType.ToString());
             }
-            //argsBuilder.AppendFormat("--build {0}", "../CMake");
+            if (arch != Architecture.Any)
+            {
+                argsBuilder.AppendFormat("-DARCH={0} ", arch.ToString());
+                //TODO: fix hardcoded vs version
+                switch (arch)
+                {
+                    case Architecture.x86:
+                        argsBuilder.AppendFormat("-B{0} ", arch.ToString());
+                        argsBuilder.AppendFormat("-G {0} ", "\"Visual Studio 15 2017 Win32\"");
+                        break;
+                    case Architecture.x86_64:
+                        argsBuilder.AppendFormat("-B{0} ", arch.ToString());
+                        argsBuilder.AppendFormat("-G {0} ", "\"Visual Studio 15 2017 Win64\"");
+                        break;
+                    default:
+                        break;
+                }
+
+            }
 
             Process cmake = new Process();
 			cmake.StartInfo.FileName = FindBinary("cmake");

@@ -39,7 +39,7 @@ namespace iBicha
 
         public void Build()
         {
-            CMakeHelper.Build(this, true, "x86_64");
+            CMakeHelper.Build(this, BuildType.Debug, Architecture.x86_64);
         }
     }
 }
