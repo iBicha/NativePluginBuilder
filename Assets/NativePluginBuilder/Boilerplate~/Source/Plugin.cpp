@@ -1,11 +1,3 @@
-#include <iostream>
+#include "../UnityPluginAPI/IUnityInterface.h"
 
-using namespace std;
-
-int main(void) {
-
-     cout << "Hello World" << endl;
-
-     return(0);
-
-}
+extern "C" int UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API GetTwo () { return 2; }

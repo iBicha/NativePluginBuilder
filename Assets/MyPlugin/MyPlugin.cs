@@ -14,13 +14,15 @@ namespace iBicha.Example
          * unsafe code
          * locked memory pointers
          */
-		#if UNITY_EDITOR
+#if UNITY_EDITOR
 		private const string libraryName = "MyPlugin";
-		#else
+#elif UNITY_IPHONE
+		private const string libraryName = "__Internal";
+#else
 		private const string libraryName = "MyPlugin";
-		#endif
+#endif
 
-		[DllImport(libraryName)]
+        [DllImport(libraryName)]
 		public static extern int GetTwo();
 
     }
