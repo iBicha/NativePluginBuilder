@@ -15,7 +15,7 @@ namespace iBicha.Example {
 
             int[] array = { 0, 0, 0, 0, 0 };
             MyPlugin.FillWithOnes(array, array.Length);
-            Debug.Log(string.Format("The callback result is:{0}", string.Join(",", array.Select(i => i.ToString()).ToArray())));
+            Debug.Log(string.Format("The content of array is:{0}", "[" + string.Join(",", array.Select(i => i.ToString()).ToArray()) + "]"));
         }
 	}
 }
