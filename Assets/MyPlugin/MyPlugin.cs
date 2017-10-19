@@ -34,7 +34,7 @@ namespace iBicha.Example
 
 
         [DllImport(libraryName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void FillWithOnes(int[] array);
+        public static extern void FillWithOnes(int[] array, int length);
 
     }
 }

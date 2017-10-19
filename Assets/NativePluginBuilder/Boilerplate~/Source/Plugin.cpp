@@ -12,4 +12,10 @@ extern "C" bool  UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API PassCallback (CALLBA
     }
     callback(5);
     return true;
- }
+}
+
+extern "C" void  UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API FillWithOnes(int* array, int length) {
+    for(int i = 0; i<length; i++) {
+        array[i] = 1;
+    }
+}
