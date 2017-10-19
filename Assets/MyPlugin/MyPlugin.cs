@@ -22,8 +22,19 @@ namespace iBicha.Example
 		private const string libraryName = "MyPlugin";
 #endif
 
-        [DllImport(libraryName)]
+        //In this example, our c++ code returns 2.
+        [DllImport(libraryName, CallingConvention = CallingConvention.Cdecl)]
 		public static extern int GetTwo();
+
+        //We pass a C# delegate which will be called from c++ with a result.
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void CallbackDelegate(int result);
+        [DllImport(libraryName, CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool PassCallback(CallbackDelegate callback);
+
+
+        [DllImport(libraryName, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void FillWithOnes(int[] array);
 
     }
 }
