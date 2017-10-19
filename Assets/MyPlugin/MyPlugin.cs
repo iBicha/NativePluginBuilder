@@ -8,12 +8,6 @@ namespace iBicha.Example
 {
     public class MyPlugin
     {
-        /* TODO: dll import examples
-         * Different types
-         * callbacks
-         * unsafe code
-         * locked memory pointers
-         */
 #if UNITY_EDITOR
 		private const string libraryName = "MyPlugin";
 #elif UNITY_IPHONE
@@ -32,7 +26,7 @@ namespace iBicha.Example
         [DllImport(libraryName, CallingConvention = CallingConvention.Cdecl)]
         public static extern bool PassCallback(CallbackDelegate callback);
 
-
+        //Pass an array to the c++ code, and fill it with 1s.
         [DllImport(libraryName, CallingConvention = CallingConvention.Cdecl)]
         public static extern void FillWithOnes(int[] array, int length);
 
