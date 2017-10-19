@@ -1,5 +1,5 @@
 # Specify the minimum version for CMake
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.2)
 
 # Plugins's name
 project(${PLUGIN_NAME})
@@ -26,7 +26,6 @@ elseif(WEBGL)
   set_target_properties(${PLUGIN_NAME} PROPERTIES PREFIX "" SUFFIX ".bc")
   install(TARGETS ${PLUGIN_NAME} DESTINATION ${PLUGIN_BINARY_FOLDER}/WebGL)
 elseif(ANDROID)
-  set(PLUGIN_NAME ${PLUGIN_NAME})
   add_library(${PLUGIN_NAME} SHARED ${SOURCE_FILES})
 elseif(APPLE)
   add_library(${PLUGIN_NAME} MODULE ${SOURCE_FILES})

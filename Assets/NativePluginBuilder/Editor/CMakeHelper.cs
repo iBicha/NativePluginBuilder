@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using UnityEditor;
 using UnityEngine;
 namespace iBicha
 {
@@ -40,7 +41,7 @@ namespace iBicha
         }
 
 
-        public static bool Build(NativePlugin plugin, BuildType buildType = BuildType.Debug, Architecture arch = Architecture.Any)
+        public static bool Build(NativePlugin plugin, RuntimePlatform platform, BuildType buildType = BuildType.Debug, Architecture arch = Architecture.Any)
         {
             //cmake --build . --clean-first
             StringBuilder argsBuilder = new StringBuilder();
@@ -53,24 +54,45 @@ namespace iBicha
             {
                 argsBuilder.AppendFormat("-DCMAKE_BUILD_TYPE={0} ", buildType.ToString());
             }
-            if (arch != Architecture.Any)
+            switch (platform)
             {
-                argsBuilder.AppendFormat("-DARCH={0} ", arch.ToString());
-                //TODO: fix hardcoded vs version
-                switch (arch)
-                {
-                    case Architecture.x86:
-                        argsBuilder.AppendFormat("-B{0} ", arch.ToString());
-                        argsBuilder.AppendFormat("-G {0} ", "\"Visual Studio 15 2017 Win32\"");
-                        break;
-                    case Architecture.x86_64:
-                        argsBuilder.AppendFormat("-B{0} ", arch.ToString());
-                        argsBuilder.AppendFormat("-G {0} ", "\"Visual Studio 15 2017 Win64\"");
-                        break;
-                    default:
-                        break;
-                }
+                case RuntimePlatform.WindowsPlayer:
+                case RuntimePlatform.WindowsEditor:
+                    if (arch != Architecture.Any)
+                    {
+                        argsBuilder.AppendFormat("-DARCH={0} ", arch.ToString());
+                        //TODO: fix hardcoded vs version
+                        switch (arch)
+                        {
+                            case Architecture.x86:
+                                argsBuilder.AppendFormat("-B{0}/{1} ", "Windows", arch.ToString());
+                                argsBuilder.AppendFormat("-G {0}/{1} ", "\"Visual Studio 15 2017 Win32\"");
+                                break;
+                            case Architecture.x86_64:
+                                argsBuilder.AppendFormat("-B{0}/{1} ", "Windows", arch.ToString());
+                                argsBuilder.AppendFormat("-G {0} ", "\"Visual Studio 15 2017 Win64\"");
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    break;
+                case RuntimePlatform.Android:
 
+                    argsBuilder.AppendFormat("-B{0}/{1} ", "Android", arch.ToString());
+                    argsBuilder.AppendFormat("-DANDROID:BOOL={0} ", "TRUE");
+                    argsBuilder.AppendFormat("-DANDROID_NDK={0} ", GetNDKLocation());
+                    string toolchain = Path.GetFullPath(Path.Combine(plugin.buildFolder, "../CMake/android-cmake/android.toolchain.cmake"));
+                    argsBuilder.AppendFormat("-DCMAKE_TOOLCHAIN_FILE={0} ", toolchain);
+
+                    /*string ndk = Path.GetFullPath(Path.Combine(GetNDKLocation(), "build/cmake/android.toolchain.cmake"));
+                    UnityEngine.Debug.Log(ndk);
+                    argsBuilder.AppendFormat("-DCMAKE_TOOLCHAIN_FILE=\"{0}\" ", Path.Combine(ndk, "build/cmake/android.toolchain.cmake"));*/
+
+                    argsBuilder.AppendFormat("-DANDROID_ABI={0} ", "armeabi-v7a");
+                    break;
+                default:
+                    break;
             }
 
             Process cmake = new Process();
@@ -109,6 +131,11 @@ namespace iBicha
             cmake.WaitForExit();
 
             return cmake.ExitCode == 0;
+        }
+
+        private static string GetNDKLocation()
+        {
+            return EditorPrefs.GetString("AndroidNdkRoot");
         }
 
 		private static string FindBinary(string command) {

@@ -8,8 +8,11 @@ namespace iBicha
     public enum Architecture
     {
         Any,
+        arm,
+        arm64,
+        mips,
+        mips64,
         x86,
-        x86_64,
-        ARM
+        x86_64
     }
 }
