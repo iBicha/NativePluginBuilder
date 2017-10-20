@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -9,50 +10,40 @@ namespace iBicha
 {
     public class CMakeHelper
     {
-        public static string GetCMakeVersion()
+        public static void GetCMakeVersion(Action<string> callback)
         {
-            Process cmake = new Process();
-			cmake.StartInfo.FileName = FindBinary("cmake");
-            cmake.StartInfo.Arguments = "--version";
-            cmake.StartInfo.UseShellExecute = false;
-            //cmake.StartInfo.CreateNoWindow = true;
-            cmake.StartInfo.RedirectStandardOutput = true;
-            cmake.StartInfo.RedirectStandardError = true;
+            StartProcess(FindBinary("cmake"), new string[] { "--version" }, null, true, (output) => {
 
-            cmake.Start();
+                output = output.ToLower();
 
-            string output = cmake.StandardOutput.ReadToEnd();
-            string err = cmake.StandardError.ReadToEnd();
-            cmake.WaitForExit();
+                if (output.Contains("version"))
+                {
+                    output = output.Substring(output.IndexOf("version") + "version".Length).Trim().Split(' ')[0];
+                }
 
-            if (cmake.ExitCode != 0)
-            {
-                throw new System.Exception(string.Format("CMake exited with code {0} and error: {1}", cmake.ExitCode, err));
-            }
+                callback(output);
 
-            output = output.ToLower();
-
-            if (output.Contains("version"))
-            {
-                output = output.Substring(output.IndexOf("version") + "version".Length).Trim().Split(' ')[0];
-            }
-
-            return output;
+            }, (error) => {
+                throw new System.Exception(error);
+            });
         }
 
 
-        public static bool Build(NativePlugin plugin, RuntimePlatform platform, BuildType buildType = BuildType.Debug, Architecture arch = Architecture.Any)
+        public static void Build(NativePlugin plugin, RuntimePlatform platform, BuildType buildType = BuildType.Debug, Architecture arch = Architecture.Any)
         {
             //cmake --build . --clean-first
-            StringBuilder argsBuilder = new StringBuilder();
-            argsBuilder.AppendFormat("{0} ", "../CMake");
-            argsBuilder.AppendFormat("-DPLUGIN_NAME:STRING={0} ", plugin.Name);
-            argsBuilder.AppendFormat("-DSOURCE_FOLDER:PATH={0} ", plugin.sourceFolder);
-            argsBuilder.AppendFormat("-DPLUGIN_BINARY_FOLDER:PATH={0} ", plugin.pluginBinaryFolderPath);
-            argsBuilder.AppendFormat("-DPLUGIN_BINARY_FOLDER:PATH={0} ", plugin.pluginBinaryFolderPath);
+
+            List<string> args = new List<string>();
+            args.Add(string.Format("{0} ", "../CMake"));
+            args.Add(string.Format("-DPLUGIN_NAME:STRING={0} ", plugin.Name));
+            args.Add(string.Format("-DSOURCE_FOLDER:PATH={0} ", plugin.sourceFolder));
+            args.Add(string.Format("-DPLUGIN_BINARY_FOLDER:PATH={0} ", plugin.pluginBinaryFolderPath));
+            args.Add(string.Format("{0} ", "../CMake"));
+            args.Add(string.Format("{0} ", "../CMake"));
+           
             if(buildType != BuildType.Empty)
             {
-                argsBuilder.AppendFormat("-DCMAKE_BUILD_TYPE={0} ", buildType.ToString());
+                args.Add(string.Format("-DCMAKE_BUILD_TYPE={0} ", buildType.ToString()));
             }
             switch (platform)
             {
@@ -60,17 +51,17 @@ namespace iBicha
                 case RuntimePlatform.WindowsEditor:
                     if (arch != Architecture.Any)
                     {
-                        argsBuilder.AppendFormat("-DARCH={0} ", arch.ToString());
+                        args.Add(string.Format("-DARCH={0} ", arch.ToString()));
                         //TODO: fix hardcoded vs version
                         switch (arch)
                         {
                             case Architecture.x86:
-                                argsBuilder.AppendFormat("-B{0}/{1} ", "Windows", arch.ToString());
-                                argsBuilder.AppendFormat("-G {0} ", "\"Visual Studio 15 2017 Win32\"");
+                                args.Add(string.Format("-B{0}/{1} ", "Windows", arch.ToString()));
+                                args.Add(string.Format("-G {0} ", "\"Visual Studio 15 2017 Win32\""));
                                 break;
                             case Architecture.x86_64:
-                                argsBuilder.AppendFormat("-B{0}/{1} ", "Windows", arch.ToString());
-                                argsBuilder.AppendFormat("-G {0} ", "\"Visual Studio 15 2017 Win64\"");
+                                args.Add(string.Format("-B{0}/{1} ", "Windows", arch.ToString()));
+                                args.Add(string.Format("-G {0} ", "\"Visual Studio 15 2017 Win64\""));
                                 break;
                             default:
                                 break;
@@ -78,17 +69,18 @@ namespace iBicha
                     }
                     break;
                 case RuntimePlatform.Android:
-                    argsBuilder.AppendFormat("-G {0} ", "\"Unix Makefiles\"");
-                    argsBuilder.AppendFormat("-DANDROID:BOOL={0} ", "TRUE");
+                    args.Add(string.Format("-G {0} ", "\"Unix Makefiles\""));
+                    args.Add(string.Format("-DANDROID:BOOL={0} ", "TRUE"));
+
                     string ndkLocation = GetNDKLocation();
-                    argsBuilder.AppendFormat("-DANDROID_NDK={0} ", ndkLocation);
+                    args.Add(string.Format("-DANDROID_NDK={0} ", ndkLocation));
                     string toolchain = Path.GetFullPath(Path.Combine(ndkLocation, "build/cmake/android.toolchain.cmake"));
-                    argsBuilder.AppendFormat("-DCMAKE_TOOLCHAIN_FILE=\"{0}\" ", toolchain);
+                    args.Add(string.Format("-DCMAKE_TOOLCHAIN_FILE=\"{0}\" ", toolchain));
                     switch (arch)
                     {
                         case Architecture.arm:
-                            argsBuilder.AppendFormat("-B{0}/{1} ", "Android", "armeabi-v7a");
-                            argsBuilder.AppendFormat("-DANDROID_ABI={0} ", "armeabi-v7a");
+                            args.Add(string.Format("-B{0}/{1} ", "Android", "armeabi-v7a"));
+                            args.Add(string.Format("-DANDROID_ABI={0} ", "armeabi-v7a"));
                             break;
                         default:
                             break;
@@ -98,43 +90,97 @@ namespace iBicha
                     break;
             }
 
-            Process cmake = new Process();
-			cmake.StartInfo.FileName = FindBinary("cmake");
-            cmake.StartInfo.Arguments = argsBuilder.ToString();
-            cmake.StartInfo.WorkingDirectory = plugin.buildFolder;
-            cmake.StartInfo.UseShellExecute = false;
-            //cmake.StartInfo.CreateNoWindow = true;
-            cmake.StartInfo.RedirectStandardOutput = true;
-            cmake.StartInfo.RedirectStandardError = true;
+            Process buildProcess = StartProcess(FindBinary("cmake"), args.ToArray(), plugin.buildFolder, true, (output) => {
+                UnityEngine.Debug.Log(output);
+            }, (error) => {
+                UnityEngine.Debug.LogError(error);
+            });
 
+            buildProcess.Exited += (sende, e) =>
+            {
+                if(buildProcess.ExitCode == 0)
+                {
+                    switch (platform)
+                    {
+                        case RuntimePlatform.Android:
+                            string makeLocation = Path.GetFullPath(Path.Combine(plugin.buildFolder, "Android/" + "armeabi-v7a"));
+                            //Hacky. and works only for windows. TODO.
+                            StartProcess("cmd", new string[] { string.Format("/C cd \"{0}\" && make install", makeLocation) }, makeLocation, true, (output) => {
+                                UnityEngine.Debug.Log(output);
+                            }, (error) => {
+                                UnityEngine.Debug.LogError(error);
+                            });
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            };
+        }
+
+        private static Process StartProcess(string filename, string[] arguments, string workingDirectory = null, bool getOutput = false, Action<string> onOutput =null, Action<string> onError = null)
+        {
+            Process process = new Process();
+            process.StartInfo.FileName = filename;
+            process.StartInfo.Arguments = string.Join(" ", arguments);
+            if(workingDirectory != null)
+            {
+                process.StartInfo.WorkingDirectory = workingDirectory;
+            }
+            process.StartInfo.UseShellExecute = !getOutput;
+            //process.StartInfo.CreateNoWindow = true;
+            process.StartInfo.RedirectStandardOutput = getOutput;
+            process.StartInfo.RedirectStandardError = getOutput;
+            process.EnableRaisingEvents = getOutput;
             try
             {
-                cmake.Start();
+                process.Start();
             }
             catch (System.Exception ex)
             {
-                UnityEngine.Debug.LogException(ex);
-                return false;
-                //throw ex;
+                if(getOutput && onError != null)
+                {
+                    onError(ex.ToString());
+                }
+                return process;
             }
-            string output = "";
-            while (!cmake.StandardOutput.EndOfStream)
+           
+            if (getOutput)
             {
-                NativePluginBuilder.lastLogLine = cmake.StandardOutput.ReadLine();
-                output += NativePluginBuilder.lastLogLine + System.Environment.NewLine;
+                string error = "";
+                string output = "";
+                process.OutputDataReceived += (sender, e) =>
+                {
+                    output += e.Data + Environment.NewLine;
+                };
+                process.ErrorDataReceived += (sender, e) =>
+                {
+                    error += e.Data + Environment.NewLine;
+                };
+                process.Exited += (sender, e) =>
+                {
+                    if (process.ExitCode != 0)
+                    {
+                        error += string.Format("Exit code: {0}", process.ExitCode) + Environment.NewLine;
+                    }
+                    output = output.Trim();
+                    error = error.Trim();
+                    if (!string.IsNullOrEmpty(output) && onOutput != null)
+                    {
+                        onOutput(output);
+                    }
+                    if (!string.IsNullOrEmpty(error) && onError != null)
+                    {
+                        onError(error);
+                    }
+                };
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
             }
 
-            string err = cmake.StandardError.ReadToEnd();
-            if (!string.IsNullOrEmpty(err))
-            {
-                UnityEngine.Debug.LogError(err);
-            }
-            UnityEngine.Debug.Log(output);
-
-            cmake.WaitForExit();
-
-            return cmake.ExitCode == 0;
+            return process;
         }
+
 
         private static string GetNDKLocation()
         {

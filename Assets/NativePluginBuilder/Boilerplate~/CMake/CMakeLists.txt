@@ -9,7 +9,11 @@ set(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE})
 # Find all .cpp and .h files in the source folder
 file(GLOB_RECURSE SOURCE_FILES "${SOURCE_FOLDER}/*.cpp" "${SOURCE_FOLDER}/*.h")
 
-if(IOS)
+
+if(ANDROID)
+  add_library(${PLUGIN_NAME} SHARED ${SOURCE_FILES})
+  install(TARGETS ${PLUGIN_NAME} DESTINATION ${PLUGIN_BINARY_FOLDER}/Android/${ANDROID_ABI})
+elseif(IOS)
   set(PLUGIN_PLATFORM_NAME iOS)
   message(STATUS "${PLUGIN_PLATFORM_NAME} native plugin files will be copied to ${PLUGIN_BINARY_FOLDER}/${PLUGIN_PLATFORM_NAME}")
   set(CMAKE_DOCS "/!\\ THIS FILE IS PART OF PLUGIN CODE FOR THE ${PLUGIN_PLATFORM_NAME} PLATFORM -- DO NOT EDIT")
@@ -25,8 +29,6 @@ elseif(WEBGL)
   add_library(${PLUGIN_NAME} SHARED ${SOURCE_FILES})
   set_target_properties(${PLUGIN_NAME} PROPERTIES PREFIX "" SUFFIX ".bc")
   install(TARGETS ${PLUGIN_NAME} DESTINATION ${PLUGIN_BINARY_FOLDER}/WebGL)
-elseif(ANDROID)
-  add_library(${PLUGIN_NAME} SHARED ${SOURCE_FILES})
 elseif(APPLE)
   add_library(${PLUGIN_NAME} MODULE ${SOURCE_FILES})
   set_target_properties(${PLUGIN_NAME} PROPERTIES

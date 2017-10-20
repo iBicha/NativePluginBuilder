@@ -27,7 +27,6 @@ namespace iBicha
         private static int selectedSection = -1;
         private static AnimBool[] SectionAnimators;
 
-		public static string lastLogLine;
 		public static string cmakeVersion;
 
         [MenuItem("Window/Native Plugin Builder")]
@@ -74,11 +73,6 @@ namespace iBicha
 
             OnGuiNewPlugin();
 
-            GUILayout.FlexibleSpace();
-            EditorGUILayout.Separator();
-
-            EditorGUILayout.LabelField(lastLogLine);
-
         }
 
 		void OnGuiSettings() {
@@ -90,7 +84,9 @@ namespace iBicha
 			EditorGUILayout.LabelField ("CMake version", cmakeVersion);
 			if (GUILayout.Button("Get Version", GUILayout.Width(110)))
 			{
-				cmakeVersion = CMakeHelper.GetCMakeVersion ();
+				CMakeHelper.GetCMakeVersion ((version) => {
+                    cmakeVersion = version;
+                });
 			}
 			EditorGUILayout.EndHorizontal();
 
