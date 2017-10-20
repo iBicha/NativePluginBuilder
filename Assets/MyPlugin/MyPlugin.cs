@@ -10,12 +10,11 @@ namespace iBicha.Example
     {
 #if UNITY_EDITOR
 		private const string libraryName = "MyPlugin";
-#elif UNITY_IPHONE
+#elif UNITY_IPHONE || UNITY_WEBGL
 		private const string libraryName = "__Internal";
 #else
 		private const string libraryName = "MyPlugin";
 #endif
-
         //In this example, our c++ code returns 2.
         [DllImport(libraryName, CallingConvention = CallingConvention.Cdecl)]
 		public static extern int GetTwo();

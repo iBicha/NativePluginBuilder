@@ -83,6 +83,18 @@ namespace iBicha
                             break;
                     }
                     break;
+                case BuildTarget.WebGL:
+                    args.Add(string.Format("-B{0} ", "WebGL"));
+                    args.Add(string.Format("-DWEBGL:BOOL={0} ", "TRUE"));
+                    args.Add(string.Format("-DCMAKE_TOOLCHAIN_FILE=\"{0}{1}\" ", GetEmscriptenLocation(), "/cmake/Modules/Platform/Emscripten.cmake"));
+                    //args.Add(string.Format("-DCMAKE_TOOLCHAIN_FILE=\"{0}\" ", "../CMake/emscripten.toolchain.cmake"));
+                    
+                    args.Add(string.Format("-DEMSCRIPTEN_ROOT_PATH=\"{0}\" ", GetEmscriptenLocation()));
+                    //-DCMAKE_SH="CMAKE_SH-NOTFOUND"
+                    args.Add(string.Format("-DCMAKE_SH=\"{0}\" ", "CMAKE_SH-NOTFOUND"));
+                    args.Add(string.Format("-DCMAKE_MAKE_PROGRAM=\"{0}\" ", "C:\\Users\\bhadriche\\Downloads\\mingw\\bin\\mingw32-make.exe"));
+                    args.Add(string.Format("-G {0} ", "\"MinGW Makefiles\""));
+                    break;
                 default:
                     break;
             }
@@ -196,6 +208,12 @@ namespace iBicha
         {
             //Get the default location
             return EditorPrefs.GetString("AndroidSdkRoot");
+        }
+
+        private static string GetEmscriptenLocation()
+        {
+            //Get the default location
+            return "C:\\Program Files\\Unity 2017.2.0f3\\Editor\\Data\\PlaybackEngines\\WebGLSupport\\BuildTools\\Emscripten";
         }
 
         private static string FindBinary(string command) {
