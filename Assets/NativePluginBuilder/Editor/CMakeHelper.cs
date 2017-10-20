@@ -78,16 +78,16 @@ namespace iBicha
                     }
                     break;
                 case RuntimePlatform.Android:
-
+                    //Need a android.toolchain.cmake file that doesnt suck.
                     argsBuilder.AppendFormat("-B{0}/{1} ", "Android", arch.ToString());
                     argsBuilder.AppendFormat("-DANDROID:BOOL={0} ", "TRUE");
                     argsBuilder.AppendFormat("-DANDROID_NDK={0} ", GetNDKLocation());
-                    string toolchain = Path.GetFullPath(Path.Combine(plugin.buildFolder, "../CMake/android-cmake/android.toolchain.cmake"));
-                    argsBuilder.AppendFormat("-DCMAKE_TOOLCHAIN_FILE={0} ", toolchain);
+                    //string toolchain = Path.GetFullPath(Path.Combine(plugin.buildFolder, "../CMake/android-cmake/android.toolchain.cmake"));
+                    //argsBuilder.AppendFormat("-DCMAKE_TOOLCHAIN_FILE={0} ", toolchain);
 
-                    /*string ndk = Path.GetFullPath(Path.Combine(GetNDKLocation(), "build/cmake/android.toolchain.cmake"));
-                    UnityEngine.Debug.Log(ndk);
-                    argsBuilder.AppendFormat("-DCMAKE_TOOLCHAIN_FILE=\"{0}\" ", Path.Combine(ndk, "build/cmake/android.toolchain.cmake"));*/
+                    string toolchain = Path.GetFullPath(Path.Combine(GetNDKLocation(), "build/cmake/android.toolchain.cmake"));
+                    UnityEngine.Debug.Log(toolchain);
+                    argsBuilder.AppendFormat("-DCMAKE_TOOLCHAIN_FILE=\"{0}\" ", toolchain);
 
                     argsBuilder.AppendFormat("-DANDROID_ABI={0} ", "armeabi-v7a");
                     break;
@@ -135,10 +135,24 @@ namespace iBicha
 
         private static string GetNDKLocation()
         {
+            //Get the default location
+            string sdk = GetSDKLocation();
+            string ndk = Path.GetFullPath(Path.Combine(sdk, "ndk-bundle"));
+            if (Directory.Exists(ndk))
+            {
+                return ndk;
+            }
+            //Get ndk from Unity settings
             return EditorPrefs.GetString("AndroidNdkRoot");
         }
 
-		private static string FindBinary(string command) {
+        private static string GetSDKLocation()
+        {
+            //Get the default location
+            return EditorPrefs.GetString("AndroidSdkRoot");
+        }
+
+        private static string FindBinary(string command) {
 			if (!IsOSX) {
 				return command;
 			}

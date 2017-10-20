@@ -1,3 +1,5 @@
+#### I thought this creating this repo was a good idea at first. I think I was wrong.
+
 # UnityNativePluginBuilder (WIP)
 Unity Native Plugin Builder is an Editor extension to automate the creation and the cross platform compilation of native Unity plugins.
 
