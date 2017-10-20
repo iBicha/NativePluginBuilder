@@ -29,26 +29,23 @@ namespace iBicha
         }
 
 
-        public static void Build(NativePlugin plugin, RuntimePlatform platform, BuildType buildType = BuildType.Debug, Architecture arch = Architecture.Any)
+        public static void Build(NativePlugin plugin, BuildTarget buildTarget, BuildType buildType = BuildType.Debug, Architecture arch = Architecture.Any)
         {
             //cmake --build . --clean-first
-
             List<string> args = new List<string>();
             args.Add(string.Format("{0} ", "../CMake"));
             args.Add(string.Format("-DPLUGIN_NAME:STRING={0} ", plugin.Name));
             args.Add(string.Format("-DSOURCE_FOLDER:PATH={0} ", plugin.sourceFolder));
             args.Add(string.Format("-DPLUGIN_BINARY_FOLDER:PATH={0} ", plugin.pluginBinaryFolderPath));
-            args.Add(string.Format("{0} ", "../CMake"));
-            args.Add(string.Format("{0} ", "../CMake"));
            
             if(buildType != BuildType.Empty)
             {
                 args.Add(string.Format("-DCMAKE_BUILD_TYPE={0} ", buildType.ToString()));
             }
-            switch (platform)
+            switch (buildTarget)
             {
-                case RuntimePlatform.WindowsPlayer:
-                case RuntimePlatform.WindowsEditor:
+                case BuildTarget.StandaloneWindows:
+                case BuildTarget.StandaloneWindows64:
                     if (arch != Architecture.Any)
                     {
                         args.Add(string.Format("-DARCH={0} ", arch.ToString()));
@@ -68,7 +65,7 @@ namespace iBicha
                         }
                     }
                     break;
-                case RuntimePlatform.Android:
+                case BuildTarget.Android:
                     args.Add(string.Format("-G {0} ", "\"Unix Makefiles\""));
                     args.Add(string.Format("-DANDROID:BOOL={0} ", "TRUE"));
 
@@ -100,9 +97,9 @@ namespace iBicha
             {
                 if(buildProcess.ExitCode == 0)
                 {
-                    switch (platform)
+                    switch (buildTarget)
                     {
-                        case RuntimePlatform.Android:
+                        case BuildTarget.Android:
                             string makeLocation = Path.GetFullPath(Path.Combine(plugin.buildFolder, "Android/" + "armeabi-v7a"));
                             //Hacky. and works only for windows. TODO.
                             StartProcess("cmd", new string[] { string.Format("/C cd \"{0}\" && make install", makeLocation) }, makeLocation, true, (output) => {
