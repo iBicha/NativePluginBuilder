@@ -66,7 +66,7 @@ namespace iBicha
                         {
                             case Architecture.x86:
                                 argsBuilder.AppendFormat("-B{0}/{1} ", "Windows", arch.ToString());
-                                argsBuilder.AppendFormat("-G {0}/{1} ", "\"Visual Studio 15 2017 Win32\"");
+                                argsBuilder.AppendFormat("-G {0} ", "\"Visual Studio 15 2017 Win32\"");
                                 break;
                             case Architecture.x86_64:
                                 argsBuilder.AppendFormat("-B{0}/{1} ", "Windows", arch.ToString());
@@ -78,18 +78,21 @@ namespace iBicha
                     }
                     break;
                 case RuntimePlatform.Android:
-                    //Need a android.toolchain.cmake file that doesnt suck.
-                    argsBuilder.AppendFormat("-B{0}/{1} ", "Android", arch.ToString());
+                    argsBuilder.AppendFormat("-G {0} ", "\"Unix Makefiles\"");
                     argsBuilder.AppendFormat("-DANDROID:BOOL={0} ", "TRUE");
-                    argsBuilder.AppendFormat("-DANDROID_NDK={0} ", GetNDKLocation());
-                    //string toolchain = Path.GetFullPath(Path.Combine(plugin.buildFolder, "../CMake/android-cmake/android.toolchain.cmake"));
-                    //argsBuilder.AppendFormat("-DCMAKE_TOOLCHAIN_FILE={0} ", toolchain);
-
-                    string toolchain = Path.GetFullPath(Path.Combine(GetNDKLocation(), "build/cmake/android.toolchain.cmake"));
-                    UnityEngine.Debug.Log(toolchain);
+                    string ndkLocation = GetNDKLocation();
+                    argsBuilder.AppendFormat("-DANDROID_NDK={0} ", ndkLocation);
+                    string toolchain = Path.GetFullPath(Path.Combine(ndkLocation, "build/cmake/android.toolchain.cmake"));
                     argsBuilder.AppendFormat("-DCMAKE_TOOLCHAIN_FILE=\"{0}\" ", toolchain);
-
-                    argsBuilder.AppendFormat("-DANDROID_ABI={0} ", "armeabi-v7a");
+                    switch (arch)
+                    {
+                        case Architecture.arm:
+                            argsBuilder.AppendFormat("-B{0}/{1} ", "Android", "armeabi-v7a");
+                            argsBuilder.AppendFormat("-DANDROID_ABI={0} ", "armeabi-v7a");
+                            break;
+                        default:
+                            break;
+                    }
                     break;
                 default:
                     break;
