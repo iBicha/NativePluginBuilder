@@ -105,16 +105,14 @@ namespace iBicha
 					switch (buildTarget) {
 					case BuildTarget.Android:
 						string makeLocation = Path.GetFullPath (Path.Combine (plugin.buildFolder, "Android/" + "armeabi-v7a"));
-                        //Hacky. TODO.
-						if (IsOSX) {
-							StartProcess ("make", new string[] { string.Format ("install", makeLocation) }, makeLocation, true, (output) => {
+						if (EditorPlatform == RuntimePlatform.WindowsEditor) {
+							StartProcess ("cmd", new string[] { string.Format ("/C cd \"{0}\" && make install", makeLocation) }, makeLocation, true, (output) => {
 								UnityEngine.Debug.Log (output);
 							}, (error) => {
 								UnityEngine.Debug.LogError (error);
 							});
-
 						} else {
-							StartProcess ("cmd", new string[] { string.Format ("/C cd \"{0}\" && make install", makeLocation) }, makeLocation, true, (output) => {
+							StartProcess ("make", new string[] { string.Format ("install", makeLocation) }, makeLocation, true, (output) => {
 								UnityEngine.Debug.Log (output);
 							}, (error) => {
 								UnityEngine.Debug.LogError (error);
@@ -206,7 +204,7 @@ namespace iBicha
 
 		private static string FindBinary (string command)
 		{
-			if (!IsOSX) {
+			if (EditorPlatform == RuntimePlatform.WindowsEditor) {
 				return command;
 			}
 			//temp hack
@@ -214,12 +212,14 @@ namespace iBicha
 		}
 
 
-		public static bool IsOSX {
+		public static RuntimePlatform EditorPlatform {
 			get {
 				#if UNITY_EDITOR_OSX
-				return true;
+				return RuntimePlatform.OSXEditor;
+				#elif UNITY_EDITOR_WIN
+				return RuntimePlatform.WindowsEditor;
 				#else
-				return false;
+				return RuntimePlatform.LinuxEditor;
 				#endif
 			}
 		}
