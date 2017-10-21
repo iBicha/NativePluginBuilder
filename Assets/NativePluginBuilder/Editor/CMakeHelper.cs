@@ -85,10 +85,11 @@ namespace iBicha
                     //args.Add(string.Format("-DCMAKE_TOOLCHAIN_FILE=\"{0}\" ", "../CMake/emscripten.toolchain.cmake"));
                     
 				args.Add (string.Format ("-DEMSCRIPTEN_ROOT_PATH=\"{0}\" ", GetEmscriptenLocation ()));
+				args.Add (string.Format ("-DEMMAKEN_COMPILER=\"{0}\" ", Path.GetFullPath(GetEmscriptenLocation () +"/../Emscripten_FastComp_Mac")));
                     //-DCMAKE_SH="CMAKE_SH-NOTFOUND"
-				args.Add (string.Format ("-DCMAKE_SH=\"{0}\" ", "CMAKE_SH-NOTFOUND"));
-				args.Add (string.Format ("-DCMAKE_MAKE_PROGRAM=\"{0}\" ", "C:\\Users\\bhadriche\\Downloads\\mingw\\bin\\mingw32-make.exe"));
-				args.Add (string.Format ("-G {0} ", "\"MinGW Makefiles\""));
+				//args.Add (string.Format ("-DCMAKE_SH=\"{0}\" ", "CMAKE_SH-NOTFOUND"));
+				args.Add (string.Format ("-DCMAKE_MAKE_PROGRAM=\"{0}\" ", GetEmscriptenLocation () + "/emcc"));
+				args.Add (string.Format ("-G {0} ", "\"Unix Makefiles\""));
 				break;
 			default:
 				break;
@@ -139,6 +140,8 @@ namespace iBicha
 			process.StartInfo.RedirectStandardOutput = getOutput;
 			process.StartInfo.RedirectStandardError = getOutput;
 			process.EnableRaisingEvents = getOutput;
+			//TODO: set correct vars for emscripten to work
+			process.StartInfo.EnvironmentVariables.Add ("EMMAKEN_COMPILER", string.Format ("\"{0}\"", Path.GetFullPath(GetEmscriptenLocation () +"/../Emscripten_FastComp_Mac")));
 			try {
 				process.Start ();
 			} catch (System.Exception ex) {
@@ -198,9 +201,19 @@ namespace iBicha
 
 		private static string GetEmscriptenLocation ()
 		{
-			//Get the default location
-			return "C:\\Program Files\\Unity 2017.2.0f3\\Editor\\Data\\PlaybackEngines\\WebGLSupport\\BuildTools\\Emscripten";
+			switch (EditorPlatform) {
+			case RuntimePlatform.WindowsEditor:
+				return "C:\\Program Files\\Unity\\Editor\\Data\\PlaybackEngines\\WebGLSupport\\BuildTools\\Emscripten";
+			case RuntimePlatform.OSXEditor:
+				return "/Applications/Unity/PlaybackEngines/WebGLSupport/BuildTools/Emscripten";
+			case RuntimePlatform.LinuxEditor:
+				throw new System.NotImplementedException ();
+					
+			default:
+				return "";
+			}
 		}
+
 
 		private static string FindBinary (string command)
 		{
