@@ -141,7 +141,10 @@ namespace iBicha
 			process.StartInfo.RedirectStandardError = getOutput;
 			process.EnableRaisingEvents = getOutput;
 			//TODO: set correct vars for emscripten to work
-			process.StartInfo.EnvironmentVariables.Add ("EMMAKEN_COMPILER", string.Format ("\"{0}\"", Path.GetFullPath(GetEmscriptenLocation () +"/../Emscripten_FastComp_Mac")));
+			//NODE_JS,EMMAKEN_COMPILER,LLVM_ROOT
+			//using process.StartInfo.EnvironmentVariables.Add
+			// OR
+			//System.Environment.SetEnvironmentVariable
 			try {
 				process.Start ();
 			} catch (System.Exception ex) {
