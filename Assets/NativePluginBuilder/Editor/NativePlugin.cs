@@ -41,7 +41,7 @@ namespace iBicha
 
         public void Build()
         {
-			CMakeHelper.Build(this, BuildTarget.iOS,  BuildType.Debug, Architecture.arm);
+			CMakeHelper.Build(this, BuildTarget.StandaloneWindows,  BuildType.Release, Architecture.x86_64);
         }
     }
 }

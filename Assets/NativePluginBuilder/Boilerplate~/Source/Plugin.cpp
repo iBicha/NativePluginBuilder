@@ -1,6 +1,6 @@
 #include "../UnityPluginAPI/IUnityInterface.h"
 
-extern "C" const char* UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API GetPluginVersion () {
+extern "C" const char UNITY_INTERFACE_EXPORT * UNITY_INTERFACE_API GetPluginVersion () {
     //This is defined in CMAKE and passed to the source.
     return PLUGIN_VERSION;
 }

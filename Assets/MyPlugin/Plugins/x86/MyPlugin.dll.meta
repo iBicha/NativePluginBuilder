@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: b00cd304f1c5c5042ac84c54ed5f84a9
-timeCreated: 1508424858
+guid: f27bb534422697640978ded13eccc766
+timeCreated: 1508797158
 licenseType: Free
 PluginImporter:
   externalObjects: {}
@@ -26,7 +26,7 @@ PluginImporter:
         Exclude WebGL: 1
         Exclude Win: 0
         Exclude Win64: 1
-        Exclude WindowsStoreApps: 0
+        Exclude WindowsStoreApps: 1
   - first:
       Android: Android
     second:
@@ -109,7 +109,7 @@ PluginImporter:
   - first:
       Windows Store Apps: WindowsStoreApps
     second:
-      enabled: 1
+      enabled: 0
       settings:
         CPU: AnyCPU
         DontProcess: False

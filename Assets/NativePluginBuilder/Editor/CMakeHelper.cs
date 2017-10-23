@@ -46,13 +46,15 @@ namespace iBicha
 			switch (buildTarget) {
 			case BuildTarget.StandaloneWindows:
 			case BuildTarget.StandaloneWindows64:
-				if (arch != Architecture.Any) {
-					args.Add (string.Format ("-DARCH={0} ", arch.ToString ()));
-					//TODO: fix hardcoded vs version
-					switch (arch) {
+                    //MSBuild MyPlugin.sln /Build Debug
+                    if (arch != Architecture.Any) {
+                    args.Add(string.Format("-DCMAKE_PDB_OUTPUT_DIRECTORY=./{0}/{1} ", "Windows",  arch.ToString()));
+                    args.Add(string.Format("-DARCH={0} ", arch.ToString()));
+                        //TODO: fix hardcoded vs version
+                        switch (arch) {
 					case Architecture.x86:
 						args.Add (string.Format ("-B{0}/{1} ", "Windows", arch.ToString ()));
-						args.Add (string.Format ("-G {0} ", "\"Visual Studio 15 2017 Win32\""));
+						args.Add (string.Format ("-G {0} ", "\"Visual Studio 15 2017\""));
 						break;
 					case Architecture.x86_64:
 						args.Add (string.Format ("-B{0}/{1} ", "Windows", arch.ToString ()));
