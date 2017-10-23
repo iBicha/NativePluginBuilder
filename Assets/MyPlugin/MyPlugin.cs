@@ -11,6 +11,7 @@ namespace iBicha.Example
 {
     public class MyPlugin
     {
+		//TODO: embed version and build number in c# to compare with library, detecting old builds.
 		private static string version;
 		public static string Version {
 			get {
@@ -44,7 +45,7 @@ namespace iBicha.Example
 
 		//Return plugin build number.
 		[DllImport(libraryName, CallingConvention = CallingConvention.Cdecl)]
-		public static extern int GetPluginBuildNumber();
+		private static extern int GetPluginBuildNumber();
 
 		//In this example, our c++ code returns 2.
 		[DllImport(libraryName, CallingConvention = CallingConvention.Cdecl)]
