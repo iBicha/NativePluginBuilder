@@ -24,6 +24,12 @@ namespace iBicha.Example
 			}
 		}
 
+		public static int BuildNumber {
+			get {
+				return GetPluginBuildNumber();
+			}
+		}
+
 #if UNITY_EDITOR
 		private const string libraryName = "MyPlugin";
 #elif UNITY_IOS || UNITY_IPHONE || UNITY_WEBGL
@@ -35,6 +41,10 @@ namespace iBicha.Example
 		//Return plugin version.
 		[DllImport(libraryName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
 		private static extern IntPtr GetPluginVersion();
+
+		//Return plugin build number.
+		[DllImport(libraryName, CallingConvention = CallingConvention.Cdecl)]
+		public static extern int GetPluginBuildNumber();
 
 		//In this example, our c++ code returns 2.
 		[DllImport(libraryName, CallingConvention = CallingConvention.Cdecl)]

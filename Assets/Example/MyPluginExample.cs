@@ -16,7 +16,7 @@ namespace iBicha.Example {
 		void Start () {
 			s_console = console;
 
-			Log(string.Format("Plugin Version: {0}", MyPlugin.Version));
+			Log(string.Format("Plugin Version: {0} build {1}", MyPlugin.Version, MyPlugin.BuildNumber));
 
 			Log(string.Format("GetTwo() returned: {0}", MyPlugin.GetTwo()));
 

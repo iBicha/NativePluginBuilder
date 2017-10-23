@@ -14,12 +14,14 @@ namespace iBicha
         {
             NativePlugin plugin = CreateInstance<NativePlugin>();
             plugin.Name = "MyPlugin";
-            plugin.Version = "1.0.0.0";
+			plugin.Version = "1.0.0.0";
+			plugin.BuildNumber = 1;
             return plugin;
         }
 
         public string Name;
-        public string Version;
+		public string Version;
+		public int BuildNumber;
 
         public Object pluginBinaryFolder;
         public string pluginBinaryFolderPath

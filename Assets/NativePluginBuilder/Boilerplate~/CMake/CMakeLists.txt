@@ -10,6 +10,9 @@ set(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE})
 #Plugin version
 add_definitions(-DPLUGIN_VERSION="${PLUGIN_VERSION}")
 
+#Plugin build number
+add_definitions(-DPLUGIN_BUILD_NUMBER=${PLUGIN_BUILD_NUMBER})
+
 # Find all .cpp and .h files in the source folder
 file(GLOB_RECURSE SOURCE_FILES "${SOURCE_FOLDER}/*.cpp" "${SOURCE_FOLDER}/*.h")
 

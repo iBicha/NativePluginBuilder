@@ -167,7 +167,8 @@ namespace iBicha
         void OnGuiNativePlugin(NativePlugin plugin)
         {
             plugin.Name = EditorGUILayout.TextField("Plugin name", plugin.Name);
-            plugin.Version = EditorGUILayout.TextField("Version", plugin.Version);
+			plugin.Version = EditorGUILayout.TextField("Version", plugin.Version);
+			plugin.BuildNumber = EditorGUILayout.IntField("Build Number", plugin.BuildNumber);
 
             EditorGUILayout.BeginHorizontal();
             plugin.sourceFolder = EditorGUILayout.TextField("Source Folder", plugin.sourceFolder);
