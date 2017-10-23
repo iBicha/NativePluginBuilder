@@ -19,7 +19,7 @@ elseif(IOS)
   # This causes the installers to properly locate the output libraries
   set (CMAKE_XCODE_EFFECTIVE_PLATFORMS "-iphonesimulator")
 
-  add_library(${PLUGIN_NAME} SHARED ${SOURCE_FILES})
+  add_library(${PLUGIN_NAME} STATIC ${SOURCE_FILES})
   install(TARGETS ${PLUGIN_NAME} DESTINATION ${PLUGIN_BINARY_FOLDER}/iOS)
 
 #  set(PLUGIN_PLATFORM_NAME iOS)
