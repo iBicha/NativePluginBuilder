@@ -10,7 +10,7 @@ namespace iBicha.Example
     {
 #if UNITY_EDITOR
 		private const string libraryName = "MyPlugin";
-#elif UNITY_IPHONE || UNITY_WEBGL
+		#elif UNITY_IOS || UNITY_IPHONE || UNITY_WEBGL
 		private const string libraryName = "__Internal";
 #else
 		private const string libraryName = "MyPlugin";

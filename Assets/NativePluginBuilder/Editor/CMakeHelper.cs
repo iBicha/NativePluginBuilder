@@ -78,6 +78,10 @@ namespace iBicha
 					break;
 				}
 				break;
+			case BuildTarget.iOS:
+				args.Add (string.Format ("-DIOS:BOOL={0} ", "TRUE"));
+				args.Add (string.Format ("-B{0} ", "iOS"));
+				break;
 			case BuildTarget.WebGL:
 				args.Add (string.Format ("-B{0} ", "WebGL"));
 				args.Add (string.Format ("-DWEBGL:BOOL={0} ", "TRUE"));
@@ -119,6 +123,16 @@ namespace iBicha
 								UnityEngine.Debug.LogError (error);
 							});
 						}
+						break;
+					case BuildTarget.iOS:
+					    makeLocation = Path.GetFullPath (Path.Combine (plugin.buildFolder, "iOS/"));
+						if (EditorPlatform == RuntimePlatform.OSXEditor) {
+							StartProcess ("make", new string[] { string.Format ("install", makeLocation) }, makeLocation, true, (output) => {
+								UnityEngine.Debug.Log (output);
+							}, (error) => {
+								UnityEngine.Debug.LogError (error);
+							});
+						} 
 						break;
 					default:
 						break;

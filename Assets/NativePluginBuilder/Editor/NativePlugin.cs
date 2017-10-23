@@ -39,7 +39,7 @@ namespace iBicha
 
         public void Build()
         {
-			CMakeHelper.Build(this, BuildTarget.WebGL,  BuildType.Debug, Architecture.arm);
+			CMakeHelper.Build(this, BuildTarget.iOS,  BuildType.Debug, Architecture.arm);
         }
     }
 }
