@@ -3,21 +3,41 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Runtime.InteropServices;
 using AOT;
+using System;
+using System.Text;
 
 
 namespace iBicha.Example
 {
     public class MyPlugin
     {
+		private static string version;
+		public static string Version {
+			get {
+				if (version == null) {
+					IntPtr ptr = GetPluginVersion ();
+					if (ptr != IntPtr.Zero) {
+						version = Marshal.PtrToStringAnsi (ptr);
+					}
+				}
+				return version;
+			}
+		}
+
 #if UNITY_EDITOR
 		private const string libraryName = "MyPlugin";
-		#elif UNITY_IOS || UNITY_IPHONE || UNITY_WEBGL
+#elif UNITY_IOS || UNITY_IPHONE || UNITY_WEBGL
 		private const string libraryName = "__Internal";
 #else
 		private const string libraryName = "MyPlugin";
 #endif
-        //In this example, our c++ code returns 2.
-        [DllImport(libraryName, CallingConvention = CallingConvention.Cdecl)]
+
+		//Return plugin version.
+		[DllImport(libraryName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+		private static extern IntPtr GetPluginVersion();
+
+		//In this example, our c++ code returns 2.
+		[DllImport(libraryName, CallingConvention = CallingConvention.Cdecl)]
 		public static extern int GetTwo();
 
         //We pass a C# delegate which will be called from c++ with a result.

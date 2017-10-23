@@ -35,6 +35,7 @@ namespace iBicha
 			List<string> args = new List<string> ();
 			args.Add (string.Format ("{0} ", "../CMake"));
 			args.Add (string.Format ("-DPLUGIN_NAME:STRING={0} ", plugin.Name));
+			args.Add (string.Format ("-DPLUGIN_VERSION:STRING={0} ", plugin.Version));
 			args.Add (string.Format ("-DSOURCE_FOLDER:PATH={0} ", plugin.sourceFolder));
 			args.Add (string.Format ("-DPLUGIN_BINARY_FOLDER:PATH={0} ", plugin.pluginBinaryFolderPath));
            

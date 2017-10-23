@@ -1,6 +1,18 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
+
+
 #include "../UnityPluginAPI/IUnityInterface.h"
 
 typedef void (*CALLBACK)(int result);
+
+extern "C" const char* UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API GetPluginVersion () {
+    //This is defined in CMAKE and passed to the source.
+    return PLUGIN_VERSION;
+}
 
 extern "C" int UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API GetTwo () { 
     return 2; 

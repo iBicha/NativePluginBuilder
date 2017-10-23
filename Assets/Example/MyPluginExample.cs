@@ -16,13 +16,15 @@ namespace iBicha.Example {
 		void Start () {
 			s_console = console;
 
-            Log(string.Format("GetTwo() returned:{0}", MyPlugin.GetTwo()));
+			Log(string.Format("Plugin Version: {0}", MyPlugin.Version));
 
-			Log(string.Format("PassCallback() returned:{0}", MyPlugin.PassCallback(MyPlugin.Callback)));
+			Log(string.Format("GetTwo() returned: {0}", MyPlugin.GetTwo()));
+
+			Log(string.Format("PassCallback() returned: {0}", MyPlugin.PassCallback(MyPlugin.Callback)));
 
             int[] array = { 0, 0, 0, 0, 0 };
             MyPlugin.FillWithOnes(array, array.Length);
-            Log(string.Format("The content of array is:{0}", "[" + string.Join(",", array.Select(i => i.ToString()).ToArray()) + "]"));
+            Log(string.Format("The content of array is: {0}", "[" + string.Join(",", array.Select(i => i.ToString()).ToArray()) + "]"));
         }
 			
 		public static void Log(string obj)
