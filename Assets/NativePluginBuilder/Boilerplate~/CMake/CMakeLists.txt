@@ -21,11 +21,13 @@ if(ANDROID)
   add_library(${PLUGIN_NAME} SHARED ${SOURCE_FILES})
   install(TARGETS ${PLUGIN_NAME} DESTINATION ${PLUGIN_BINARY_FOLDER}/Android/${ANDROID_ABI})
 elseif(IOS)
-  set (IOS_PLATFORM_LOCATION "iPhoneSimulator.platform")
-
-  # This causes the installers to properly locate the output libraries
-  set (CMAKE_XCODE_EFFECTIVE_PLATFORMS "-iphonesimulator")
-
+  if(SIMULATOR)
+#    set (IOS_PLATFORM_LOCATION "iPhoneSimulator.platform")
+    set (CMAKE_XCODE_EFFECTIVE_PLATFORMS "-iphonesimulator")
+  else()
+#    set (IOS_PLATFORM_LOCATION "iPhoneOS.platform")
+    set (CMAKE_XCODE_EFFECTIVE_PLATFORMS "-iphoneos")
+  endif()
   add_library(${PLUGIN_NAME} STATIC ${SOURCE_FILES})
   install(TARGETS ${PLUGIN_NAME} DESTINATION ${PLUGIN_BINARY_FOLDER}/iOS)
 

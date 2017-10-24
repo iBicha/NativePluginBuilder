@@ -85,6 +85,10 @@ namespace iBicha
 			case BuildTarget.iOS:
 				args.Add (string.Format ("-DIOS:BOOL={0} ", "TRUE"));
 				args.Add (string.Format ("-B{0} ", "iOS"));
+				bool isSimulator = true;
+				if (isSimulator) {
+					args.Add (string.Format ("-DSIMULATOR:BOOL={0} ", "TRUE"));
+				}
 				break;
 			case BuildTarget.WebGL:
 				args.Add (string.Format ("-B{0} ", "WebGL"));
