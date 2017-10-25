@@ -55,7 +55,6 @@ namespace iBicha
 			case BuildTarget.StandaloneWindows64:
                     //MSBuild MyPlugin.sln /Build Debug
 				if (arch != Architecture.Any) {
-					args.Add (string.Format ("-DCMAKE_PDB_OUTPUT_DIRECTORY=./{0}/{1} ", "Windows", arch.ToString ()));
 					args.Add (string.Format ("-DARCH={0} ", arch.ToString ()));
 					//TODO: fix hardcoded vs version
 					switch (arch) {
