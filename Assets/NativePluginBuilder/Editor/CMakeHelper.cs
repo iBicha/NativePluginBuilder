@@ -87,6 +87,12 @@ namespace iBicha
                         }
                     }
                     break;
+				case BuildTarget.StandaloneOSXUniversal:
+				makeLocation = Path.GetFullPath(Path.Combine(plugin.buildFolder, "OSX"));
+				args.Add(string.Format("-DOSX:BOOL={0} ", "TRUE"));
+				args.Add(string.Format("-B{0} ", "OSX"));
+
+				break;
                 case BuildTarget.Android:
                     makeLocation = Path.GetFullPath(Path.Combine(plugin.buildFolder, "Android/" + "armeabi-v7a"));
 
@@ -201,7 +207,7 @@ namespace iBicha
                     }
                     else
                     {
-                        StartProcess(FindBinary("cmake"), new string[] { "--build .", "--target INSTALL" }, makeLocation, true, (output) =>
+                        StartProcess(FindBinary("cmake"), new string[] { "--build .", "--target install" }, makeLocation, true, (output) =>
                         {
                             UnityEngine.Debug.Log(output);
                         }, (error) =>
