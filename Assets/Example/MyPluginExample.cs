@@ -25,7 +25,9 @@ namespace iBicha.Example {
             Log(string.Format("The content of array is: {0}", "[" + string.Join(",", array.Select(i => i.ToString()).ToArray()) + "]"));
        
 			if (Application.platform == RuntimePlatform.WebGLPlayer) {
-				Log(string.Format("Confirm() returned: {0}", MyPlugin.Confirm("Are you sure?")));
+                Log(string.Format("Prompt() returned: {0}", MyPlugin.Prompt("Please enter your name", "Harry Potter")));
+
+                Log(string.Format("Confirm() returned: {0}", MyPlugin.Confirm("Are you sure?")));
 			}
 		}
 			

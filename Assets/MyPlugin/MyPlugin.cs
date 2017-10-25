@@ -71,20 +71,29 @@ namespace iBicha.Example
 #if UNITY_WEBGL
 		const string WebGLPluginPrefix = "MyPlugin_";
 
-		[DllImport ("__Internal", EntryPoint = WebGLPluginPrefix + "confirm")]
-		public static extern bool Confirm (string message);
+        [DllImport("__Internal", EntryPoint = WebGLPluginPrefix + "confirm")]
+        public static extern bool Confirm(string message);
 
-		[DllImport ("__Internal", EntryPoint = WebGLPluginPrefix + "getConfirmCallCount")]
+        [DllImport("__Internal", EntryPoint = WebGLPluginPrefix + "prompt")]
+        public static extern string Prompt(string message, string defaultInput = null);
+
+        [DllImport ("__Internal", EntryPoint = WebGLPluginPrefix + "getConfirmCallCount")]
 		public static extern int GetConfirmCallCount ();
 #elif
-		public static bool Confirm (string message) {
-			Debug.LogException (new System.PlatformNotSupportedException ("Only available on WebGL"));
-		}
+        public static bool Confirm(string message)
+        {
+            Debug.LogException(new System.PlatformNotSupportedException("Only available on WebGL"));
+        }
 
-		public static extern int GetConfirmCallCount (){
-			Debug.LogException (new System.PlatformNotSupportedException ("Only available on WebGL"));
-		}
+        public static string Prompt(string message, string defaultInput = null)
+        {
+            Debug.LogException(new System.PlatformNotSupportedException("Only available on WebGL"));
+        }
+
+        public static extern int GetConfirmCallCount()
+        {
+            Debug.LogException(new System.PlatformNotSupportedException("Only available on WebGL"));
+        }
 #endif
-
     }
 }

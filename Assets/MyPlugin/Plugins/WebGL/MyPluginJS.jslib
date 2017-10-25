@@ -3,26 +3,34 @@ const PluginPrefix = "MyPlugin_";
 
 //Plugin implementation
 var MyPlugin = {
-	confirm : function (messagePtr) {
-		Helper.Static.confirmCallCount++;
-		var message = Helper.ToJsString(messagePtr);
-		return confirm(message);
-	}, 
-	getConfirmCallCount () {
-		return Helper.Static.confirmCallCount;
-	}
+    confirm: function(messagePtr) {
+        Static.confirmCallCount++;
+        var message = Helper.ToJsString(messagePtr);
+        return confirm(message);
+    },
+    prompt: function(messagePtr, defaultPtr) {
+        var message = Helper.ToJsString(messagePtr);
+        var defaultInput = Helper.ToJsString(defaultPtr);
+        var result = prompt(message, defaultInput);
+        if (result != null) {
+            result = Helper.ToCsString(result);
+        }
+        return result;
+    },
+    getConfirmCallCount: function() {
+        return Static.confirmCallCount;
+    }
 };
+
+//A static variable to store data between API calls
+var Static = {
+    confirmCallCount: 0
+}
 
 //Helper functions
 var Helper = {
-	//A static variable to store data between API calls
-	Static: {
-		confirmCallCount: 0
-	},
-	
-	//Convert a Javascript string to a C# string
-    ToCsString: function (str) 
-    {
+    //Convert a Javascript string to a C# string
+    ToCsString: function(str) {
         if (typeof str === 'object') {
             str = JSON.stringify(str);
         }
@@ -33,44 +41,49 @@ var Helper = {
     },
 
     //Convert a C# string pointer to a Javascript string
-	ToJsString: function (ptr) {
-		return Pointer_stringify(ptr);
-	},
+    ToJsString: function(ptr) {
+        return Pointer_stringify(ptr);
+    },
 
-	//Convert a C# json string pointer to a Javascript object
-	ToJsObject: function (ptr) {
-		var str = Pointer_stringify(ptr);
-		try {
-			return JSON.parse(str);
-		} catch (e) {
-			return null;
-		}
-	},
+    //Convert a C# json string pointer to a Javascript object
+    ToJsObject: function(ptr) {
+        var str = Pointer_stringify(ptr);
+        try {
+            return JSON.parse(str);
+        } catch (e) {
+            return null;
+        }
+    },
 
-	//free allocated memory of a C# pointer
-	FreeMemory: function (ptr) {
-		_free(ptr);
-	}
+    //free allocated memory of a C# pointer
+    FreeMemory: function(ptr) {
+        _free(ptr);
+    }
 };
 
 //Plugin merge function
 function MergePlugin(plugin, prefix) {
-	//prefix
-	if(prefix) {
-		for (var key in plugin) {
-			if (plugin.hasOwnProperty(key)) {
-				plugin[prefix + key] = plugin[key];
-				delete plugin[key];
-			}
-		}
-	}
-	//helper
-	if(Helper) {
-		plugin.$Helper = Helper;
-		autoAddDeps(plugin, '$Helper');
-	}
-	//merge
-	mergeInto(LibraryManager.library, plugin);
+    //prefix
+    if (prefix) {
+        for (var key in plugin) {
+            if (plugin.hasOwnProperty(key)) {
+                plugin[prefix + key] = plugin[key];
+                delete plugin[key];
+            }
+        }
+    }
+    //helper
+    if (Helper) {
+        plugin.$Helper = Helper;
+        autoAddDeps(plugin, '$Helper');
+    }
+    //static vars
+    if (Static) {
+        plugin.$Static = Static;
+        autoAddDeps(plugin, '$Static');
+    }
+    //merge
+    mergeInto(LibraryManager.library, plugin);
 }
 
 MergePlugin(MyPlugin, PluginPrefix);

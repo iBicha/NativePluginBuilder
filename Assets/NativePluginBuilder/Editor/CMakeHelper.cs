@@ -285,8 +285,14 @@ namespace iBicha
 
 		private static string GetEditorLocation ()
 		{
-			return Path.GetDirectoryName (EditorApplication.applicationPath);
-		}
+            switch (EditorPlatform)
+            {
+                case RuntimePlatform.WindowsEditor:
+                    return Path.GetFullPath(Path.Combine(Path.GetDirectoryName(EditorApplication.applicationPath) , "Data"));
+                default:
+                    return Path.GetDirectoryName(EditorApplication.applicationPath);
+            }
+        }
 
 		private static string FindBinary (string command)
 		{
