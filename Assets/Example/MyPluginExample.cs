@@ -6,8 +6,6 @@ using UnityEngine;
 namespace iBicha.Example {
 	public class MyPluginExample : MonoBehaviour {
 
-
-
         public UnityEngine.UI.Text console;
 
 		private static UnityEngine.UI.Text s_console;
@@ -25,7 +23,11 @@ namespace iBicha.Example {
             int[] array = { 0, 0, 0, 0, 0 };
             MyPlugin.FillWithOnes(array, array.Length);
             Log(string.Format("The content of array is: {0}", "[" + string.Join(",", array.Select(i => i.ToString()).ToArray()) + "]"));
-        }
+       
+			if (Application.platform == RuntimePlatform.WebGLPlayer) {
+				Log(string.Format("Confirm() returned: {0}", MyPlugin.Confirm("Are you sure?")));
+			}
+		}
 			
 		public static void Log(string obj)
         {

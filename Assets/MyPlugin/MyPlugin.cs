@@ -67,5 +67,24 @@ namespace iBicha.Example
 			MyPluginExample.Log(string.Format("The callback result is:{0}", result));
 		}
 
+		//WebGL specific javascript functions from MyPlugin.jslib
+#if UNITY_WEBGL
+		const string WebGLPluginPrefix = "MyPlugin_";
+
+		[DllImport ("__Internal", EntryPoint = WebGLPluginPrefix + "confirm")]
+		public static extern bool Confirm (string message);
+
+		[DllImport ("__Internal", EntryPoint = WebGLPluginPrefix + "getConfirmCallCount")]
+		public static extern int GetConfirmCallCount ();
+#elif
+		public static bool Confirm (string message) {
+			Debug.LogException (new System.PlatformNotSupportedException ("Only available on WebGL"));
+		}
+
+		public static extern int GetConfirmCallCount (){
+			Debug.LogException (new System.PlatformNotSupportedException ("Only available on WebGL"));
+		}
+#endif
+
     }
 }
