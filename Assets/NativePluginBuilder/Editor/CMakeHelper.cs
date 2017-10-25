@@ -91,14 +91,15 @@ namespace iBicha
 				}
 				break;
 			case BuildTarget.WebGL:
-                    //TODO: correct paths
+                //TODO: Setting variables requires Restarting the editor
+				//Doesn't work on OS X
 				if (string.IsNullOrEmpty (Environment.GetEnvironmentVariable ("LLVM", EnvironmentVariableTarget.User))) {
 					switch (EditorPlatform) {
 					case RuntimePlatform.WindowsEditor:
 						Environment.SetEnvironmentVariable ("LLVM", Path.GetFullPath (Path.Combine (GetEmscriptenLocation (), "../Emscripten_FastComp_Win")), EnvironmentVariableTarget.User);
 						break;
 					case RuntimePlatform.OSXEditor:
-							Environment.SetEnvironmentVariable("LLVM", Path.GetFullPath(Path.Combine(GetEmscriptenLocation(), "../Emscripten_FastComp_Mac")), EnvironmentVariableTarget.User);
+						Environment.SetEnvironmentVariable ("LLVM", Path.GetFullPath (Path.Combine (GetEmscriptenLocation (), "../Emscripten_FastComp_Mac")), EnvironmentVariableTarget.User);
 						break;
 					default:
 						break;
@@ -110,7 +111,7 @@ namespace iBicha
 						Environment.SetEnvironmentVariable ("NODE", Path.GetFullPath (Path.Combine (GetEmscriptenLocation (), "../Emscripten_Win/node/node.exe")), EnvironmentVariableTarget.User);
 						break;
 					case RuntimePlatform.OSXEditor:
-						Environment.SetEnvironmentVariable("NODE", Path.GetFullPath(Path.Combine(GetEmscriptenLocation(), "../Emscripten_Mac/node/0.10.18_64bit/bin/node")), EnvironmentVariableTarget.User);
+						Environment.SetEnvironmentVariable ("NODE", Path.GetFullPath (Path.Combine (GetEmscriptenLocation (), "../Emscripten_Mac/node/0.10.18_64bit/bin/node")), EnvironmentVariableTarget.User);
 						break;
 					default:
 						break;
@@ -124,7 +125,7 @@ namespace iBicha
 				if (EditorPlatform == RuntimePlatform.WindowsEditor) {
 					args.Add (string.Format ("-G {0} ", "\"MinGW Makefiles\""));
 					//TODO: mingw32-make location
-					args.Add (string.Format ("-DCMAKE_MAKE_PROGRAM=\"{0}\" ", GetMinGW32MakeLocation()));
+					args.Add (string.Format ("-DCMAKE_MAKE_PROGRAM=\"{0}\" ", GetMinGW32MakeLocation ()));
 				} else {
 					args.Add (string.Format ("-G {0} ", "\"Unix Makefiles\""));
 				}
@@ -162,7 +163,7 @@ namespace iBicha
 						makeLocation = Path.GetFullPath (Path.Combine (plugin.buildFolder, "WebGL"));
 						if (EditorPlatform == RuntimePlatform.WindowsEditor) {
 							//mingw32-make.exe
-							StartProcess (GetMinGW32MakeLocation(), new string[] { string.Format ("install", makeLocation) }, makeLocation, true, (output) => {
+							StartProcess (GetMinGW32MakeLocation (), new string[] { string.Format ("install", makeLocation) }, makeLocation, true, (output) => {
 								UnityEngine.Debug.Log (output);
 							}, (error) => {
 								UnityEngine.Debug.LogError (error);
@@ -277,7 +278,7 @@ namespace iBicha
 
 		private static string GetEditorLocation ()
 		{
-			return Path.GetDirectoryName(EditorApplication.applicationPath);
+			return Path.GetDirectoryName (EditorApplication.applicationPath);
 		}
 
 		private static string FindBinary (string command)
