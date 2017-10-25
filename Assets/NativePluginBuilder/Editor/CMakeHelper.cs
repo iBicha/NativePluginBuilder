@@ -54,10 +54,13 @@ namespace iBicha
 			case BuildTarget.StandaloneWindows:
 			case BuildTarget.StandaloneWindows64:
                     //MSBuild MyPlugin.sln /Build Debug
-				if (arch != Architecture.Any) {
-					args.Add (string.Format ("-DARCH={0} ", arch.ToString ()));
-					//TODO: fix hardcoded vs version
-					switch (arch) {
+                args.Add(string.Format("-DWINDOWS:BOOL={0} ", "TRUE"));
+                if (arch != Architecture.Any) {
+                    args.Add(string.Format("-DARCH={0} ", arch.ToString()));
+                    //args.Add(string.Format("-DCMAKE_GENERATOR_PLATFORM={0} ", arch.ToString()));
+                        //TODO: fix hardcoded vs version
+                        //https://cmake.org/cmake/help/v3.7/generator/Visual%20Studio%2015%202017.html
+                    switch (arch) {
 					case Architecture.x86:
 						args.Add (string.Format ("-B{0}/{1} ", "Windows", arch.ToString ()));
 						args.Add (string.Format ("-G {0} ", "\"Visual Studio 15 2017\""));
@@ -145,7 +148,16 @@ namespace iBicha
 			}, (error) => {
 				UnityEngine.Debug.LogError (error);
 			});
-
+            /*Usage: cmake --build <dir> [options] [-- [native-options]]
+            Options:
+              <dir>          = Project binary directory to be built.
+              --target <tgt> = Build <tgt> instead of default targets.
+                               May only be specified once.
+              --config <cfg> = For multi-configuration tools, choose <cfg>.
+              --clean-first  = Build target 'clean' first, then build.
+                               (To clean only, use --target 'clean'.)
+              --use-stderr   = Ignored.  Behavior is default in CMake >= 3.0.
+              --             = Pass remaining options to the native tool.*/
 			buildProcess.Exited += (sende, e) => {
 				if (buildProcess.ExitCode == 0) {
 					switch (buildTarget) {
