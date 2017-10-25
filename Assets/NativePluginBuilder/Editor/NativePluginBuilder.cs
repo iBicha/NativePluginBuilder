@@ -59,7 +59,7 @@ namespace iBicha
 			PluginsFoldoutAnimator = new AnimBool (true);
 			PluginsFoldoutAnimator.valueChanged.AddListener (Repaint);
 
-			NewPluginFoldoutAnimator = new AnimBool (true);
+			NewPluginFoldoutAnimator = new AnimBool (false);
 			NewPluginFoldoutAnimator.valueChanged.AddListener (Repaint);
 
 			NativePluginSettings.Load ();
