@@ -67,16 +67,19 @@ namespace iBicha.Example
 			MyPluginExample.Log(string.Format("The callback result is:{0}", result));
 		}
 
-		//WebGL specific javascript functions from MyPlugin.jslib
+		//WebGL specific javascript functions from MyPluginJS.jslib
 #if UNITY_WEBGL
 		const string WebGLPluginPrefix = "MyPlugin_";
 
+        //Call window.confirm in the browser
         [DllImport("__Internal", EntryPoint = WebGLPluginPrefix + "confirm")]
         public static extern bool Confirm(string message);
 
+        //Call window.prompt in the browser
         [DllImport("__Internal", EntryPoint = WebGLPluginPrefix + "prompt")]
         public static extern string Prompt(string message, string defaultInput = null);
 
+        //Returns how many times Confirm has been called
         [DllImport ("__Internal", EntryPoint = WebGLPluginPrefix + "getConfirmCallCount")]
 		public static extern int GetConfirmCallCount ();
 #elif
