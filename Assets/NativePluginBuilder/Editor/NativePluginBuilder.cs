@@ -67,6 +67,10 @@ namespace iBicha
 			if (newPlugin == null) {
 				newPlugin = NativePlugin.GetDefault ();
 			}
+
+			CMakeHelper.GetCMakeVersion ((version) => {
+				cmakeVersion = version;
+			});
 		}
 
 		private void OnDisable ()
@@ -109,10 +113,10 @@ namespace iBicha
 
 			EditorGUILayout.BeginHorizontal ();
 			EditorGUILayout.LabelField ("CMake version", cmakeVersion);
-			if (GUILayout.Button ("Get Version", GUILayout.Width (110))) {
+			if (GUILayout.Button ("Refresh", GUILayout.Width (110))) {
 				CMakeHelper.GetCMakeVersion ((version) => {
 					cmakeVersion = version;
-				});
+				}, true);
 			}
 			EditorGUILayout.EndHorizontal ();
 

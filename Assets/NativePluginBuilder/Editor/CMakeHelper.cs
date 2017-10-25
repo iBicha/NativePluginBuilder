@@ -11,18 +11,25 @@ namespace iBicha
 {
 	public class CMakeHelper
 	{
-		public static void GetCMakeVersion (Action<string> callback)
+		public static void GetCMakeVersion (Action<string> callback, bool refresh = false)
 		{
+			if (!refresh) {
+				string version = EditorPrefs.GetString("cmakeVersion");
+				if (!string.IsNullOrEmpty (version)) {
+					callback (version);
+					return;
+				}
+			}
+
 			StartProcess (FindBinary ("cmake"), new string[] { "--version" }, null, true, (output) => {
-
 				output = output.ToLower ();
-
 				if (output.Contains ("version")) {
 					output = output.Substring (output.IndexOf ("version") + "version".Length).Trim ().Split (' ') [0];
 				}
-
-				callback (output);
-
+				EditorMainThread.Run(() => {
+					EditorPrefs.SetString("cmakeVersion", output);
+					callback (output);
+				});
 			}, (error) => {
 				throw new System.Exception (error);
 			});
