@@ -82,7 +82,7 @@ namespace iBicha.Example
         //Returns how many times Confirm has been called
         [DllImport ("__Internal", EntryPoint = WebGLPluginPrefix + "getConfirmCallCount")]
 		public static extern int GetConfirmCallCount ();
-#elif
+#else
         public static bool Confirm(string message)
         {
             Debug.LogException(new System.PlatformNotSupportedException("Only available on WebGL"));
