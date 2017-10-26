@@ -129,38 +129,47 @@ namespace iBicha
                     break;
                 case BuildTarget.WebGL:
                     makeLocation = Path.GetFullPath(Path.Combine(plugin.buildFolder, "WebGL"));
+                    string nodeLocation = "";
+                    string llvmLocation = "";
+
+                    switch (EditorPlatform)
+                    {
+                        case RuntimePlatform.WindowsEditor:
+                            llvmLocation = Path.GetFullPath(Path.Combine(GetEmscriptenLocation(), "../Emscripten_FastComp_Win"));
+                            nodeLocation = Path.GetFullPath(Path.Combine(GetEmscriptenLocation(), "../Emscripten_Win/node/node.exe"));
+                            break;
+                        case RuntimePlatform.OSXEditor:
+                            llvmLocation = Path.GetFullPath(Path.Combine(GetEmscriptenLocation(), "../Emscripten_FastComp_Mac"));
+                            nodeLocation = Path.GetFullPath(Path.Combine(GetEmscriptenLocation(), "../Emscripten_Mac/node/0.10.18_64bit/bin/node"));
+                            break;
+                        default:
+                            break;
+                    }
 
                     //TODO: Setting variables requires Restarting the editor
                     //Doesn't work on OS X
                     //Can it be done in cmake? https://cmake.org/cmake/help/v3.0/command/set.html
+                    //THIS IS A HACK. THIS NEEDS TO BE PASSED THROUGH emconfigure somehow.
+                    bool restart = false;
                     if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("LLVM", EnvironmentVariableTarget.User)))
                     {
-                        switch (EditorPlatform)
-                        {
-                            case RuntimePlatform.WindowsEditor:
-                                Environment.SetEnvironmentVariable("LLVM", Path.GetFullPath(Path.Combine(GetEmscriptenLocation(), "../Emscripten_FastComp_Win")), EnvironmentVariableTarget.User);
-                                break;
-                            case RuntimePlatform.OSXEditor:
-                                Environment.SetEnvironmentVariable("LLVM", Path.GetFullPath(Path.Combine(GetEmscriptenLocation(), "../Emscripten_FastComp_Mac")), EnvironmentVariableTarget.User);
-                                break;
-                            default:
-                                break;
-                        }
+                        Environment.SetEnvironmentVariable("LLVM", llvmLocation, EnvironmentVariableTarget.User);
+                        restart = true;
                     }
                     if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("NODE", EnvironmentVariableTarget.User)))
                     {
-                        switch (EditorPlatform)
-                        {
-                            case RuntimePlatform.WindowsEditor:
-                                Environment.SetEnvironmentVariable("NODE", Path.GetFullPath(Path.Combine(GetEmscriptenLocation(), "../Emscripten_Win/node/node.exe")), EnvironmentVariableTarget.User);
-                                break;
-                            case RuntimePlatform.OSXEditor:
-                                Environment.SetEnvironmentVariable("NODE", Path.GetFullPath(Path.Combine(GetEmscriptenLocation(), "../Emscripten_Mac/node/0.10.18_64bit/bin/node")), EnvironmentVariableTarget.User);
-                                break;
-                            default:
-                                break;
-                        }
+                        Environment.SetEnvironmentVariable("NODE", nodeLocation, EnvironmentVariableTarget.User);
+                        restart = true;
                     }
+                    if (restart)
+                    {
+                        UnityEngine.Debug.Log("Environment variables has been set. Please restart Unity.");
+                        return;
+                    }
+
+                    args.Add(string.Format("-DLLVM=\"{0}\" ", llvmLocation));
+                    args.Add(string.Format("-DNODE=\"{0}\" ", nodeLocation));
+
                     args.Add(string.Format("-B{0} ", "WebGL"));
                     args.Add(string.Format("-DWEBGL:BOOL={0} ", "TRUE"));
                     args.Add(string.Format("-DCMAKE_TOOLCHAIN_FILE=\"{0}{1}\" ", GetEmscriptenLocation(), "/cmake/Modules/Platform/Emscripten.cmake"));
@@ -193,12 +202,14 @@ namespace iBicha
             {
                 if (buildProcess.ExitCode == 0)
                 {
-                    StartProcess(FindBinary("cmake"), new string[] { "--build .", "--target install" }, makeLocation, true, (output) =>
-                    {
-                        UnityEngine.Debug.Log(output);
-                    }, (error) =>
-                    {
-                        UnityEngine.Debug.LogError(error);
+                    EditorMainThread.Run(()=> {
+                        StartProcess(FindBinary("cmake"), new string[] { "--build .", "--target install" }, makeLocation, true, (output) =>
+                        {
+                            UnityEngine.Debug.Log(output);
+                        }, (error) =>
+                        {
+                            UnityEngine.Debug.LogError(error);
+                        });
                     });
                 }
             };
