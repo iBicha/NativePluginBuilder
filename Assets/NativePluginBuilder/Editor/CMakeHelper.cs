@@ -146,6 +146,24 @@ namespace iBicha
                             break;
                     }
 
+                    /*from EmccArguments.cs
+
+                    internal static void SetupDefaultEmscriptenEnvironment(ProcessStartInfo startInfo)
+		            {
+			            EmccArguments.FixClangSymLinkOnMac();
+			            EmccArguments.SetEnvironmentVariable(startInfo, "EM_CONFIG", EmscriptenPaths.emscriptenConfig);
+			            EmccArguments.SetEnvironmentVariable(startInfo, "LLVM", EmscriptenPaths.llvmDir);
+			            EmccArguments.SetEnvironmentVariable(startInfo, "NODE", EmscriptenPaths.nodeExecutable);
+			            EmccArguments.SetEnvironmentVariable(startInfo, "EMSCRIPTEN", EmscriptenPaths.emscriptenDir);
+			            EmccArguments.SetEnvironmentVariable(startInfo, "EMSCRIPTEN_TMP", EmscriptenPaths.tempDirForEmscriptenCompiler);
+			            EmccArguments.SetEnvironmentVariable(startInfo, "EM_CACHE", EmscriptenPaths.emscriptenCache);
+			            EmccArguments.SetEnvironmentVariable(startInfo, "EMSCRIPTEN_NATIVE_OPTIMIZER", EmscriptenPaths.optimizer);
+			            EmccArguments.SetEnvironmentVariable(startInfo, "BINARYEN", EmscriptenPaths.binaryen);
+			            EmccArguments.SetEnvironmentVariable(startInfo, "EMCC_WASM_BACKEND", "0");
+			            EmccArguments.SetEnvironmentVariable(startInfo, "EM_EXCLUSIVE_CACHE_ACCESS", "1");
+		            } */
+
+                    //https://kripken.github.io/emscripten-site/docs/tools_reference/emcc.html
                     //TODO: Setting variables requires Restarting the editor
                     //Doesn't work on OS X
                     //Can it be done in cmake? https://cmake.org/cmake/help/v3.0/command/set.html
@@ -173,8 +191,7 @@ namespace iBicha
                     args.Add(string.Format("-B{0} ", "WebGL"));
                     args.Add(string.Format("-DWEBGL:BOOL={0} ", "TRUE"));
                     args.Add(string.Format("-DCMAKE_TOOLCHAIN_FILE=\"{0}{1}\" ", GetEmscriptenLocation(), "/cmake/Modules/Platform/Emscripten.cmake"));
-                    //No need to set EMSCRIPTEN_ROOT_PATH, the toolchain searches for it
-                    //args.Add (string.Format ("-DEMSCRIPTEN_ROOT_PATH=\"{0}\" ", GetEmscriptenLocation ()));
+                    args.Add (string.Format ("-DEMSCRIPTEN_ROOT_PATH=\"{0}\" ", GetEmscriptenLocation ()));
                     if (EditorPlatform == RuntimePlatform.WindowsEditor)
                     {
                         args.Add(string.Format("-G {0} ", "\"MinGW Makefiles\""));
@@ -279,7 +296,6 @@ namespace iBicha
             return process;
         }
 
-
         private static string GetNDKLocation()
         {
             //Get the default location
@@ -297,6 +313,47 @@ namespace iBicha
         {
             //Get the default location
             return EditorPrefs.GetString("AndroidSdkRoot");
+        }
+
+        private static void RefreshEmscriptenConfig()
+        {
+            string llvm = "", node = "";
+            switch (EditorPlatform)
+            {
+                case RuntimePlatform.WindowsEditor:
+                    llvm = Path.GetFullPath(Path.Combine(GetEmscriptenLocation(), "../Emscripten_FastComp_Win"));
+                    node = Path.GetFullPath(Path.Combine(GetEmscriptenLocation(), "../Emscripten_Win/node/node.exe"));
+                    break;
+                case RuntimePlatform.OSXEditor:
+                    llvm = Path.GetFullPath(Path.Combine(GetEmscriptenLocation(), "../Emscripten_FastComp_Mac"));
+                    //this is totally wrong
+                    node = Path.GetFullPath(Path.Combine(GetEmscriptenLocation(), "../Emscripten_Mac/node/0.10.18_64bit/bin/node"));
+                    break;
+                case RuntimePlatform.LinuxEditor:
+                    llvm = Path.GetFullPath(Path.Combine(GetEmscriptenLocation(), "../Emscripten_FastComp_Linux"));
+                    //TODO: node location for linux
+                    break;
+                default:
+                    break;
+            }
+
+
+            StringBuilder sb = new StringBuilder();
+            sb.AppendFormat("LLVM_ROOT='{0}'\n", llvm);
+            sb.AppendFormat("NODE_JS=['{0}','--stack_size=8192','--max-old-space-size=2048']}\n", node);
+            sb.AppendFormat("EMSCRIPTEN_ROOT='{0}'\n", GetEmscriptenLocation());
+            sb.Append("SPIDERMONKEY_ENGINE=''\n");
+            sb.Append("V8_ENGINE=''\n");
+            sb.AppendFormat("BINARYEN_ROOT='{0}'\n", Path.Combine(llvm, "binaryen"));
+            sb.Append("COMPILER_ENGINE=NODE_JS\n");
+            sb.Append("JS_ENGINES=[NODE_JS]\n");
+            sb.Append("JAVA=''");
+
+            /*TODO:
+             * save to emscripten.config in build folder
+             * copy toolchain to cmake folder
+             * add --em-config option to emcc calls
+             */
         }
 
         private static string GetEmscriptenLocation()
