@@ -86,16 +86,19 @@ namespace iBicha.Example
         public static bool Confirm(string message)
         {
             Debug.LogException(new System.PlatformNotSupportedException("Only available on WebGL"));
+			return false;
         }
 
         public static string Prompt(string message, string defaultInput = null)
         {
             Debug.LogException(new System.PlatformNotSupportedException("Only available on WebGL"));
+			return null;
         }
 
-        public static extern int GetConfirmCallCount()
+        public static int GetConfirmCallCount()
         {
             Debug.LogException(new System.PlatformNotSupportedException("Only available on WebGL"));
+			return 0;
         }
 #endif
     }
