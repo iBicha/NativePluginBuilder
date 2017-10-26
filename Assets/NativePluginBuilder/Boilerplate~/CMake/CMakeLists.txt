@@ -13,9 +13,8 @@ add_definitions(-DPLUGIN_VERSION="${PLUGIN_VERSION}")
 #Plugin build number
 add_definitions(-DPLUGIN_BUILD_NUMBER=${PLUGIN_BUILD_NUMBER})
 
-# Find all .cpp and .h files in the source folder
-file(GLOB_RECURSE SOURCE_FILES "${SOURCE_FOLDER}/*.cpp" "${SOURCE_FOLDER}/*.h")
-
+# Find all .c, .cc and .cpp files in the source folder
+file(GLOB_RECURSE SOURCE_FILES "${SOURCE_FOLDER}/*.c" "${SOURCE_FOLDER}/*.cc" "${SOURCE_FOLDER}/*.cpp")
 
 if(ANDROID)
   add_library(${PLUGIN_NAME} SHARED ${SOURCE_FILES})
