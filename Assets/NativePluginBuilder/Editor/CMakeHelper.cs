@@ -62,37 +62,41 @@ namespace iBicha
             {
                 case BuildTarget.StandaloneWindows:
                 case BuildTarget.StandaloneWindows64:
-                    //MSBuild MyPlugin.sln /Build Debug
                     makeLocation = Path.GetFullPath(Path.Combine(plugin.buildFolder, "Windows/" + arch.ToString()));
 
                     args.Add(string.Format("-DWINDOWS:BOOL={0} ", "TRUE"));
                     if (arch != Architecture.Any)
                     {
                         args.Add(string.Format("-DARCH={0} ", arch.ToString()));
-                        //args.Add(string.Format("-DCMAKE_GENERATOR_PLATFORM={0} ", arch.ToString()));
                         //TODO: fix hardcoded vs version
                         //https://cmake.org/cmake/help/v3.7/generator/Visual%20Studio%2015%202017.html
+                        args.Add(string.Format("-G {0} ", "\"Visual Studio 15 2017\""));
+                        args.Add(string.Format("-B{0}/{1} ", "Windows", arch.ToString()));
+                        //Default is x86
                         switch (arch)
                         {
-                            case Architecture.x86:
-                                args.Add(string.Format("-B{0}/{1} ", "Windows", arch.ToString()));
-                                args.Add(string.Format("-G {0} ", "\"Visual Studio 15 2017\""));
-                                break;
                             case Architecture.x86_64:
-                                args.Add(string.Format("-B{0}/{1} ", "Windows", arch.ToString()));
-                                args.Add(string.Format("-G {0} ", "\"Visual Studio 15 2017 Win64\""));
+                                args.Add(string.Format("-DCMAKE_GENERATOR_PLATFORM={0} ", "x64"));
+                                break;
+                            case Architecture.arm:
+                                args.Add(string.Format("-DCMAKE_GENERATOR_PLATFORM={0} ", "ARM"));
                                 break;
                             default:
                                 break;
                         }
                     }
                     break;
-				case BuildTarget.StandaloneOSXUniversal:
-				makeLocation = Path.GetFullPath(Path.Combine(plugin.buildFolder, "OSX"));
-				args.Add(string.Format("-DOSX:BOOL={0} ", "TRUE"));
-				args.Add(string.Format("-B{0} ", "OSX"));
-
-				break;
+                case BuildTarget.StandaloneOSXUniversal:
+                    makeLocation = Path.GetFullPath(Path.Combine(plugin.buildFolder, "OSX"));
+                    args.Add(string.Format("-DOSX:BOOL={0} ", "TRUE"));
+                    args.Add(string.Format("-B{0} ", "OSX"));
+                    break;
+                case BuildTarget.StandaloneLinux:
+                case BuildTarget.StandaloneLinux64:
+                    makeLocation = Path.GetFullPath(Path.Combine(plugin.buildFolder, "Linux"));
+                    args.Add(string.Format("-DLINUX:BOOL={0} ", "TRUE"));
+                    args.Add(string.Format("-B{0}/{1} ", "Linux", arch.ToString()));
+                    break;
                 case BuildTarget.Android:
                     makeLocation = Path.GetFullPath(Path.Combine(plugin.buildFolder, "Android/" + "armeabi-v7a"));
 
@@ -128,6 +132,7 @@ namespace iBicha
 
                     //TODO: Setting variables requires Restarting the editor
                     //Doesn't work on OS X
+                    //Can it be done in cmake? https://cmake.org/cmake/help/v3.0/command/set.html
                     if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("LLVM", EnvironmentVariableTarget.User)))
                     {
                         switch (EditorPlatform)
@@ -159,7 +164,7 @@ namespace iBicha
                     args.Add(string.Format("-B{0} ", "WebGL"));
                     args.Add(string.Format("-DWEBGL:BOOL={0} ", "TRUE"));
                     args.Add(string.Format("-DCMAKE_TOOLCHAIN_FILE=\"{0}{1}\" ", GetEmscriptenLocation(), "/cmake/Modules/Platform/Emscripten.cmake"));
-                    //Do we need the EMSCRIPTEN_ROOT_PATH option?
+                    //No need to set EMSCRIPTEN_ROOT_PATH, the toolchain searches for it
                     //args.Add (string.Format ("-DEMSCRIPTEN_ROOT_PATH=\"{0}\" ", GetEmscriptenLocation ()));
                     if (EditorPlatform == RuntimePlatform.WindowsEditor)
                     {
@@ -183,84 +188,18 @@ namespace iBicha
             {
                 UnityEngine.Debug.LogError(error);
             });
-            /*Usage: cmake --build <dir> [options] [-- [native-options]]
-            Options:
-              <dir>          = Project binary directory to be built.
-              --target <tgt> = Build <tgt> instead of default targets.
-                               May only be specified once.
-              --config <cfg> = For multi-configuration tools, choose <cfg>.
-              --clean-first  = Build target 'clean' first, then build.
-                               (To clean only, use --target 'clean'.)
-              --use-stderr   = Ignored.  Behavior is default in CMake >= 3.0.
-              --             = Pass remaining options to the native tool.*/
+
             buildProcess.Exited += (sende, e) =>
             {
                 if (buildProcess.ExitCode == 0)
                 {
-                    if (EditorPlatform == RuntimePlatform.WindowsEditor)
+                    StartProcess(FindBinary("cmake"), new string[] { "--build .", "--target install" }, makeLocation, true, (output) =>
                     {
-                        StartProcess("cmd", new string[] { string.Format("/C cd \"{0}\" && cmake --build . --target INSTALL", makeLocation) }, makeLocation, true, (output) => {
-                            UnityEngine.Debug.Log(output);
-                        }, (error) => {
-                            UnityEngine.Debug.LogError(error);
-                        });
-                    }
-                    else
+                        UnityEngine.Debug.Log(output);
+                    }, (error) =>
                     {
-                        StartProcess(FindBinary("cmake"), new string[] { "--build .", "--target install" }, makeLocation, true, (output) =>
-                        {
-                            UnityEngine.Debug.Log(output);
-                        }, (error) =>
-                        {
-                            UnityEngine.Debug.LogError(error);
-                        });
-                    }
-                    /*
-                    switch (buildTarget) {
-					case BuildTarget.Android:
-						if (EditorPlatform == RuntimePlatform.WindowsEditor) {
-							StartProcess ("cmd", new string[] { string.Format ("/C cd \"{0}\" && make install", makeLocation) }, makeLocation, true, (output) => {
-								UnityEngine.Debug.Log (output);
-							}, (error) => {
-								UnityEngine.Debug.LogError (error);
-							});
-						} else {
-							StartProcess ("make", new string[] { string.Format ("install", makeLocation) }, makeLocation, true, (output) => {
-								UnityEngine.Debug.Log (output);
-							}, (error) => {
-								UnityEngine.Debug.LogError (error);
-							});
-						}
-						break;
-					case BuildTarget.WebGL:
-						if (EditorPlatform == RuntimePlatform.WindowsEditor) {
-							//mingw32-make.exe
-							StartProcess (GetMinGW32MakeLocation (), new string[] { string.Format ("install", makeLocation) }, makeLocation, true, (output) => {
-								UnityEngine.Debug.Log (output);
-							}, (error) => {
-								UnityEngine.Debug.LogError (error);
-							});
-						} else {
-							StartProcess ("make", new string[] { string.Format ("install", makeLocation) }, makeLocation, true, (output) => {
-								UnityEngine.Debug.Log (output);
-							}, (error) => {
-								UnityEngine.Debug.LogError (error);
-							});
-						}
-                        
-						break;
-					case BuildTarget.iOS:
-						if (EditorPlatform == RuntimePlatform.OSXEditor) {
-							StartProcess ("make", new string[] { string.Format ("install", makeLocation) }, makeLocation, true, (output) => {
-								UnityEngine.Debug.Log (output);
-							}, (error) => {
-								UnityEngine.Debug.LogError (error);
-							});
-						}
-						break;
-					default:
-						break;
-					}*/
+                        UnityEngine.Debug.LogError(error);
+                    });
                 }
             };
         }
