@@ -1,8 +1,8 @@
 //A prefix to add to every function in the plugin
-const PluginPrefix = "MyPlugin_";
+const PluginPrefix = "#PLUGIN_NAME#_";
 
 //Plugin implementation
-var MyPlugin = {
+var Plugin = {
     confirm: function(messagePtr) {
         Static.confirmCallCount++;
         var message = Helper.ToJsString(messagePtr);
@@ -86,4 +86,4 @@ function MergePlugin(plugin, prefix) {
     mergeInto(LibraryManager.library, plugin);
 }
 
-MergePlugin(MyPlugin, PluginPrefix);
+MergePlugin(Plugin, PluginPrefix);

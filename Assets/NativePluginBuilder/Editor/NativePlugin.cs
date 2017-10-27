@@ -46,10 +46,40 @@ namespace iBicha
         public AnimBool sectionAnimator;
         public bool isSelected;
         #endregion
+        public void Create()
+        {
+            //THIS IS A LOT OF MESS. TO BE CONTINUED.
+            //Escape name
+            //check if exists
+
+            FileUtil.CopyFileOrDirectory("Assets/NativePluginBuilder/Boilerplate~", "Assets/" + Name);
+
+            FileUtil.MoveFileOrDirectory("Assets/" + Name + "/Plugin.cs", "Assets/" + Name + "/" + Name + ".cs");
+            FileUtil.MoveFileOrDirectory("Assets/" + Name + "/PluginExample.cs", "Assets/" + Name + "/" + Name + "Example.cs");
+
+            ProcessTemplateFile("Assets/" + Name + "/" + Name + ".cs");
+            ProcessTemplateFile("Assets/" + Name + "/" + Name + "Example.cs");
+            ProcessTemplateFile("Assets/" + Name + "/Plugins/WebGL/PluginJS.jslib");
+
+            sourceFolder = Path.GetFullPath("Assets/" + Name + "/NativeSource~/Source");
+            buildFolder = Path.GetFullPath("Assets/" + Name + "/NativeSource~/Build");
+            pluginBinaryFolder = AssetDatabase.LoadAssetAtPath<Object>("Assets/" + Name + "/Plugins") //FIX: THIS IS NOT WORKING
+            AssetDatabase.CreateAsset(this, "Assets/" + Name + "/" + Name + ".asset");
+
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+        }
+
+        void ProcessTemplateFile(string filename)
+        {
+            string content = File.ReadAllText(filename);
+            content = content.Replace("#PLUGIN_NAME#", Name);
+            File.WriteAllText(filename, content);
+        }
 
         public void Build()
         {
-            CMakeHelper.Build(this, BuildTarget.Android, BuildType.Debug, Architecture.arm);
+            CMakeHelper.Build(this, BuildTarget.StandaloneWindows, BuildType.Debug, Architecture.x86_64);
         }
     }
 }

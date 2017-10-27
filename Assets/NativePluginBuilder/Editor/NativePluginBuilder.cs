@@ -174,7 +174,8 @@ namespace iBicha
                             {
                                 NativePluginSettings.plugins.Remove(plugin);
                                 i--;
-                            }
+                                AssetDatabase.DeleteAsset(AssetDatabase.GetAssetPath(plugin));
+                            } 
                         }
                         EditorGUILayout.EndHorizontal();
                     }
@@ -199,11 +200,15 @@ namespace iBicha
             if (EditorGUILayout.BeginFadeGroup(NewPluginFoldoutAnimator.faded))
             {
                 EditorGUI.indentLevel++;
-                OnGuiNativePlugin(newPlugin);
+                newPlugin.Name = EditorGUILayout.TextField("Plugin name", newPlugin.Name);
+                newPlugin.Version = EditorGUILayout.TextField("Version", newPlugin.Version);
+                //Location for the plugin?
+
                 EditorGUILayout.BeginHorizontal();
                 GUILayout.FlexibleSpace();
                 if (GUILayout.Button("Create", GUILayout.Width(160)))
                 {
+                    newPlugin.Create();
                     NativePluginSettings.plugins.Add(newPlugin);
                     newPlugin = NativePlugin.GetDefault(this);
                 }

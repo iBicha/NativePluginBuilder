@@ -19,13 +19,9 @@ namespace iBicha
             foreach (NativePlugin plugin in plugins)
             {
                 //TODO: recently created plugins must be saved instantly
-                if (EditorUtility.IsPersistent(plugin))
+                if (plugin != null && EditorUtility.IsPersistent(plugin))
                 {
                     EditorUtility.SetDirty(plugin);
-                }
-                else
-                {
-                    AssetDatabase.CreateAsset(plugin, Path.Combine(Path.GetDirectoryName(AssetDatabase.GetAssetPath(plugin.pluginBinaryFolder)), plugin.Name + ".asset"));
                 }
             }
             AssetDatabase.SaveAssets();
