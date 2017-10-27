@@ -8,7 +8,6 @@ namespace iBicha
     {
         public static List<NativePlugin> plugins = new List<NativePlugin>();
 
-
         public static void Load()
         {
             plugins.Clear();
@@ -19,18 +18,19 @@ namespace iBicha
         {
             foreach (NativePlugin plugin in plugins)
             {
+                //TODO: recently created plugins must be saved instantly
                 if (EditorUtility.IsPersistent(plugin))
                 {
                     EditorUtility.SetDirty(plugin);
                 }
                 else
                 {
-                    AssetDatabase.CreateAsset(plugin, Path.GetFullPath(Path.Combine(plugin.pluginBinaryFolderPath, "../" + plugin.Name + ".asset")));
+                    AssetDatabase.CreateAsset(plugin, Path.Combine(Path.GetDirectoryName(AssetDatabase.GetAssetPath(plugin.pluginBinaryFolder)),  plugin.Name + ".asset"));
                 }
             }
             AssetDatabase.SaveAssets();
-        }
-
+        } 
+         
         public static List<T> FindAssetsByType<T>() where T : UnityEngine.Object
         {
             List<T> assets = new List<T>();
