@@ -17,6 +17,8 @@ namespace iBicha
         private static AnimBool PluginsFoldoutAnimator;
         private static AnimBool NewPluginFoldoutAnimator;
 
+        private static Vector2 scrollPos;
+
         private static string cmakeVersion;
 
         private static GUIStyle _foldoutBold;
@@ -92,6 +94,7 @@ namespace iBicha
         {
 
             selectedTab = GUILayout.Toolbar(selectedTab, tabs);
+            scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
 
             switch (selectedTab)
             {
@@ -105,6 +108,15 @@ namespace iBicha
                 default:
                     break;
             }
+            GUILayout.FlexibleSpace();
+            EditorGUILayout.EndScrollView();
+
+            OnGuiStatusBar();
+        }
+
+        void OnGuiStatusBar()
+        {
+            GUILayout.Label("Status bar");
         }
 
         void OnGuiSettings()
@@ -120,6 +132,13 @@ namespace iBicha
                     cmakeVersion = version;
                 }, true);
             }
+
+            /*TODO:
+             * NDK location
+             * Visual Studio version
+             * mingw32-make.exe
+             */
+
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.Space();
