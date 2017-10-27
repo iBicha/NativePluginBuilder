@@ -123,6 +123,8 @@ namespace iBicha
                     args.Add(string.Format("-DCMAKE_TOOLCHAIN_FILE=\"{0}\" ", toolchain));
                     args.Add(string.Format("-B{0}/{1} ", "Android", folderName));
                     args.Add(string.Format("-DANDROID_ABI={0} ", folderName));
+                    //Do we need to target a specific api?
+                    //args.Add(string.Format("-DANDROID_PLATFORM={0} ", "android-16"));
                     break;
                 case BuildTarget.iOS:
                     makeLocation = CombinePath(plugin.buildFolder, "iOS/");

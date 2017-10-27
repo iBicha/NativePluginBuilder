@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &1
+--- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
@@ -9,15 +9,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ba3b360fcee51e3409078f3802fb343d, type: 3}
-  m_Name: MyPlugin
+  m_Name: Testing12
   m_EditorClassIdentifier: 
-  Name: MyPlugin
+  Name: Testing12
   Version: 1.0.0.0
   BuildNumber: 1
-  pluginBinaryFolder: {fileID: 102900000, guid: 53d401ad7b18ce64b9154799c39423e5,
+  pluginBinaryFolder: {fileID: 102900000, guid: 8da15618361199e44b5da2ce8739fe1c,
     type: 3}
-  sourceFolder: C:/Users/bhadriche/Desktop/UnityNativePluginBuilder/Assets/NativePluginBuilder/Boilerplate~/Source
-  buildFolder: C:/Users/bhadriche/Desktop/UnityNativePluginBuilder/Assets/NativePluginBuilder/Boilerplate~/Build
+  sourceFolder: 
+  buildFolder: 
   sectionAnimator:
     m_Target: 0
     speed: 2

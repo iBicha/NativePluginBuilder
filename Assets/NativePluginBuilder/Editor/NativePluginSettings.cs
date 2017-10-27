@@ -25,12 +25,12 @@ namespace iBicha
                 }
                 else
                 {
-                    AssetDatabase.CreateAsset(plugin, Path.Combine(Path.GetDirectoryName(AssetDatabase.GetAssetPath(plugin.pluginBinaryFolder)),  plugin.Name + ".asset"));
+                    AssetDatabase.CreateAsset(plugin, Path.Combine(Path.GetDirectoryName(AssetDatabase.GetAssetPath(plugin.pluginBinaryFolder)), plugin.Name + ".asset"));
                 }
             }
             AssetDatabase.SaveAssets();
-        } 
-         
+        }
+
         public static List<T> FindAssetsByType<T>() where T : UnityEngine.Object
         {
             List<T> assets = new List<T>();
