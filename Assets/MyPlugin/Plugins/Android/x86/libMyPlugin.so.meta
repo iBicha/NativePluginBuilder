@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: 65042f84d9912aa40b394e744850b80f
-timeCreated: 1509128684
+guid: e985fb155610249438cca6260b983c00
+timeCreated: 1509128733
 licenseType: Free
 PluginImporter:
   externalObjects: {}
@@ -32,7 +32,7 @@ PluginImporter:
     second:
       enabled: 1
       settings:
-        CPU: ARMv7
+        CPU: x86
   - first:
       Any: 
     second:
