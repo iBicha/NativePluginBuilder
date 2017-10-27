@@ -259,7 +259,7 @@ namespace iBicha
 		{
 			switch (EditorPlatform) {
 			case RuntimePlatform.WindowsEditor:
-				return CombinePath (GetEmscriptenLocation (), "nodejs/node.exe");
+				return CombinePath (GetToolsLocation (), "nodejs/node.exe");
 			case RuntimePlatform.OSXEditor:
 			case RuntimePlatform.LinuxEditor:
 				return CombinePath (GetToolsLocation (), "nodejs/bin/node");
@@ -297,8 +297,7 @@ namespace iBicha
 		{
 			switch (EditorPlatform) {
 			case RuntimePlatform.WindowsEditor:
-				//TODO:
-				throw new NotImplementedException ();
+				return CombinePath (GetEditorLocation(), "Tools");
 			case RuntimePlatform.OSXEditor:
 				return CombinePath (EditorApplication.applicationPath, "Contents/Tools");
 			case RuntimePlatform.LinuxEditor:
@@ -337,11 +336,14 @@ namespace iBicha
 			for (int i = 1; i < components.Length; i++) {
 				text = Path.Combine (text, components [i]);
 			}
-			return Path.GetFullPath (text);
+			return Path.GetFullPath (text).Replace('\\', '/');
 		}
 
 		public static RuntimePlatform EditorPlatform {
 			get {
+#if !UNITY_EDITOR
+				throw new PlatformNotSupportedException ("Editor only");
+#endif
 #if UNITY_EDITOR_OSX
 				return RuntimePlatform.OSXEditor;
 #elif UNITY_EDITOR_WIN
