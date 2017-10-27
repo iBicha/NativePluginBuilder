@@ -118,33 +118,10 @@ namespace iBicha
 				break;
 			case BuildTarget.WebGL:
 				makeLocation = CombinePath (plugin.buildFolder, "WebGL");
-
-                    /*from EmccArguments.cs
-
-                    internal static void SetupDefaultEmscriptenEnvironment(ProcessStartInfo startInfo)
-		            {
-			            EmccArguments.FixClangSymLinkOnMac();
-			            EmccArguments.SetEnvironmentVariable(startInfo, "EM_CONFIG", EmscriptenPaths.emscriptenConfig);
-			            EmccArguments.SetEnvironmentVariable(startInfo, "LLVM", EmscriptenPaths.llvmDir);
-			            EmccArguments.SetEnvironmentVariable(startInfo, "NODE", EmscriptenPaths.nodeExecutable);
-			            EmccArguments.SetEnvironmentVariable(startInfo, "EMSCRIPTEN", EmscriptenPaths.emscriptenDir);
-			            EmccArguments.SetEnvironmentVariable(startInfo, "EMSCRIPTEN_TMP", EmscriptenPaths.tempDirForEmscriptenCompiler);
-			            EmccArguments.SetEnvironmentVariable(startInfo, "EM_CACHE", EmscriptenPaths.emscriptenCache);
-			            EmccArguments.SetEnvironmentVariable(startInfo, "EMSCRIPTEN_NATIVE_OPTIMIZER", EmscriptenPaths.optimizer);
-			            EmccArguments.SetEnvironmentVariable(startInfo, "BINARYEN", EmscriptenPaths.binaryen);
-			            EmccArguments.SetEnvironmentVariable(startInfo, "EMCC_WASM_BACKEND", "0");
-			            EmccArguments.SetEnvironmentVariable(startInfo, "EM_EXCLUSIVE_CACHE_ACCESS", "1");
-		            } */
-
-                    //https://kripken.github.io/emscripten-site/docs/tools_reference/emcc.html
-                    //TODO: Setting variables requires Restarting the editor
-                    //Doesn't work on OS X
-                    //Can it be done in cmake? https://cmake.org/cmake/help/v3.0/command/set.html
-                    //THIS IS A HACK. THIS NEEDS TO BE PASSED THROUGH emconfigure somehow.
-
 				args.Add (string.Format ("-B{0} ", "WebGL"));
 				args.Add (string.Format ("-DWEBGL:BOOL={0} ", "TRUE"));
-					//args.Add(string.Format("-DCMAKE_TOOLCHAIN_FILE=\"{0}{1}\" ", GetEmscriptenLocation(), "/cmake/Modules/Platform/Emscripten.cmake"));
+				//We need our own copy of the toolchain, because we need to pass --em-config to emcc.
+				//args.Add(string.Format("-DCMAKE_TOOLCHAIN_FILE=\"{0}{1}\" ", GetEmscriptenLocation(), "/cmake/Modules/Platform/Emscripten.cmake"));
 				args.Add (string.Format ("-DCMAKE_TOOLCHAIN_FILE=\"{0}\" ", CombinePath (plugin.buildFolder, "../CMake/Emscripten.cmake")));
 				args.Add (string.Format ("-DEMSCRIPTEN_ROOT_PATH=\"{0}\" ", GetEmscriptenLocation ()));
 				string emconfig = RefreshEmscriptenConfig (plugin.buildFolder);
@@ -280,7 +257,6 @@ namespace iBicha
 			default:
 				throw new PlatformNotSupportedException ("Unknown platform");
 			}
-
 		}
 
 		private static string GetLLVMLocation ()
