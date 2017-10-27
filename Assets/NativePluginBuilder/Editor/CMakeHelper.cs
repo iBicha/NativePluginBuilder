@@ -30,7 +30,7 @@ namespace iBicha
 					EditorPrefs.SetString ("cmakeVersion", output);
 					callback (output);
 				});
-			}, (error) => {
+			}, (exitCode, error) => {
 				throw new System.Exception (error);
 			});
 		}
@@ -39,7 +39,6 @@ namespace iBicha
 		public static void Build (NativePlugin plugin, BuildTarget buildTarget, BuildType buildType = BuildType.Debug, Architecture arch = Architecture.Any)
 		{
 			string makeLocation = "";
-			//cmake --build . --clean-first
 			List<string> args = new List<string> ();
 			args.Add (string.Format ("{0} ", "../CMake"));
 			args.Add (string.Format ("-DPLUGIN_NAME:STRING={0} ", plugin.Name));
@@ -61,6 +60,8 @@ namespace iBicha
 					args.Add (string.Format ("-DARCH={0} ", arch.ToString ()));
 					//TODO: fix hardcoded vs version
 					//https://cmake.org/cmake/help/v3.7/generator/Visual%20Studio%2015%202017.html
+					//1-Find visual studio in Unity settings
+					//2-Find all installed vs versions, use the newest.
 					args.Add (string.Format ("-G {0} ", "\"Visual Studio 15 2017\""));
 					args.Add (string.Format ("-B{0}/{1} ", "Windows", arch.ToString ()));
 					//Default is x86
@@ -128,7 +129,6 @@ namespace iBicha
 				args.Add (string.Format ("-DEM_CONFIG=\"{0}\" ", emconfig));
 				if (EditorPlatform == RuntimePlatform.WindowsEditor) {
 					args.Add (string.Format ("-G {0} ", "\"MinGW Makefiles\""));
-					//TODO: mingw32-make location
 					args.Add (string.Format ("-DCMAKE_MAKE_PROGRAM=\"{0}\" ", GetMinGW32MakeLocation ()));
 				} else {
 					args.Add (string.Format ("-G {0} ", "\"Unix Makefiles\""));
@@ -140,8 +140,13 @@ namespace iBicha
 
 			Process buildProcess = StartProcess (FindBinary ("cmake"), args.ToArray (), plugin.buildFolder, true, (output) => {
 				UnityEngine.Debug.Log (output);
-			}, (error) => {
-				UnityEngine.Debug.LogError (error);
+			}, (exitCode, error) =>
+			{
+				if(exitCode == 0) {
+					UnityEngine.Debug.LogWarning(error);
+				} else {
+					UnityEngine.Debug.LogError(error);
+				}
 			});
 
 			buildProcess.Exited += (sende, e) => {
@@ -150,16 +155,20 @@ namespace iBicha
 						StartProcess(FindBinary("cmake"), new string[] { "--build .", "--target install" }, makeLocation, true, (output) =>
                         {
                             UnityEngine.Debug.Log(output);
-                        }, (error) =>
+                        }, (exitCode, error) =>
                         {
-                            UnityEngine.Debug.LogError(error);
+							if(exitCode == 0) {
+								UnityEngine.Debug.LogWarning(error);
+							} else {
+								UnityEngine.Debug.LogError(error);
+							}
                         });
 					});
 				}
 			};
 		}
 
-		private static Process StartProcess (string filename, string[] arguments, string workingDirectory = null, bool getOutput = false, Action<string> onOutput = null, Action<string> onError = null)
+		private static Process StartProcess (string filename, string[] arguments, string workingDirectory = null, bool getOutput = false, Action<string> onOutput = null, Action<int, string> onError = null)
 		{
 			Process process = new Process ();
 			process.StartInfo.FileName = filename;
@@ -177,7 +186,7 @@ namespace iBicha
 				process.Start ();
 			} catch (System.Exception ex) {
 				if (getOutput && onError != null) {
-					onError (ex.ToString ());
+					onError (-1, ex.ToString ());
 				}
 				return process;
 			}
@@ -201,7 +210,7 @@ namespace iBicha
 						onOutput (output);
 					}
 					if (!string.IsNullOrEmpty (error) && onError != null) {
-						onError (error);
+						onError (process.ExitCode, error);
 					}
 				};
 				process.BeginOutputReadLine ();
@@ -250,7 +259,7 @@ namespace iBicha
 		{
 			switch (EditorPlatform) {
 			case RuntimePlatform.WindowsEditor:
-				return CombinePath (GetEmscriptenLocation (), "../Emscripten_FastComp_Win");
+				return CombinePath (GetEmscriptenLocation (), "nodejs/node.exe");
 			case RuntimePlatform.OSXEditor:
 			case RuntimePlatform.LinuxEditor:
 				return CombinePath (GetToolsLocation (), "nodejs/bin/node");
@@ -288,10 +297,12 @@ namespace iBicha
 		{
 			switch (EditorPlatform) {
 			case RuntimePlatform.WindowsEditor:
+				//TODO:
 				throw new NotImplementedException ();
 			case RuntimePlatform.OSXEditor:
 				return CombinePath (EditorApplication.applicationPath, "Contents/Tools");
 			case RuntimePlatform.LinuxEditor:
+				//TODO:
 				throw new NotImplementedException ();
 			default:
 				throw new PlatformNotSupportedException ("Unknown platform");
@@ -313,7 +324,7 @@ namespace iBicha
 			if (EditorPlatform == RuntimePlatform.WindowsEditor) {
 				return command;
 			}
-			//temp hack
+			//TODO: temp hack
 			return "/usr/local/bin/" + command;
 		}
 
