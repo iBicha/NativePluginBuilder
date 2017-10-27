@@ -1,23 +1,6 @@
 # Specify the minimum version for CMake
 cmake_minimum_required(VERSION 3.2)
 
-message(STATUS "LLVM=$ENV{LLVM}")
-message(STATUS "NODE=$ENV{NODE}")
-
-#Environment variables needs to be set before anything else
-#THIS IS NOT THE WAY TO GO, FOR TESTING PURPOSES
-if(WEBGL)
-  if (DEFINED LLVM AND ("$ENV{LLVM}" STREQUAL ""))
-    set(ENV{LLVM} ${LLVM})
-    message(STATUS "Env var LLVM was set to $ENV{LLVM}")
-  endif()
-  
-  if (DEFINED NODE AND ("$ENV{NODE}" STREQUAL ""))
-    set(ENV{NODE} ${NODE})
-    message(STATUS "Env var NODE was set to $ENV{NODE}")
-  endif()
-endif()
-
 # Plugins's name
 project(${PLUGIN_NAME})
 
