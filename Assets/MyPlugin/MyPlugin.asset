@@ -16,5 +16,5 @@ MonoBehaviour:
   BuildNumber: 1
   pluginBinaryFolder: {fileID: 102900000, guid: 53d401ad7b18ce64b9154799c39423e5,
     type: 3}
-  sourceFolder: /Users/ibicha/UnityNativePluginBuilder/Assets/NativePluginBuilder/Boilerplate~/Source
-  buildFolder: /Users/ibicha/UnityNativePluginBuilder/Assets/NativePluginBuilder/Boilerplate~/Build
+  sourceFolder: C:/Users/bhadriche/Desktop/UnityNativePluginBuilder/Assets/NativePluginBuilder/Boilerplate~/Source
+  buildFolder: C:/Users/bhadriche/Desktop/UnityNativePluginBuilder/Assets/NativePluginBuilder/Boilerplate~/Build

@@ -6,37 +6,50 @@ namespace iBicha
 {
     public class NativePluginSettings
     {
-        private const string pluginsPath = "Assets/NativePluginBuilder/Editor/Assets";
-
         public static List<NativePlugin> plugins = new List<NativePlugin>();
 
 
         public static void Load()
-        { 
+        {
             plugins.Clear();
-            string[] pluginFiles = Directory.GetFiles(Path.GetFullPath(pluginsPath));
-            foreach (string pluginfile in pluginFiles)
-            {
-                UnityEngine.Object[] array = UnityEditorInternal.InternalEditorUtility.LoadSerializedFileAndForget(pluginfile);
-                if (array.Length > 0 && array[0] != null)
-                {
-                    NativePlugin plugin = array[0] as NativePlugin;
-                    plugins.Add(plugin) ;
-                }
-
-            }
+            plugins.AddRange(FindAssetsByType<NativePlugin>());
         }
 
         public static void Save()
         {
             foreach (NativePlugin plugin in plugins)
             {
-                string savePath = Path.Combine(pluginsPath, plugin.Name + ".asset");
-                UnityEditorInternal.InternalEditorUtility.SaveToSerializedFileAndForget(new Object[] { plugin }, savePath, false);
-
+                if (EditorUtility.IsPersistent(plugin))
+                {
+                    EditorUtility.SetDirty(plugin);
+                }
+                else
+                {
+                    AssetDatabase.CreateAsset(plugin, Path.GetFullPath(Path.Combine(plugin.pluginBinaryFolderPath, "../" + plugin.Name + ".asset")));
+                }
             }
-            AssetDatabase.Refresh();
+            AssetDatabase.SaveAssets();
         }
 
+        public static List<T> FindAssetsByType<T>() where T : UnityEngine.Object
+        {
+            List<T> assets = new List<T>();
+            string[] guids = AssetDatabase.FindAssets(string.Format("t:{0}", typeof(T)));
+            for (int i = 0; i < guids.Length; i++)
+            {
+                string assetPath = AssetDatabase.GUIDToAssetPath(guids[i]);
+                T asset = AssetDatabase.LoadAssetAtPath<T>(assetPath);
+                if (asset != null)
+                {
+                    assets.Add(asset);
+                }
+            }
+            return assets;
+        }
+
+
     }
+
+
+
 }
