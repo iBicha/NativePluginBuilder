@@ -63,7 +63,7 @@ namespace iBicha
 
             sourceFolder = Path.GetFullPath("Assets/" + Name + "/NativeSource~/Source");
             buildFolder = Path.GetFullPath("Assets/" + Name + "/NativeSource~/Build");
-            pluginBinaryFolder = AssetDatabase.LoadAssetAtPath<Object>("Assets/" + Name + "/Plugins") //FIX: THIS IS NOT WORKING
+            pluginBinaryFolder = AssetDatabase.LoadAssetAtPath<Object>("Assets/" + Name + "/Plugins"); //FIX: THIS IS NOT WORKING
             AssetDatabase.CreateAsset(this, "Assets/" + Name + "/" + Name + ".asset");
 
             AssetDatabase.SaveAssets();
