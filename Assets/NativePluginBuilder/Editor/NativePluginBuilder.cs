@@ -4,6 +4,8 @@ using UnityEditor;
 using UnityEditor.AnimatedValues;
 using UnityEngine;
 using UnityEngine.Events;
+using System;
+using System.Linq;
 
 namespace iBicha
 {
@@ -200,7 +202,11 @@ namespace iBicha
             if (EditorGUILayout.BeginFadeGroup(NewPluginFoldoutAnimator.faded))
             {
                 EditorGUI.indentLevel++;
-                newPlugin.Name = EditorGUILayout.TextField("Plugin name", newPlugin.Name);
+				GUI.changed = false;
+				newPlugin.Name = EditorGUILayout.TextField("Plugin name", newPlugin.Name);
+				if (GUI.changed) {
+					newPlugin.Name = SanitizeName (newPlugin.Name);
+				}
                 newPlugin.Version = EditorGUILayout.TextField("Version", newPlugin.Version);
                 //Location for the plugin?
 
@@ -225,7 +231,11 @@ namespace iBicha
 
         void OnGuiNativePlugin(NativePlugin plugin)
         {
+			GUI.changed = false;
             plugin.Name = EditorGUILayout.TextField("Plugin name", plugin.Name);
+			if (GUI.changed) {
+				plugin.Name = SanitizeName (plugin.Name);
+			}
             plugin.Version = EditorGUILayout.TextField("Version", plugin.Version);
             plugin.BuildNumber = EditorGUILayout.IntField("Build Number", plugin.BuildNumber);
 
@@ -256,6 +266,17 @@ namespace iBicha
 			plugin.pluginBinaryFolder = (DefaultAsset)EditorGUILayout.ObjectField("Plugins folder", plugin.pluginBinaryFolder, typeof(DefaultAsset), false);
 
         }
+
+		private static string SanitizeName(string s)
+		{
+			s = String.Join("", (s.AsEnumerable()
+				.Select(chr => Char.IsLetter(chr) || Char.IsDigit(chr) ? chr.ToString() : "")).ToArray()
+			);
+			if (s.Length == 0 || Char.IsDigit (s [0])) {
+				s = 'A' + s;
+			}
+			return s;
+		}
 
         private bool BeginSettingsBox(int nr, GUIContent header, NativePlugin plugin)
         {

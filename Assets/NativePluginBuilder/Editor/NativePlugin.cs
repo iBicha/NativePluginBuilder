@@ -5,6 +5,7 @@ using System.Text;
 using UnityEditor;
 using UnityEditor.AnimatedValues;
 using UnityEngine;
+using System;
 
 namespace iBicha
 {
@@ -48,9 +49,15 @@ namespace iBicha
         #endregion
         public void Create()
         {
-            //THIS IS A LOT OF MESS. TO BE CONTINUED.
-            //Escape name
-            //check if exists
+			foreach (NativePlugin plugin in NativePluginSettings.plugins) {
+				if (plugin != this && plugin.Name == Name) {
+					throw new Exception("Plugin name \"" + Name + "\" already exists.");
+				}	
+			}
+
+			if (Directory.Exists ("Assets/" + Name)) {
+				throw new Exception("Assets/" + Name + " already exists.");
+			}
 
             FileUtil.CopyFileOrDirectory("Assets/NativePluginBuilder/Boilerplate~", "Assets/" + Name);
 
@@ -73,7 +80,7 @@ namespace iBicha
             AssetDatabase.SaveAssets();
 
         }
-
+			
         void ProcessTemplateFile(string filename)
         {
             string content = File.ReadAllText(filename);
