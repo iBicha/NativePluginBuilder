@@ -5,7 +5,6 @@ using UnityEditor.AnimatedValues;
 using UnityEngine;
 using UnityEngine.Events;
 using System;
-using System.Linq;
 
 namespace iBicha
 {
@@ -269,13 +268,24 @@ namespace iBicha
 
 		private static string SanitizeName(string s)
 		{
-			s = String.Join("", (s.AsEnumerable()
-				.Select(chr => Char.IsLetter(chr) || Char.IsDigit(chr) ? chr.ToString() : "")).ToArray()
-			);
-			if (s.Length == 0 || Char.IsDigit (s [0])) {
-				s = 'A' + s;
+			//s = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(s);
+			bool isValid = Microsoft.CSharp.CSharpCodeProvider.CreateProvider("C#").IsValidIdentifier(s);
+
+			if (!isValid)
+			{ 
+				// File name contains invalid chars, remove them
+				System.Text.RegularExpressions.Regex regex = 
+					new System.Text.RegularExpressions.Regex(@"[^\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}\p{Nl}\p{Mn}\p{Mc}\p{Cf}\p{Pc}\p{Lm}]");
+				s = regex.Replace(s, "");
+
+				// Class name doesn't begin with a letter, insert an underscore
+				if (!char.IsLetter(s, 0))
+				{
+					s = s.Insert(0, "_");
+				}
 			}
-			return s;
+
+			return s.Replace(" ", string.Empty);
 		}
 
         private bool BeginSettingsBox(int nr, GUIContent header, NativePlugin plugin)
