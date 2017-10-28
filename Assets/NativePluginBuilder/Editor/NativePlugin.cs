@@ -61,13 +61,17 @@ namespace iBicha
             ProcessTemplateFile("Assets/" + Name + "/" + Name + "Example.cs");
             ProcessTemplateFile("Assets/" + Name + "/Plugins/WebGL/PluginJS.jslib");
 
+			//Refresh to detect changes
+			AssetDatabase.Refresh();
+
+			//TODO: Make relative to root folder?
             sourceFolder = Path.GetFullPath("Assets/" + Name + "/NativeSource~/Source");
             buildFolder = Path.GetFullPath("Assets/" + Name + "/NativeSource~/Build");
 			pluginBinaryFolder = AssetDatabase.LoadAssetAtPath<DefaultAsset>("Assets/" + Name + "/Plugins");
             AssetDatabase.CreateAsset(this, "Assets/" + Name + "/" + Name + ".asset");
 
             AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
+
         }
 
         void ProcessTemplateFile(string filename)

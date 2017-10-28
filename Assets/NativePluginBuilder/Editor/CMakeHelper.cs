@@ -184,11 +184,17 @@ namespace iBicha
                         StartProcess(FindBinary("cmake"), new string[] { "--build .", "--target install" }, makeLocation, true, (output) =>
                         {
                             UnityEngine.Debug.Log(output);
+							EditorMainThread.Run(() => {
+								AssetDatabase.Refresh();
+							});
                         }, (exitCode, error) =>
                         {
                             if (exitCode == 0)
                             {
                                 UnityEngine.Debug.LogWarning(error);
+								EditorMainThread.Run(() => {
+									AssetDatabase.Refresh();
+								});
                             }
                             else
                             {
