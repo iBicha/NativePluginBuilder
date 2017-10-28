@@ -253,7 +253,7 @@ namespace iBicha
             }
             EditorGUILayout.EndHorizontal();
 
-            plugin.pluginBinaryFolder = EditorGUILayout.ObjectField("Plugins folder", plugin.pluginBinaryFolder, typeof(DefaultAsset), false);
+			plugin.pluginBinaryFolder = (DefaultAsset)EditorGUILayout.ObjectField("Plugins folder", plugin.pluginBinaryFolder, typeof(DefaultAsset), false);
 
         }
 

@@ -26,7 +26,7 @@ namespace iBicha
         public string Version;
         public int BuildNumber;
 
-        public Object pluginBinaryFolder;
+		public DefaultAsset pluginBinaryFolder;
         public string pluginBinaryFolderPath
         {
             get
@@ -63,7 +63,7 @@ namespace iBicha
 
             sourceFolder = Path.GetFullPath("Assets/" + Name + "/NativeSource~/Source");
             buildFolder = Path.GetFullPath("Assets/" + Name + "/NativeSource~/Build");
-            pluginBinaryFolder = AssetDatabase.LoadAssetAtPath<Object>("Assets/" + Name + "/Plugins"); //FIX: THIS IS NOT WORKING
+			pluginBinaryFolder = AssetDatabase.LoadAssetAtPath<DefaultAsset>("Assets/" + Name + "/Plugins");
             AssetDatabase.CreateAsset(this, "Assets/" + Name + "/" + Name + ".asset");
 
             AssetDatabase.SaveAssets();
