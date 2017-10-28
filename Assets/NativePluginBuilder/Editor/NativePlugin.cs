@@ -83,7 +83,10 @@ namespace iBicha
 
         public void Build()
         {
-            CMakeHelper.Build(this, BuildTarget.StandaloneWindows, BuildType.Debug, Architecture.x86_64);
+			if (!Directory.Exists(buildFolder)) {
+				Directory.CreateDirectory (buildFolder);
+			}
+			CMakeHelper.Build(this, BuildTarget.StandaloneOSXUniversal, BuildType.Debug, Architecture.x86_64);
         }
     }
 }
