@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEditor;
 using System.Text;
 using System.Diagnostics;
+using System.IO;
 
 namespace iBicha
 {
@@ -58,7 +59,7 @@ namespace iBicha
 				AddCmakeArg (cmakeArgs, "CMAKE_GENERATOR_PLATFORM", "x64", "STRING");
 			}
 
-			buildOptions.OutputDirectory = CombinePath (plugin.buildFolder, "Windows", buildOptions.Architecture.ToString ());
+			buildOptions.OutputDirectory = CombineFullPath (plugin.buildFolder, "Windows", buildOptions.Architecture.ToString ());
 
 			ProcessStartInfo startInfo = new ProcessStartInfo();
 			startInfo.FileName = CMakeHelper.GetCMakeLocation ();
@@ -81,6 +82,31 @@ namespace iBicha
 		public override void PostBuild (NativePlugin plugin, NativeBuildOptions buildOptions)
 		{
 			base.PostBuild (plugin, buildOptions);
+
+			string assetFile = CombinePath(
+				AssetDatabase.GetAssetPath (plugin.pluginBinaryFolder),
+				"Windows", 
+				buildOptions.Architecture.ToString(),
+				string.Format("{0}.dll", plugin.Name));
+
+			PluginImporter pluginImporter = PluginImporter.GetAtPath((assetFile)) as PluginImporter;
+			if (pluginImporter != null) {
+				pluginImporter.SetCompatibleWithAnyPlatform (false);
+				pluginImporter.SetCompatibleWithEditor (true);
+				if (buildOptions.Architecture == Architecture.x86) {
+					pluginImporter.SetCompatibleWithPlatform (BuildTarget.StandaloneWindows, true);
+				} else {
+					pluginImporter.SetCompatibleWithPlatform (BuildTarget.StandaloneWindows64, true);
+				}
+
+				pluginImporter.SetEditorData ("PLUGIN_NAME", plugin.Name);
+				pluginImporter.SetEditorData ("PLUGIN_VERSION", plugin.Version);
+				pluginImporter.SetEditorData ("PLUGIN_BUILD_NUMBER", plugin.BuildNumber.ToString());
+				pluginImporter.SetEditorData ("BUILD_TYPE", buildOptions.BuildType.ToString());
+
+				pluginImporter.SaveAndReimport ();
+			}
+
 		}
 
 	}

@@ -55,13 +55,13 @@ namespace iBicha
 
 			//We need our own copy of the toolchain, because we need to pass --em-config to emcc.
 			//args.Add(string.Format("-DCMAKE_TOOLCHAIN_FILE=\"{0}{1}\" ", GetEmscriptenLocation(), "/cmake/Modules/Platform/Emscripten.cmake"));
-			AddCmakeArg (cmakeArgs, "CMAKE_TOOLCHAIN_FILE", CombinePath(plugin.buildFolder, "../CMake/Emscripten.cmake"), "FILEPATH");
+			AddCmakeArg (cmakeArgs, "CMAKE_TOOLCHAIN_FILE", CombineFullPath(plugin.buildFolder, "../CMake/Emscripten.cmake"), "FILEPATH");
 			AddCmakeArg (cmakeArgs, "EMSCRIPTEN_ROOT_PATH", GetEmscriptenLocation(), "PATH");
 
 			string emconfig = RefreshEmscriptenConfig(plugin.buildFolder);
 			AddCmakeArg (cmakeArgs, "EM_CONFIG", emconfig, "FILEPATH");
 
-			buildOptions.OutputDirectory = CombinePath (plugin.buildFolder, "WebGL");
+			buildOptions.OutputDirectory = CombineFullPath (plugin.buildFolder, "WebGL");
 
 			ProcessStartInfo startInfo = new ProcessStartInfo();
 			startInfo.FileName = CMakeHelper.GetCMakeLocation ();
@@ -84,11 +84,26 @@ namespace iBicha
 		public override void PostBuild (NativePlugin plugin, NativeBuildOptions buildOptions)
 		{
 			base.PostBuild (plugin, buildOptions);
+
+			string assetFile = CombinePath(
+				AssetDatabase.GetAssetPath (plugin.pluginBinaryFolder),
+				"WebGL", 
+				string.Format("{0}.bc", plugin.Name));
+
+			PluginImporter pluginImporter = PluginImporter.GetAtPath((assetFile)) as PluginImporter;
+			if (pluginImporter != null) {
+				pluginImporter.SetEditorData ("PLUGIN_NAME", plugin.Name);
+				pluginImporter.SetEditorData ("PLUGIN_VERSION", plugin.Version);
+				pluginImporter.SetEditorData ("PLUGIN_BUILD_NUMBER", plugin.BuildNumber.ToString());
+				pluginImporter.SetEditorData ("BUILD_TYPE", buildOptions.BuildType.ToString());
+
+				pluginImporter.SaveAndReimport ();
+			}
 		}
 
 		private static string GetEmscriptenLocation()
 		{
-			return CombinePath(GetEditorLocation(), "PlaybackEngines/WebGLSupport/BuildTools/Emscripten");
+			return CombineFullPath(GetEditorLocation(), "PlaybackEngines/WebGLSupport/BuildTools/Emscripten");
 		}
 
 		private static string GetMinGW32MakeLocation()
@@ -106,11 +121,11 @@ namespace iBicha
 			sb.AppendFormat("EMSCRIPTEN_ROOT='{0}'\n", GetEmscriptenLocation());
 			sb.Append("SPIDERMONKEY_ENGINE=''\n");
 			sb.Append("V8_ENGINE=''\n");
-			sb.AppendFormat("BINARYEN_ROOT='{0}'\n", CombinePath(GetLLVMLocation(), "binaryen"));
+			sb.AppendFormat("BINARYEN_ROOT='{0}'\n", CombineFullPath(GetLLVMLocation(), "binaryen"));
 			sb.Append("COMPILER_ENGINE=NODE_JS\n");
 			sb.Append("JS_ENGINES=[NODE_JS]\n");
 			sb.Append("JAVA=''");
-			string path = CombinePath(buildFolder, "emscripten.config");
+			string path = CombineFullPath(buildFolder, "emscripten.config");
 			File.WriteAllText(path, sb.ToString());
 			return path;
 		}
@@ -120,10 +135,10 @@ namespace iBicha
 			switch (EditorPlatform)
 			{
 			case RuntimePlatform.WindowsEditor:
-				return CombinePath(GetToolsLocation(), "nodejs/node.exe");
+				return CombineFullPath(GetToolsLocation(), "nodejs/node.exe");
 			case RuntimePlatform.OSXEditor:
 			case RuntimePlatform.LinuxEditor:
-				return CombinePath(GetToolsLocation(), "nodejs/bin/node");
+				return CombineFullPath(GetToolsLocation(), "nodejs/bin/node");
 			default:
 				throw new PlatformNotSupportedException("Unknown platform");
 			}
@@ -134,11 +149,11 @@ namespace iBicha
 			switch (EditorPlatform)
 			{
 			case RuntimePlatform.WindowsEditor:
-				return CombinePath(GetEmscriptenLocation(), "../Emscripten_FastComp_Win");
+				return CombineFullPath(GetEmscriptenLocation(), "../Emscripten_FastComp_Win");
 			case RuntimePlatform.OSXEditor:
-				return CombinePath(GetEmscriptenLocation(), "../Emscripten_FastComp_Mac");
+				return CombineFullPath(GetEmscriptenLocation(), "../Emscripten_FastComp_Mac");
 			case RuntimePlatform.LinuxEditor:
-				return CombinePath(GetEmscriptenLocation(), "../Emscripten_FastComp_Linux");
+				return CombineFullPath(GetEmscriptenLocation(), "../Emscripten_FastComp_Linux");
 			default:
 				throw new PlatformNotSupportedException("Unknown platform");
 			}

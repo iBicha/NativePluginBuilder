@@ -39,7 +39,7 @@ namespace iBicha
 			cmakeArgs.AppendFormat ("-B{0} ", "iOS");
 			AddCmakeArg (cmakeArgs, "SIMULATOR", buildOptions.IsSimulatorBuild ? "ON" : "OFF", "BOOL");
 
-			buildOptions.OutputDirectory = CombinePath (plugin.buildFolder, "iOS");
+			buildOptions.OutputDirectory = CombineFullPath (plugin.buildFolder, "iOS");
 
 			ProcessStartInfo startInfo = new ProcessStartInfo();
 			startInfo.FileName = CMakeHelper.GetCMakeLocation ();
@@ -64,24 +64,23 @@ namespace iBicha
 		{
 			base.PostBuild (plugin, buildOptions);
 
-			string folder = Path.Combine(AssetDatabase.GetAssetPath (plugin.pluginBinaryFolder), "iOS");
-			string[] files = Directory.GetFiles (folder);
-			foreach (string file in files) {
-				string assetFile = Path.Combine(folder, Path.GetFileName(file));
-				if (Path.GetExtension (assetFile) == ".a") {
-					PluginImporter pluginImporter = PluginImporter.GetAtPath((assetFile)) as PluginImporter;
-					if (pluginImporter != null) {
-						pluginImporter.SetCompatibleWithAnyPlatform (false);
-						pluginImporter.SetCompatibleWithPlatform (BuildTarget.iOS, true);
+			string assetFile = CombinePath(
+				AssetDatabase.GetAssetPath (plugin.pluginBinaryFolder),
+				"iOS", 
+				string.Format("lib{0}.a", plugin.Name));
+			
+			PluginImporter pluginImporter = PluginImporter.GetAtPath((assetFile)) as PluginImporter;
+			if (pluginImporter != null) {
+				pluginImporter.SetCompatibleWithAnyPlatform (false);
+				pluginImporter.SetCompatibleWithPlatform (BuildTarget.iOS, true);
 
-						pluginImporter.SetEditorData ("PLUGIN_NAME", plugin.Name);
-						pluginImporter.SetEditorData ("PLUGIN_VERSION", plugin.Version);
-						pluginImporter.SetEditorData ("PLUGIN_BUILD_NUMBER", plugin.BuildNumber.ToString());
-						pluginImporter.SetEditorData ("SIMULATOR", buildOptions.IsSimulatorBuild.ToString());
+				pluginImporter.SetEditorData ("PLUGIN_NAME", plugin.Name);
+				pluginImporter.SetEditorData ("PLUGIN_VERSION", plugin.Version);
+				pluginImporter.SetEditorData ("PLUGIN_BUILD_NUMBER", plugin.BuildNumber.ToString());
+				pluginImporter.SetEditorData ("BUILD_TYPE", buildOptions.BuildType.ToString());
+				pluginImporter.SetEditorData ("SIMULATOR", buildOptions.IsSimulatorBuild.ToString());
 
-						pluginImporter.SaveAndReimport ();
-					}
-				}
+				pluginImporter.SaveAndReimport ();
 			}
 		}
 

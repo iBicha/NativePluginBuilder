@@ -47,7 +47,7 @@ namespace iBicha
 			string ndkLocation = GetNDKLocation();
 			AddCmakeArg (cmakeArgs, "ANDROID_NDK", ndkLocation, "PATH");
 
-			string toolchain = CombinePath(ndkLocation, "build/cmake/android.toolchain.cmake");
+			string toolchain = CombineFullPath(ndkLocation, "build/cmake/android.toolchain.cmake");
 			AddCmakeArg (cmakeArgs, "CMAKE_TOOLCHAIN_FILE", "\"" + toolchain + "\"", "FILEPATH");
 
 			string archName = buildOptions.Architecture == Architecture.arm ? "armeabi-v7a" : "x86";
@@ -58,7 +58,7 @@ namespace iBicha
 				AddCmakeArg (cmakeArgs, "ANDROID_PLATFORM", "android-" + buildOptions.AndroidSdkVersion);
 			}
 				
-			buildOptions.OutputDirectory = CombinePath (plugin.buildFolder, "Android", archName);
+			buildOptions.OutputDirectory = CombineFullPath (plugin.buildFolder, "Android", archName);
 
 			ProcessStartInfo startInfo = new ProcessStartInfo();
 			startInfo.FileName = CMakeHelper.GetCMakeLocation ();
@@ -83,6 +83,29 @@ namespace iBicha
 		public override void PostBuild (NativePlugin plugin, NativeBuildOptions buildOptions)
 		{
 			base.PostBuild (plugin, buildOptions);
+
+			string archName = buildOptions.Architecture == Architecture.arm ? "armeabi-v7a" : "x86";
+
+			string assetFile = CombinePath(
+				AssetDatabase.GetAssetPath (plugin.pluginBinaryFolder),
+				"Android", 
+				archName,
+				string.Format("lib{0}.a", plugin.Name));
+
+			PluginImporter pluginImporter = PluginImporter.GetAtPath((assetFile)) as PluginImporter;
+			if (pluginImporter != null) {
+				pluginImporter.SetCompatibleWithAnyPlatform (false);
+				pluginImporter.SetCompatibleWithPlatform (BuildTarget.Android, true);
+				//TODO: set arch
+
+				pluginImporter.SetEditorData ("PLUGIN_NAME", plugin.Name);
+				pluginImporter.SetEditorData ("PLUGIN_VERSION", plugin.Version);
+				pluginImporter.SetEditorData ("PLUGIN_BUILD_NUMBER", plugin.BuildNumber.ToString());
+				pluginImporter.SetEditorData ("BUILD_TYPE", buildOptions.BuildType.ToString());
+				pluginImporter.SetEditorData ("ANDROID_SDK_VERSION", buildOptions.AndroidSdkVersion.ToString());
+
+				pluginImporter.SaveAndReimport ();
+			}
 		}
 	
 
@@ -91,7 +114,7 @@ namespace iBicha
 		{
 			//Get the default location
 			string sdk = GetSDKLocation();
-			string ndk = CombinePath(sdk, "ndk-bundle");
+			string ndk = CombineFullPath(sdk, "ndk-bundle");
 			if (Directory.Exists(ndk))
 			{
 				return ndk;

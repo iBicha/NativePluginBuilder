@@ -103,7 +103,12 @@ namespace iBicha {
 			{
 				text = Path.Combine(text, components[i]);
 			}
-			return Path.GetFullPath(text).Replace('\\', '/');
+			return text.Replace('\\', '/');
+		}
+
+		protected static string CombineFullPath(params string[] components)
+		{
+			return Path.GetFullPath(CombinePath(components)).Replace('\\', '/');
 		}
 
 		protected static string GetEditorLocation()
@@ -111,7 +116,7 @@ namespace iBicha {
 			switch (EditorPlatform)
 			{
 			case RuntimePlatform.WindowsEditor:
-				return CombinePath(Path.GetDirectoryName(EditorApplication.applicationPath), "Data");
+				return CombineFullPath(Path.GetDirectoryName(EditorApplication.applicationPath), "Data");
 			default:
 				return Path.GetDirectoryName(EditorApplication.applicationPath);
 			}
@@ -122,9 +127,9 @@ namespace iBicha {
 			switch (EditorPlatform)
 			{
 			case RuntimePlatform.WindowsEditor:
-				return CombinePath(GetEditorLocation(), "Tools");
+				return CombineFullPath(GetEditorLocation(), "Tools");
 			case RuntimePlatform.OSXEditor:
-				return CombinePath(EditorApplication.applicationPath, "Contents/Tools");
+				return CombineFullPath(EditorApplication.applicationPath, "Contents/Tools");
 			case RuntimePlatform.LinuxEditor:
 				//TODO:
 				throw new NotImplementedException();

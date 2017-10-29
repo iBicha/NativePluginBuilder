@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEditor;
 using System.Text;
 using System.Diagnostics;
+using System.IO;
 
 namespace iBicha
 {
@@ -42,7 +43,7 @@ namespace iBicha
 			AddCmakeArg (cmakeArgs, "OSX", "ON", "BOOL");
 			cmakeArgs.AppendFormat ("-B{0} ", "OSX");
 
-			buildOptions.OutputDirectory = CombinePath (plugin.buildFolder, "OSX");
+			buildOptions.OutputDirectory = CombineFullPath (plugin.buildFolder, "OSX");
 
 			ProcessStartInfo startInfo = new ProcessStartInfo();
 			startInfo.FileName = CMakeHelper.GetCMakeLocation ();
@@ -66,6 +67,26 @@ namespace iBicha
 		public override void PostBuild (NativePlugin plugin, NativeBuildOptions buildOptions)
 		{
 			base.PostBuild (plugin, buildOptions);
+
+			string assetFile = CombinePath(
+				AssetDatabase.GetAssetPath (plugin.pluginBinaryFolder),
+				"OSX", 
+				string.Format("{0}.bundle", plugin.Name));
+
+			PluginImporter pluginImporter = PluginImporter.GetAtPath((assetFile)) as PluginImporter;
+			if (pluginImporter != null) {
+				pluginImporter.SetCompatibleWithAnyPlatform (false);
+				pluginImporter.SetCompatibleWithEditor (true);
+				pluginImporter.SetCompatibleWithPlatform (BuildTarget.StandaloneOSXUniversal, true);
+
+				pluginImporter.SetEditorData ("PLUGIN_NAME", plugin.Name);
+				pluginImporter.SetEditorData ("PLUGIN_VERSION", plugin.Version);
+				pluginImporter.SetEditorData ("PLUGIN_BUILD_NUMBER", plugin.BuildNumber.ToString());
+				pluginImporter.SetEditorData ("BUILD_TYPE", buildOptions.BuildType.ToString());
+
+				pluginImporter.SaveAndReimport ();
+			}
+
 		}
 
 	}
