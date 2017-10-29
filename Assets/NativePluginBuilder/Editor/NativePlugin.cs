@@ -27,6 +27,8 @@ namespace iBicha
         public string Version;
         public int BuildNumber;
 
+		public Dictionary<string, string> Definitions;
+
 		public DefaultAsset pluginBinaryFolder;
         public string pluginBinaryFolderPath
         {
@@ -90,10 +92,66 @@ namespace iBicha
 
         public void Build()
         {
-			if (!Directory.Exists(buildFolder)) {
-				Directory.CreateDirectory (buildFolder);
-			}
-			CMakeHelper.Build(this, BuildTarget.StandaloneOSXUniversal, BuildType.Debug, Architecture.x86_64);
+			NativeBuildOptions options = new NativeBuildOptions ();
+			options.BuildTarget = BuildTarget.iOS;
+
+			PluginBuilderBase builder = PluginBuilderBase.GetBuilderForTarget (options.BuildTarget);
+
+			builder.PreBuild (this, options);
+
+			BackgroundProcess buildProcess = builder.Build (this, options);
+			/*buildProcess.OutputLine += (string str) => {
+				Debug.Log(str);
+			};
+			buildProcess.ErrorLine += (string str) => {
+				Debug.LogError(str);
+			};*/
+			buildProcess.Exited += (exitCode, outputData, errorData) => {
+
+				if(!string.IsNullOrEmpty(outputData)){
+					Debug.Log(string.Format("{0}:\n{1}", buildProcess.Name, outputData));
+				}
+
+				if(exitCode == 0) {
+					if(!string.IsNullOrEmpty(errorData)){
+						Debug.LogWarning(string.Format("{0}:\n{1}", buildProcess.Name, errorData));
+					}
+				} else {
+					if(!string.IsNullOrEmpty(errorData)){
+						Debug.LogError(string.Format("{0}:\n{1}", buildProcess.Name, errorData));
+					}
+				}
+			};
+
+			BackgroundProcess installProcess = builder.Install (this, options);
+			/*installProcess.OutputLine += (string str) => {
+				Debug.Log(str);
+			};
+			installProcess.ErrorLine += (string str) => {
+				Debug.LogError(str);
+			};*/
+
+			installProcess.StartAfter (buildProcess);
+
+			installProcess.Exited += (exitCode, outputData, errorData) => {
+
+				if(!string.IsNullOrEmpty(outputData)){
+					Debug.Log(string.Format("{0}:\n{1}", installProcess.Name, outputData));
+				}
+
+				if(exitCode == 0) {
+					if(!string.IsNullOrEmpty(errorData)){
+						Debug.LogWarning(string.Format("{0}:\n{1}", installProcess.Name, errorData));
+					}
+					builder.PostBuild(this,options);
+				} else {
+					if(!string.IsNullOrEmpty(errorData)){
+						Debug.LogError(string.Format("{0}:\n{1}", installProcess.Name, errorData));
+					}
+				}
+			};
+
+			buildProcess.Start ();
         }
     }
 }
