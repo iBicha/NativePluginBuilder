@@ -78,6 +78,7 @@ namespace iBicha
 				pluginImporter.SetCompatibleWithAnyPlatform (false);
 				pluginImporter.SetCompatibleWithEditor (true);
 				pluginImporter.SetCompatibleWithPlatform (BuildTarget.StandaloneOSXUniversal, true);
+				pluginImporter.SetEditorData ("OS", "OSX");
 
 				pluginImporter.SetEditorData ("PLUGIN_NAME", plugin.Name);
 				pluginImporter.SetEditorData ("PLUGIN_VERSION", plugin.Version);

@@ -93,6 +93,9 @@ namespace iBicha
 			if (pluginImporter != null) {
 				pluginImporter.SetCompatibleWithAnyPlatform (false);
 				pluginImporter.SetCompatibleWithEditor (true);
+				pluginImporter.SetEditorData ("OS", "Windows");
+				pluginImporter.SetEditorData ("CPU", buildOptions.Architecture.ToString());
+
 				if (buildOptions.Architecture == Architecture.x86) {
 					pluginImporter.SetCompatibleWithPlatform (BuildTarget.StandaloneWindows, true);
 				} else {
