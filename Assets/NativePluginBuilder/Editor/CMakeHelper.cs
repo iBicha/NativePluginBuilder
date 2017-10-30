@@ -64,8 +64,12 @@ namespace iBicha
             {
                 return "cmake";
             }
+            if (EditorPlatform == RuntimePlatform.OSXEditor)
+            {
+                return "/usr/local/bin/cmake";
+            }
             //TODO: temp hack
-            return "/usr/local/bin/cmake";
+            return "cmake";
         }
  
         public static RuntimePlatform EditorPlatform

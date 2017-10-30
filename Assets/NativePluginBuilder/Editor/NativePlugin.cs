@@ -93,8 +93,8 @@ namespace iBicha
         public void Build()
         {
 			NativeBuildOptions options = new NativeBuildOptions ();
-			options.BuildTarget = BuildTarget.iOS;
-
+			options.BuildTarget = BuildTarget.StandaloneLinux;
+			options.Architecture = Architecture.x86_64;
 			PluginBuilderBase builder = PluginBuilderBase.GetBuilderForTarget (options.BuildTarget);
 
 			builder.PreBuild (this, options);
