@@ -46,7 +46,7 @@ namespace iBicha
 				}
 			}
 			string warnings = warningStringBuilder.ToString ();
-			if (!string.IsNullOrEmpty) {
+			if (!string.IsNullOrEmpty(warnings)) {
 				Debug.LogWarning (warnings);
 			}
 		}
