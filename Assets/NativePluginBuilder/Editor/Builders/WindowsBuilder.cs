@@ -15,10 +15,16 @@ namespace iBicha
 		public override void PreBuild (NativePlugin plugin, NativeBuildOptions buildOptions){
 			base.PreBuild (plugin, buildOptions);
 
-			if (buildOptions.BuildTarget == BuildTarget.StandaloneWindows64) {
-				buildOptions.BuildTarget = BuildTarget.StandaloneWindows;
-				buildOptions.Architecture = Architecture.x86_64;
-			}
+            if (buildOptions.BuildTarget == BuildTarget.StandaloneWindows64 && buildOptions.Architecture == Architecture.Any)
+            {
+                buildOptions.BuildTarget = BuildTarget.StandaloneWindows;
+                buildOptions.Architecture = Architecture.x86_64;
+            }
+
+            if (buildOptions.BuildTarget == BuildTarget.StandaloneWindows && buildOptions.Architecture == Architecture.Any)
+            {
+                buildOptions.Architecture = Architecture.x86;
+            }
 
 			if (buildOptions.BuildTarget != BuildTarget.StandaloneWindows) {
 				throw new System.ArgumentException (string.Format(
@@ -156,7 +162,6 @@ namespace iBicha
                 foreach (object key in dict.Keys)
                 {
                     versions.Add((int)key);
-                    UnityEngine.Debug.Log(versions.Last<int>());
                 }
 
                 int[] sortedVersions = versions.ToArray();

@@ -9,7 +9,6 @@ using System.Text;
 
 public class #PLUGIN_NAME#
 {
-    //TODO: embed version and build number in c# to compare with library, detecting old builds.
     private static string version;
     public static string Version
     {
