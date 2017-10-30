@@ -165,10 +165,12 @@ namespace iBicha
 
                         EditorGUILayout.BeginHorizontal();
                         GUILayout.FlexibleSpace();
+                        GUI.enabled = !EditorApplication.isUpdating && !EditorApplication.isUpdating;
                         if (GUILayout.Button("Build", GUILayout.Width(110)))
                         {
                             plugin.Build();
                         }
+                        GUI.enabled = true;
                         if (GUILayout.Button("Remove", GUILayout.Width(110)))
                         {
                             if (EditorUtility.DisplayDialog("Remove " + plugin.Name + "?", "This will remove the plugin from the builder. Source files will not be deleted.", "Remove", "Cancel"))
