@@ -90,15 +90,17 @@ namespace iBicha
 				AssetDatabase.GetAssetPath (plugin.pluginBinaryFolder),
 				"Android", 
 				archName,
-				string.Format("lib{0}.a", plugin.Name));
+				string.Format("lib{0}.so", plugin.Name));
 
 			PluginImporter pluginImporter = PluginImporter.GetAtPath((assetFile)) as PluginImporter;
 			if (pluginImporter != null) {
 				pluginImporter.SetCompatibleWithAnyPlatform (false);
 				pluginImporter.SetCompatibleWithPlatform (BuildTarget.Android, true);
-				//TODO: set arch
 
-				pluginImporter.SetEditorData ("PLUGIN_NAME", plugin.Name);
+                string editorArchName = buildOptions.Architecture == Architecture.arm ? "ARMv7" : "x86";
+                pluginImporter.SetEditorData("CPU", editorArchName);
+
+                pluginImporter.SetEditorData ("PLUGIN_NAME", plugin.Name);
 				pluginImporter.SetEditorData ("PLUGIN_VERSION", plugin.Version);
 				pluginImporter.SetEditorData ("PLUGIN_BUILD_NUMBER", plugin.BuildNumber.ToString());
 				pluginImporter.SetEditorData ("BUILD_TYPE", buildOptions.BuildType.ToString());
