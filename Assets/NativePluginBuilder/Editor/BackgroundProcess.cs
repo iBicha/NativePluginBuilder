@@ -20,7 +20,7 @@ namespace iBicha
 		public StringBuilder outputData;
 		public StringBuilder errorData;
 
-		private Process process;
+		public Process process;
 
 		public BackgroundProcess nextProcess;
 		public bool nextStopOnError;

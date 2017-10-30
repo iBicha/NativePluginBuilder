@@ -43,9 +43,10 @@ namespace iBicha
 		{
 			StringBuilder cmakeArgs = GetBasePluginCMakeArgs (plugin);
 
-			AddCmakeArg (cmakeArgs, "CMAKE_CONFIGURATION_TYPES", buildOptions.BuildType.ToString());
+			AddCmakeArg (cmakeArgs, "CMAKE_CONFIGURATION_TYPES", "Debug;Release");
+            AddCmakeArg(cmakeArgs, "CMAKE_BUILD_TYPE", buildOptions.BuildType.ToString());
 
-			AddCmakeArg (cmakeArgs, "WINDOWS", "ON", "BOOL");
+            AddCmakeArg(cmakeArgs, "WINDOWS", "ON", "BOOL");
 			cmakeArgs.AppendFormat ("-B{0}/{1} ", "Windows", buildOptions.Architecture.ToString());
 
 			AddCmakeArg (cmakeArgs, "ARCH", buildOptions.Architecture.ToString(), "STRING");
@@ -76,7 +77,10 @@ namespace iBicha
 		{
 			BackgroundProcess process = base.Install (plugin, buildOptions);
 			process.Name = string.Format ("Installing \"{0}\" for {1} ({2})", plugin.Name, "Windows", buildOptions.Architecture.ToString());
-			return process;
+
+            process.process.StartInfo.Arguments += " --config " + buildOptions.BuildType.ToString();
+
+            return process;
 		}
 
 		public override void PostBuild (NativePlugin plugin, NativeBuildOptions buildOptions)

@@ -93,8 +93,8 @@ namespace iBicha
         public void Build()
         {
 			NativeBuildOptions options = new NativeBuildOptions ();
-			options.BuildTarget = BuildTarget.StandaloneLinux;
-			options.Architecture = Architecture.x86_64;
+			options.BuildTarget = BuildTarget.StandaloneWindows64;
+            options.BuildType = BuildType.Release;
 			PluginBuilderBase builder = PluginBuilderBase.GetBuilderForTarget (options.BuildTarget);
 
 			builder.PreBuild (this, options);
