@@ -22,6 +22,8 @@ namespace iBicha
 
         private static string cmakeVersion;
 
+        private BackgroundProcessManager backgroundProcessManager;
+
         private static GUIStyle _foldoutBold;
 
         private static GUIStyle foldoutBold
@@ -39,7 +41,7 @@ namespace iBicha
 
         private static GUIStyle _categoryBox;
 
-        private static GUIStyle categoryBox
+        public static GUIStyle categoryBox
         {
             get
             {
@@ -84,6 +86,8 @@ namespace iBicha
             {
                 cmakeVersion = version;
             });
+
+            backgroundProcessManager = new BackgroundProcessManager(this);
         }
 
         private void OnDisable()
@@ -117,7 +121,7 @@ namespace iBicha
 
         void OnGuiStatusBar()
         {
-			BackgroundProcessManager.OnGUI ();
+            backgroundProcessManager.OnGUI ();
         }
 
         void OnGuiSettings()

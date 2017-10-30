@@ -21,6 +21,7 @@ namespace iBicha
 		public StringBuilder errorData;
 
 		public Process process;
+        public string lastLine;
 
 		public BackgroundProcess nextProcess;
 		public bool nextStopOnError;
@@ -65,6 +66,7 @@ namespace iBicha
 		void Process_ErrorDataReceived (object sender, DataReceivedEventArgs e)
 		{
 			errorData.AppendLine (e.Data);
+            lastLine = e.Data;
 			Action<string> ErrorLineHandler = ErrorLine;
 			if (ErrorLineHandler != null) {
 				EditorMainThread.Run (()=>{
@@ -76,6 +78,7 @@ namespace iBicha
 
 		void Process_OutputDataReceived (object sender, DataReceivedEventArgs e)
 		{
+            lastLine = e.Data;
 			outputData.AppendLine (e.Data);
 			Action<string> OutputLineHandler = OutputLine;
 			if (OutputLineHandler != null) {
