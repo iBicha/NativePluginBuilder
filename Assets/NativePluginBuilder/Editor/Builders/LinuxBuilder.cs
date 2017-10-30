@@ -8,7 +8,15 @@ using System.Diagnostics;
 namespace iBicha
 {
 	public class LinuxBuilder : PluginBuilderBase {
-		public override void PreBuild (NativePlugin plugin, NativeBuildOptions buildOptions){
+        public override bool IsAvailable
+        {
+            get
+            {
+                return EditorPlatform == RuntimePlatform.LinuxEditor;
+            }
+        }
+
+        public override void PreBuild (NativePlugin plugin, NativeBuildOptions buildOptions){
 			base.PreBuild (plugin, buildOptions);
 
 			if (buildOptions.BuildTarget == BuildTarget.StandaloneLinux64) {

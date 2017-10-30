@@ -9,15 +9,15 @@ using System.Diagnostics;
 
 
 namespace iBicha {
-	//Each platform should implemet this e.g. IOSPluginBuilder
 	public abstract class PluginBuilderBase {
+        public abstract bool IsAvailable { get; }
 
-		public virtual void PreBuild (NativePlugin plugin, NativeBuildOptions buildOptions){
-			//Check for cmake
+        public virtual void PreBuild (NativePlugin plugin, NativeBuildOptions buildOptions){
+			//TODO: Check for cmake
+
 			if (!Directory.Exists(plugin.buildFolder)) {
 				Directory.CreateDirectory (plugin.buildFolder);
 			}
-			//throw new System.NotImplementedException();
 		}
 
 		public abstract BackgroundProcess Build (NativePlugin plugin, NativeBuildOptions buildOptions);

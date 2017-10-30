@@ -8,7 +8,15 @@ using System.Diagnostics;
 namespace iBicha
 {
 	public class AndroidBuilder : PluginBuilderBase {
-		public override void PreBuild (NativePlugin plugin, NativeBuildOptions buildOptions){
+        public override bool IsAvailable
+        {
+            get
+            {
+                return IsAndroidModuleInstalled;
+            }
+        }
+
+        public override void PreBuild (NativePlugin plugin, NativeBuildOptions buildOptions){
 			base.PreBuild (plugin, buildOptions);
 
 			if (buildOptions.BuildTarget != BuildTarget.Android) {
@@ -109,10 +117,15 @@ namespace iBicha
 				pluginImporter.SaveAndReimport ();
 			}
 		}
-	
 
+        private static bool IsAndroidModuleInstalled
+        {
+            get {
+                return Directory.Exists(CombineFullPath(GetEditorLocation(), "PlaybackEngines/AndroidPlayer"));
+            }
+        }
 
-		private static string GetNDKLocation()
+        private static string GetNDKLocation()
 		{
 			//Get the default location
 			string sdk = GetSDKLocation();

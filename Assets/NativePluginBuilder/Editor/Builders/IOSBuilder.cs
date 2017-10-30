@@ -9,7 +9,15 @@ using System.IO;
 namespace iBicha
 {
 	public class IOSBuilder : PluginBuilderBase {
-		public override void PreBuild (NativePlugin plugin, NativeBuildOptions buildOptions){
+        public override bool IsAvailable
+        {
+            get
+            {
+                return EditorPlatform == RuntimePlatform.OSXEditor;
+            }
+        }
+
+        public override void PreBuild (NativePlugin plugin, NativeBuildOptions buildOptions){
 			base.PreBuild (plugin, buildOptions);
 
 			if (buildOptions.BuildTarget != BuildTarget.iOS) {

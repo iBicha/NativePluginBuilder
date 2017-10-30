@@ -12,7 +12,15 @@ using System.Reflection;
 namespace iBicha
 {
 	public class WindowsBuilder : PluginBuilderBase {
-		public override void PreBuild (NativePlugin plugin, NativeBuildOptions buildOptions){
+        public override bool IsAvailable
+        {
+            get
+            {
+                return EditorPlatform == RuntimePlatform.WindowsEditor;
+            }
+        }
+
+        public override void PreBuild (NativePlugin plugin, NativeBuildOptions buildOptions){
 			base.PreBuild (plugin, buildOptions);
 
             if (buildOptions.BuildTarget == BuildTarget.StandaloneWindows64 && buildOptions.Architecture == Architecture.Any)

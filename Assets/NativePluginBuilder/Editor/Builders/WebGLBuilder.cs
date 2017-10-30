@@ -10,7 +10,15 @@ using System.Diagnostics;
 namespace iBicha
 {
 	public class WebGLBuilder : PluginBuilderBase {
-		public override void PreBuild (NativePlugin plugin, NativeBuildOptions buildOptions){
+        public override bool IsAvailable
+        {
+            get
+            {
+                return Directory.Exists(GetEmscriptenLocation());
+            }
+        }
+
+        public override void PreBuild (NativePlugin plugin, NativeBuildOptions buildOptions){
 			base.PreBuild (plugin, buildOptions);
 
 			if (buildOptions.BuildTarget != BuildTarget.WebGL) {
