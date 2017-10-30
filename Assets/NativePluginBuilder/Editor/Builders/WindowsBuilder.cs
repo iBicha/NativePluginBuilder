@@ -5,6 +5,9 @@ using UnityEditor;
 using System.Text;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System;
+using System.Reflection;
 
 namespace iBicha
 {
@@ -36,8 +39,11 @@ namespace iBicha
 					"BuildType not supported: only Debug and Release, current:\"{0}\"", buildOptions.BuildType));
 			}
 
-			//Visual Studio check
-		}
+            if(InstalledVisualStudios.Length == 0)
+            {
+                throw new System.InvalidOperationException("Could not find Visual Studio");
+            }
+        }
 
 		public override BackgroundProcess Build (NativePlugin plugin, NativeBuildOptions buildOptions)
 		{
@@ -51,12 +57,10 @@ namespace iBicha
 
 			AddCmakeArg (cmakeArgs, "ARCH", buildOptions.Architecture.ToString(), "STRING");
 
-			//TODO: fix hardcoded vs version
-			//https://cmake.org/cmake/help/v3.7/generator/Visual%20Studio%2015%202017.html
-			//1-Find visual studio in Unity settings
-			//2-Find all installed vs versions, use the newest.
-			cmakeArgs.AppendFormat ("-G {0} ", "\"Visual Studio 15 2017\"");
-			if (buildOptions.Architecture == Architecture.x86_64) {
+            cmakeArgs.AppendFormat ("-G \"{0} {1}\" ", "Visual Studio", InstalledVisualStudios.Last<int>());
+         
+            //Default is x86
+            if (buildOptions.Architecture == Architecture.x86_64) {
 				AddCmakeArg (cmakeArgs, "CMAKE_GENERATOR_PLATFORM", "x64", "STRING");
 			}
 
@@ -116,5 +120,49 @@ namespace iBicha
 
 		}
 
-	}
+        private static Type tySyncVS;
+        private static PropertyInfo PIInstalledVisualStudios;
+
+        public static int[] InstalledVisualStudios
+        {
+            get
+            {
+                if(EditorPlatform != RuntimePlatform.WindowsEditor )
+                {
+                    return new int[] { };
+                }
+
+                if (tySyncVS == null)
+                {
+                    Assembly UnityEditor = typeof(Editor).Assembly;
+                    tySyncVS = UnityEditor.GetType("UnityEditor.SyncVS", true);
+                    if (tySyncVS == null)
+                    {
+                        return new int[] { };
+                    }
+                }
+
+                if (PIInstalledVisualStudios == null)
+                {
+                    PIInstalledVisualStudios = tySyncVS.GetProperty("InstalledVisualStudios", BindingFlags.NonPublic | BindingFlags.Static);
+                    if (PIInstalledVisualStudios == null)
+                    {
+                        return new int[] { };
+                    }
+                }
+
+                IDictionary dict = PIInstalledVisualStudios.GetValue(null, null) as IDictionary;
+                List<int> versions = new List<int>();
+                foreach (object key in dict.Keys)
+                {
+                    versions.Add((int)key);
+                    UnityEngine.Debug.Log(versions.Last<int>());
+                }
+
+                int[] sortedVersions = versions.ToArray();
+                Array.Sort(sortedVersions);
+                return sortedVersions;
+            }
+        }
+    }
 }
