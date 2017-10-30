@@ -246,7 +246,7 @@ namespace iBicha
 
             EditorGUILayout.BeginHorizontal();
             plugin.sourceFolder = EditorGUILayout.TextField("Source Folder", plugin.sourceFolder);
-            if (GUILayout.Button("Browse...", GUILayout.Width(90)))
+            if (GUILayout.Button("Browse...", EditorStyles.miniButton, GUILayout.Width(80)))
             {
                 string folder = EditorUtility.OpenFolderPanel("Select Source Folder", plugin.sourceFolder, "");
                 if (!string.IsNullOrEmpty(folder) && System.IO.Directory.Exists(folder))
@@ -254,17 +254,25 @@ namespace iBicha
                     plugin.sourceFolder = folder;
                 }
             }
+            if (GUILayout.Button("Reveal", EditorStyles.miniButton, GUILayout.Width(60)))
+            {
+                EditorUtility.RevealInFinder(plugin.sourceFolder);
+            }
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
             plugin.buildFolder = EditorGUILayout.TextField("Build Folder", plugin.buildFolder);
-            if (GUILayout.Button("Browse...", GUILayout.Width(90)))
+            if (GUILayout.Button("Browse...", EditorStyles.miniButton, GUILayout.Width(80)))
             {
                 string folder = EditorUtility.OpenFolderPanel("Select Build Folder", plugin.buildFolder, "");
                 if (!string.IsNullOrEmpty(folder) && System.IO.Directory.Exists(folder))
                 {
                     plugin.buildFolder = folder;
                 }
+            }
+            if (GUILayout.Button("Reveal", EditorStyles.miniButton, GUILayout.Width(60)))
+            {
+                EditorUtility.RevealInFinder(plugin.buildFolder);
             }
             EditorGUILayout.EndHorizontal();
 
