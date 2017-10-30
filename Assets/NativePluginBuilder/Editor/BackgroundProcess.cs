@@ -96,6 +96,8 @@ namespace iBicha
 				process.BeginOutputReadLine();
 				process.BeginErrorReadLine();
 
+				BackgroundProcessManager.Add(this);
+
 			} catch (Exception ex) {
 				string err = string.Format ("Could not start process: {0}", ex.ToString ());
 				errorData.AppendLine (err);

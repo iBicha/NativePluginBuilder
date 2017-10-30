@@ -117,7 +117,7 @@ namespace iBicha
 
         void OnGuiStatusBar()
         {
-            GUILayout.Label("Status bar");
+			BackgroundProcessManager.OnGUI ();
         }
 
         void OnGuiSettings()

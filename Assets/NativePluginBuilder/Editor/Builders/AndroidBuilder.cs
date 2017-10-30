@@ -66,7 +66,7 @@ namespace iBicha
 			startInfo.WorkingDirectory = plugin.buildFolder;
 
 			BackgroundProcess process = new BackgroundProcess (startInfo);
-			process.Name = string.Format ("Building {0} for {1} ({2})", plugin.Name, "Android", archName);
+			process.Name = string.Format ("Building \"{0}\" for {1} ({2})", plugin.Name, "Android", archName);
 			return process;
 
 		}
@@ -75,7 +75,7 @@ namespace iBicha
 		{
 			BackgroundProcess process = base.Install (plugin, buildOptions);
 			string archName = buildOptions.Architecture == Architecture.arm ? "armeabi-v7a" : "x86";
-			process.Name = string.Format ("Installing {0} for {1} ({2})", plugin.Name, "Android", archName);
+			process.Name = string.Format ("Installing \"{0}\" for {1} ({2})", plugin.Name, "Android", archName);
 			return process;
 		}
 

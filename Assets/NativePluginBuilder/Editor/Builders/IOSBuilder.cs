@@ -47,7 +47,7 @@ namespace iBicha
 			startInfo.WorkingDirectory = plugin.buildFolder;
 
 			BackgroundProcess process = new BackgroundProcess (startInfo);
-			process.Name = string.Format ("Building {0} for {1}", plugin.Name, "iOS");
+			process.Name = string.Format ("Building \"{0}\" for {1}", plugin.Name, "iOS");
 			return process;
 
 		}
@@ -55,7 +55,7 @@ namespace iBicha
 		public override BackgroundProcess Install (NativePlugin plugin, NativeBuildOptions buildOptions)
 		{
 			BackgroundProcess process = base.Install (plugin, buildOptions);
-			process.Name = string.Format ("Installing {0} for {1}", plugin.Name, "iOS");
+			process.Name = string.Format ("Installing \"{0}\" for {1}", plugin.Name, "iOS");
 			return process;
 		}
 
