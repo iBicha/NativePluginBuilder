@@ -116,11 +116,7 @@ namespace iBicha
 		public void Stop() {
 			process.Kill ();
 		}
-
-		public void OnGui(){
-			
-		}
-
+        
 		public void StartAfter(BackgroundProcess backgroundProcess, bool stopOnError = true) {
 			backgroundProcess.nextProcess = this;
 			backgroundProcess.nextStopOnError = stopOnError;
