@@ -100,23 +100,24 @@ namespace iBicha
 			case 0:
 				OnGuiPlugins ();
 
-
-				EditorGUILayout.BeginHorizontal ();
-				GUILayout.FlexibleSpace ();
-				GUI.enabled = !EditorApplication.isUpdating && !EditorApplication.isUpdating;
-				if (GUILayout.Button ("Build All", GUILayout.Width (120))) {
-					foreach (NativePlugin plugin in NativePluginSettings.plugins) {
-						plugin.Build ();
+				if (NativePluginSettings.plugins.Count > 1) {
+					EditorGUILayout.BeginHorizontal ();
+					GUILayout.FlexibleSpace ();
+					GUI.enabled = !EditorApplication.isUpdating && !EditorApplication.isUpdating;
+					if (GUILayout.Button ("Build All", GUILayout.Width (120))) {
+						foreach (NativePlugin plugin in NativePluginSettings.plugins) {
+							plugin.Build ();
+						}
 					}
-				}
-				GUI.enabled = true;
-				if (GUILayout.Button ("Clean All", GUILayout.Width (120))) {
-					foreach (NativePlugin plugin in NativePluginSettings.plugins) {
-						plugin.Clean ();
+					GUI.enabled = true;
+					if (GUILayout.Button ("Clean All", GUILayout.Width (120))) {
+						foreach (NativePlugin plugin in NativePluginSettings.plugins) {
+							plugin.Clean ();
+						}
 					}
+					GUILayout.FlexibleSpace ();
+					EditorGUILayout.EndHorizontal ();
 				}
-				GUILayout.FlexibleSpace ();
-				EditorGUILayout.EndHorizontal ();
 
 				OnGuiNewPlugin ();
 				break;
@@ -170,33 +171,37 @@ namespace iBicha
 
 			if (EditorGUILayout.BeginFadeGroup (PluginsFoldoutAnimator.faded)) {
 				EditorGUI.indentLevel++;
-				for (int i = 0; i < NativePluginSettings.plugins.Count; i++) {
-					if (BeginSettingsBox (i, new GUIContent (NativePluginSettings.plugins [i].Name), NativePluginSettings.plugins [i])) {
-						NativePlugin plugin = NativePluginSettings.plugins [i];
-						OnGuiNativePlugin (plugin);
-						OnGuiBuildOptions (plugin.buildOptions);
-						EditorGUILayout.BeginHorizontal ();
-						GUILayout.FlexibleSpace ();
-						GUI.enabled = !EditorApplication.isUpdating && !EditorApplication.isUpdating;
-						if (GUILayout.Button ("Build", GUILayout.Width (110))) {
-							plugin.Build ();
+				if (NativePluginSettings.plugins.Count == 0) {
+					EditorGUILayout.HelpBox ("You have no plugins yet. Start by creating a new one.", MessageType.Info);
+				} else {
+					for (int i = 0; i < NativePluginSettings.plugins.Count; i++) {
+						if (BeginSettingsBox (i, new GUIContent (NativePluginSettings.plugins [i].Name), NativePluginSettings.plugins [i])) {
+							NativePlugin plugin = NativePluginSettings.plugins [i];
+							OnGuiNativePlugin (plugin);
+							OnGuiBuildOptions (plugin.buildOptions);
+							EditorGUILayout.BeginHorizontal ();
+							GUILayout.FlexibleSpace ();
+							GUI.enabled = !EditorApplication.isUpdating && !EditorApplication.isUpdating;
+							if (GUILayout.Button ("Build", GUILayout.Width (110))) {
+								plugin.Build ();
+							}
+							GUI.enabled = true;
+							if (GUILayout.Button ("Clean", GUILayout.Width (110))) {
+								plugin.Clean ();
+							}
+							if (GUILayout.Button ("Remove", GUILayout.Width (110))) {
+								if (EditorUtility.DisplayDialog ("Remove " + plugin.Name + "?", "This will remove the plugin and all the build options from the builder. Source files will not be deleted.", "Remove", "Cancel")) {
+									NativePluginSettings.plugins.Remove (plugin);
+									i--;
+									AssetDatabase.DeleteAsset (AssetDatabase.GetAssetPath (plugin));
+								} 
+							}
+							GUILayout.FlexibleSpace ();
+							EditorGUILayout.EndHorizontal ();
+							EditorGUILayout.Space ();
 						}
-						GUI.enabled = true;
-						if (GUILayout.Button ("Clean", GUILayout.Width (110))) {
-							plugin.Clean ();
-						}
-						if (GUILayout.Button ("Remove", GUILayout.Width (110))) {
-							if (EditorUtility.DisplayDialog ("Remove " + plugin.Name + "?", "This will remove the plugin and all the build options from the builder. Source files will not be deleted.", "Remove", "Cancel")) {
-								NativePluginSettings.plugins.Remove (plugin);
-								i--;
-								AssetDatabase.DeleteAsset (AssetDatabase.GetAssetPath (plugin));
-							} 
-						}
-						GUILayout.FlexibleSpace ();
-						EditorGUILayout.EndHorizontal ();
-						EditorGUILayout.Space ();
+						EndSettingsBox ();
 					}
-					EndSettingsBox ();
 				}
 				EditorGUI.indentLevel--;
 			}

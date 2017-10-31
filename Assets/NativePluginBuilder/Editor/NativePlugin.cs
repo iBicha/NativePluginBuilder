@@ -96,7 +96,9 @@ namespace iBicha
         }
 		public void Clean() {
 			System.IO.DirectoryInfo directory = new DirectoryInfo(buildFolder);
-
+			if (!directory.Exists) {
+				return;
+			}
 			foreach (FileInfo file in directory.GetFiles())
 			{
 				file.Delete(); 
