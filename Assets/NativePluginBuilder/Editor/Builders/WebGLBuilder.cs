@@ -53,7 +53,7 @@ namespace iBicha
 
 			if (EditorPlatform == RuntimePlatform.WindowsEditor)
 			{
-				cmakeArgs.AppendFormat(string.Format("-G {0} ", "MinGW Makefiles"));
+				cmakeArgs.AppendFormat(string.Format("-G {0} ", "\"MinGW Makefiles\""));
 				AddCmakeArg (cmakeArgs, "CMAKE_MAKE_PROGRAM", GetMinGW32MakeLocation(), "FILEPATH");
 			}
 			else
