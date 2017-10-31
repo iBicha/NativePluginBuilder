@@ -294,7 +294,7 @@ namespace iBicha
             EditorGUI.indentLevel--;
             EditorGUILayout.LabelField("Misc", EditorStyles.boldLabel);
             EditorGUI.indentLevel++;
-            plugin.includePluginAPI = EditorGUILayout.Toggle("Include Plugin API", plugin.includePluginAPI);
+            plugin.includePluginAPI = EditorGUILayout.Toggle(new GUIContent("Include Plugin API", "Include the headers folder from Unity to create low level rendering plugins."), plugin.includePluginAPI);
             OnGuiDictionnary(plugin.Definitions);
             EditorGUILayout.Space();
         }
@@ -392,7 +392,7 @@ namespace iBicha
 						break;
 					case BuildPlatform.Android:
 						EditorGUILayout.LabelField ("Android options", EditorStyles.boldLabel);
-						buildOptions [i].AndroidSdkVersion = EditorGUILayout.IntField ("SDK version (0=default)", buildOptions [i].AndroidSdkVersion);
+						buildOptions [i].AndroidSdkVersion = EditorGUILayout.IntField (new GUIContent("SDK version", "(0=default)") , buildOptions [i].AndroidSdkVersion);
 						break;
 					default:
 						break;
