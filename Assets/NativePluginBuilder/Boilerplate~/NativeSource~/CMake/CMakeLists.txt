@@ -16,6 +16,11 @@ add_definitions(-DPLUGIN_BUILD_NUMBER=${PLUGIN_BUILD_NUMBER})
 # Find all .c, .cc and .cpp files in the source folder
 file(GLOB_RECURSE SOURCE_FILES "${SOURCE_FOLDER}/*.c" "${SOURCE_FOLDER}/*.cc" "${SOURCE_FOLDER}/*.cpp")
 
+#Include Unity plugin API
+if(DEFINED INCLUDE_PLUGIN_API)
+  include_directories(${INCLUDE_PLUGIN_API})
+endif()
+
 if(ANDROID)
   add_library(${PLUGIN_NAME} SHARED ${SOURCE_FILES})
   install(TARGETS ${PLUGIN_NAME} DESTINATION ${PLUGIN_BINARY_FOLDER}/Android/${ANDROID_ABI})

@@ -19,7 +19,9 @@ namespace iBicha
             plugin.Version = "1.0.0.0";
             plugin.BuildNumber = 1;
 
-			plugin.buildOptions = new List<NativeBuildOptions> ();
+            plugin.includePluginAPI = true;
+
+            plugin.buildOptions = new List<NativeBuildOptions> ();
 			plugin.buildOptions.Add (NativeBuildOptions.GetDefault (editorWindow));
 
             plugin.sectionAnimator = new AnimBool(false, editorWindow.Repaint);
@@ -29,6 +31,8 @@ namespace iBicha
         public string Name;
         public string Version;
         public int BuildNumber;
+
+        public bool includePluginAPI;
 
 		public List<NativeBuildOptions> buildOptions;
 

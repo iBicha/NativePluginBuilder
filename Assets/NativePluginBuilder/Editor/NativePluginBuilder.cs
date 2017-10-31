@@ -178,6 +178,7 @@ namespace iBicha
 						if (BeginSettingsBox (i, new GUIContent (NativePluginSettings.plugins [i].Name), NativePluginSettings.plugins [i])) {
 							NativePlugin plugin = NativePluginSettings.plugins [i];
 							OnGuiNativePlugin (plugin);
+                            OnGuiMisc(plugin);
 							OnGuiBuildOptions (plugin.buildOptions);
 							EditorGUILayout.BeginHorizontal ();
 							GUILayout.FlexibleSpace ();
@@ -288,7 +289,17 @@ namespace iBicha
 			EditorGUILayout.Space ();
 		}
 
-		void OnGuiBuildOptions (List<NativeBuildOptions> buildOptions)
+        void OnGuiMisc(NativePlugin plugin)
+        {
+            EditorGUI.indentLevel--;
+            EditorGUILayout.LabelField("Misc", EditorStyles.boldLabel);
+            EditorGUI.indentLevel++;
+            plugin.includePluginAPI = EditorGUILayout.Toggle("Include Plugin API", plugin.includePluginAPI);
+
+            EditorGUILayout.Space();
+        }
+
+        void OnGuiBuildOptions (List<NativeBuildOptions> buildOptions)
 		{
 			EditorGUI.indentLevel--;
 			EditorGUILayout.LabelField (string.Format ("Build Options ({0})", buildOptions.Count), EditorStyles.boldLabel);

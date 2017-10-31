@@ -68,7 +68,12 @@ namespace iBicha {
 			AddCmakeArg (cmakeArgs, "SOURCE_FOLDER", plugin.sourceFolder, "PATH");
 			AddCmakeArg (cmakeArgs, "PLUGIN_BINARY_FOLDER", plugin.pluginBinaryFolderPath, "PATH");
 
-			return cmakeArgs;
+            if (plugin.includePluginAPI)
+            {
+                AddCmakeArg(cmakeArgs, "INCLUDE_PLUGIN_API", GetPluginAPILocation(), "PATH");
+            }
+
+            return cmakeArgs;
 		}
 
 		protected static void AddCmakeArg (StringBuilder sb, string name, string value, string type = null){
@@ -101,18 +106,23 @@ namespace iBicha {
 			return Path.GetFullPath(CombinePath(components)).Replace('\\', '/');
 		}
 
-		protected static string GetEditorLocation()
-		{
-			switch (EditorPlatform)
-			{
-			case RuntimePlatform.WindowsEditor:
-				return CombineFullPath(Path.GetDirectoryName(EditorApplication.applicationPath), "Data");
-			default:
-				return Path.GetDirectoryName(EditorApplication.applicationPath);
-			}
-		}
+        protected static string GetPluginAPILocation()
+        {
+            return CombineFullPath(GetEditorLocation(), "PluginAPI");
+        }
 
-		protected static string GetToolsLocation()
+        protected static string GetEditorLocation()
+        {
+            switch (EditorPlatform)
+            {
+                case RuntimePlatform.WindowsEditor:
+                    return CombineFullPath(Path.GetDirectoryName(EditorApplication.applicationPath), "Data");
+                default:
+                    return Path.GetDirectoryName(EditorApplication.applicationPath);
+            }
+        }
+
+        protected static string GetToolsLocation()
 		{
 			switch (EditorPlatform)
 			{
