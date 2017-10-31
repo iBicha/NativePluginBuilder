@@ -19,6 +19,9 @@ namespace iBicha
             plugin.Version = "1.0.0.0";
             plugin.BuildNumber = 1;
 
+			plugin.buildOptions = new List<NativeBuildOptions> ();
+			plugin.buildOptions.Add (NativeBuildOptions.GetDefault (editorWindow));
+
             plugin.sectionAnimator = new AnimBool(false, editorWindow.Repaint);
             return plugin;
         }
@@ -26,6 +29,8 @@ namespace iBicha
         public string Name;
         public string Version;
         public int BuildNumber;
+
+		public List<NativeBuildOptions> buildOptions;
 
 		public Dictionary<string, string> Definitions;
 
@@ -89,69 +94,89 @@ namespace iBicha
             content = content.Replace("#PLUGIN_NAME#", Name);
             File.WriteAllText(filename, content);
         }
+		public void Clean() {
+			System.IO.DirectoryInfo directory = new DirectoryInfo(buildFolder);
 
+			foreach (FileInfo file in directory.GetFiles())
+			{
+				file.Delete(); 
+			}
+			foreach (DirectoryInfo dir in directory.GetDirectories())
+			{
+				dir.Delete(true); 
+			}
+		}
         public void Build()
         {
-			NativeBuildOptions options = new NativeBuildOptions ();
-			options.BuildTarget = BuildTarget.StandaloneWindows64;
-            options.BuildType = BuildType.Release;
-			PluginBuilderBase builder = PluginBuilderBase.GetBuilderForTarget (options.BuildTarget);
+			bool nothingToBuild = true;
+			foreach (NativeBuildOptions options in buildOptions) {
+				if (!options.isEnabled) {
+					continue;
+				}
+				nothingToBuild = false;
+				PluginBuilderBase builder = PluginBuilderBase.GetBuilderForTarget (options.BuildPlatform);
 
-			builder.PreBuild (this, options);
+				builder.PreBuild (this, options);
 
-			BackgroundProcess buildProcess = builder.Build (this, options);
-			/*buildProcess.OutputLine += (string str) => {
+				BackgroundProcess buildProcess = builder.Build (this, options);
+				/*buildProcess.OutputLine += (string str) => {
 				Debug.Log(str);
-			};
-			buildProcess.ErrorLine += (string str) => {
-				Debug.LogError(str);
-			};*/
-			buildProcess.Exited += (exitCode, outputData, errorData) => {
+				};
+				buildProcess.ErrorLine += (string str) => {
+					Debug.LogError(str);
+				};*/
+				buildProcess.Exited += (exitCode, outputData, errorData) => {
 
-				if(!string.IsNullOrEmpty(outputData)){
-					Debug.Log(string.Format("{0}:\n{1}", buildProcess.Name, outputData));
-				}
-
-				if(exitCode == 0) {
-					if(!string.IsNullOrEmpty(errorData)){
-						Debug.LogWarning(string.Format("{0}:\n{1}", buildProcess.Name, errorData));
+					if(!string.IsNullOrEmpty(outputData)){
+						Debug.Log(string.Format("{0}:\n{1}", buildProcess.Name, outputData));
 					}
-				} else {
-					if(!string.IsNullOrEmpty(errorData)){
-						Debug.LogError(string.Format("{0}:\n{1}", buildProcess.Name, errorData));
-					}
-				}
-			};
 
-			BackgroundProcess installProcess = builder.Install (this, options);
-			/*installProcess.OutputLine += (string str) => {
+					if(exitCode == 0) {
+						if(!string.IsNullOrEmpty(errorData)){
+							Debug.LogWarning(string.Format("{0}:\n{1}", buildProcess.Name, errorData));
+						}
+					} else {
+						if(!string.IsNullOrEmpty(errorData)){
+							Debug.LogError(string.Format("{0}:\n{1}", buildProcess.Name, errorData));
+						}
+					}
+				};
+
+				BackgroundProcess installProcess = builder.Install (this, options);
+				/*installProcess.OutputLine += (string str) => {
 				Debug.Log(str);
-			};
-			installProcess.ErrorLine += (string str) => {
-				Debug.LogError(str);
-			};*/
+				};
+				installProcess.ErrorLine += (string str) => {
+					Debug.LogError(str);
+				};*/
 
-			installProcess.StartAfter (buildProcess);
+				installProcess.StartAfter (buildProcess);
 
-			installProcess.Exited += (exitCode, outputData, errorData) => {
+				installProcess.Exited += (exitCode, outputData, errorData) => {
 
-				if(!string.IsNullOrEmpty(outputData)){
-					Debug.Log(string.Format("{0}:\n{1}", installProcess.Name, outputData));
-				}
-
-				if(exitCode == 0) {
-					if(!string.IsNullOrEmpty(errorData)){
-						Debug.LogWarning(string.Format("{0}:\n{1}", installProcess.Name, errorData));
+					if(!string.IsNullOrEmpty(outputData)){
+						Debug.Log(string.Format("{0}:\n{1}", installProcess.Name, outputData));
 					}
-					builder.PostBuild(this,options);
-				} else {
-					if(!string.IsNullOrEmpty(errorData)){
-						Debug.LogError(string.Format("{0}:\n{1}", installProcess.Name, errorData));
-					}
-				}
-			};
 
-			buildProcess.Start ();
+					if(exitCode == 0) {
+						if(!string.IsNullOrEmpty(errorData)){
+							Debug.LogWarning(string.Format("{0}:\n{1}", installProcess.Name, errorData));
+						}
+						builder.PostBuild(this,options);
+					} else {
+						if(!string.IsNullOrEmpty(errorData)){
+							Debug.LogError(string.Format("{0}:\n{1}", installProcess.Name, errorData));
+						}
+					}
+				};
+
+				buildProcess.Start ();
+
+			}
+
+			if (nothingToBuild) {
+				Debug.Log (string.Format ("{0}: Nothing to build.", Name));
+			}
         }
     }
 }

@@ -40,30 +40,20 @@ namespace iBicha {
 		public virtual void PostBuild (NativePlugin plugin, NativeBuildOptions buildOptions){
 			AssetDatabase.Refresh ();
 		}
-
-		public virtual void OnGuiBuildSettings (NativePlugin plugin, NativeBuildOptions buildOptions)
-		{
-			//
-		}
-
-		public static PluginBuilderBase GetBuilderForTarget(BuildTarget target){
+			
+		public static PluginBuilderBase GetBuilderForTarget(BuildPlatform target){
 			switch (target) {
-			case BuildTarget.Android:
+			case BuildPlatform.Android:
 				return new AndroidBuilder ();
-			case BuildTarget.iOS:
+			case BuildPlatform.iOS:
 				return new IOSBuilder ();
-			case BuildTarget.StandaloneLinux:
-			case BuildTarget.StandaloneLinux64:
-			case BuildTarget.StandaloneLinuxUniversal:
+			case BuildPlatform.Linux:
 				return new LinuxBuilder ();
-			case BuildTarget.StandaloneOSXIntel:
-			case BuildTarget.StandaloneOSXIntel64:
-			case BuildTarget.StandaloneOSXUniversal:
+			case BuildPlatform.OSX:
 				return new OSXBuilder ();
-			case BuildTarget.WebGL:
+			case BuildPlatform.WebGL:
 				return new WebGLBuilder ();
-			case BuildTarget.StandaloneWindows:
-			case BuildTarget.StandaloneWindows64:
+			case BuildPlatform.Windows:
 				return new WindowsBuilder ();
 			default:
 				throw new PlatformNotSupportedException();
@@ -139,7 +129,7 @@ namespace iBicha {
 			}
 		}
 
-		protected static RuntimePlatform EditorPlatform
+		public static RuntimePlatform EditorPlatform
 		{
 			get
 			{

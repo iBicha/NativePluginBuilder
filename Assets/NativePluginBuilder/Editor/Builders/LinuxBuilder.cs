@@ -19,14 +19,9 @@ namespace iBicha
         public override void PreBuild (NativePlugin plugin, NativeBuildOptions buildOptions){
 			base.PreBuild (plugin, buildOptions);
 
-			if (buildOptions.BuildTarget == BuildTarget.StandaloneLinux64) {
-				buildOptions.BuildTarget = BuildTarget.StandaloneLinux;
-				buildOptions.Architecture = Architecture.x86_64;
-			}
-
-			if (buildOptions.BuildTarget != BuildTarget.StandaloneLinux) {
+			if (buildOptions.BuildPlatform != BuildPlatform.Linux) {
 				throw new System.ArgumentException (string.Format(
-					"BuildTarget mismatch: expected:\"{0}\", current:\"{1}\"", BuildTarget.StandaloneLinux, buildOptions.BuildTarget));
+					"BuildPlatform mismatch: expected:\"{0}\", current:\"{1}\"", BuildPlatform.Linux, buildOptions.BuildPlatform));
 			}
 
 			if (buildOptions.Architecture != Architecture.x86 && buildOptions.Architecture != Architecture.x86_64) {
@@ -34,7 +29,7 @@ namespace iBicha
 					"Architecture not supported: only x86 and x64, current:\"{0}\"", buildOptions.Architecture));
 			}
 
-			if (buildOptions.BuildType == BuildType.Default) {
+			if (buildOptions.BuildType == BuildType.DefaultBuild) {
 				buildOptions.BuildType = EditorUserBuildSettings.development ? BuildType.Debug : BuildType.Release;
 			}
 

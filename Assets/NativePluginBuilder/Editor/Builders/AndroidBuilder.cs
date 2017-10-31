@@ -19,9 +19,9 @@ namespace iBicha
         public override void PreBuild (NativePlugin plugin, NativeBuildOptions buildOptions){
 			base.PreBuild (plugin, buildOptions);
 
-			if (buildOptions.BuildTarget != BuildTarget.Android) {
+			if (buildOptions.BuildPlatform != BuildPlatform.Android) {
 				throw new System.ArgumentException (string.Format(
-					"BuildTarget mismatch: expected:\"{0}\", current:\"{1}\"", BuildTarget.Android, buildOptions.BuildTarget));
+					"BuildPlatform mismatch: expected:\"{0}\", current:\"{1}\"", BuildPlatform.Android, buildOptions.BuildPlatform));
 			}
 
 			if (buildOptions.Architecture != Architecture.arm && buildOptions.Architecture != Architecture.x86) {
@@ -29,7 +29,7 @@ namespace iBicha
 					"Architecture not supported: only ARMv7 and x86, current:\"{0}\"", buildOptions.Architecture));
 			}
 
-			if (buildOptions.BuildType == BuildType.Default) {
+			if (buildOptions.BuildType == BuildType.DefaultBuild) {
 				buildOptions.BuildType = EditorUserBuildSettings.development ? BuildType.Debug : BuildType.Release;
 			}
 

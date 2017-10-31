@@ -20,12 +20,12 @@ namespace iBicha
         public override void PreBuild (NativePlugin plugin, NativeBuildOptions buildOptions){
 			base.PreBuild (plugin, buildOptions);
 
-			if (buildOptions.BuildTarget != BuildTarget.iOS) {
+			if (buildOptions.BuildPlatform != BuildPlatform.iOS) {
 				throw new System.ArgumentException (string.Format(
-					"BuildTarget mismatch: expected:\"{0}\", current:\"{1}\"", BuildTarget.iOS, buildOptions.BuildTarget));
+					"BuildPlatform mismatch: expected:\"{0}\", current:\"{1}\"", BuildPlatform.iOS, buildOptions.BuildPlatform));
 			}
 				
-			if (buildOptions.BuildType == BuildType.Default) {
+			if (buildOptions.BuildType == BuildType.DefaultBuild)  {
 				buildOptions.BuildType = EditorUserBuildSettings.development ? BuildType.Debug : BuildType.Release;
 			}
 

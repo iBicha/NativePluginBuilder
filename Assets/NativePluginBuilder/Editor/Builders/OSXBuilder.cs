@@ -20,17 +20,17 @@ namespace iBicha
         public override void PreBuild (NativePlugin plugin, NativeBuildOptions buildOptions){
 			base.PreBuild (plugin, buildOptions);
 
-			if (buildOptions.BuildTarget != BuildTarget.StandaloneOSXUniversal) {
+			if (buildOptions.BuildPlatform != BuildPlatform.OSX) {
 				throw new System.ArgumentException (string.Format(
-					"BuildTarget mismatch: expected:\"{0}\", current:\"{1}\"", BuildTarget.StandaloneOSXUniversal, buildOptions.BuildTarget));
+					"BuildPlatform mismatch: expected:\"{0}\", current:\"{1}\"", BuildPlatform.OSX, buildOptions.BuildPlatform));
 			}
 
-			if (buildOptions.Architecture != Architecture.Any) {
+			if (buildOptions.Architecture != Architecture.AnyCPU) {
 				throw new System.NotSupportedException (string.Format(
 					"Architecture not supported: only Universal, current:\"{0}\"", buildOptions.Architecture));
 			}
 
-			if (buildOptions.BuildType == BuildType.Default) {
+			if (buildOptions.BuildType == BuildType.DefaultBuild) {
 				buildOptions.BuildType = EditorUserBuildSettings.development ? BuildType.Debug : BuildType.Release;
 			}
 
