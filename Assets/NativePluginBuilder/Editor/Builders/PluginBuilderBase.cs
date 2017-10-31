@@ -73,6 +73,14 @@ namespace iBicha {
                 AddCmakeArg(cmakeArgs, "INCLUDE_PLUGIN_API", GetPluginAPILocation(), "PATH");
             }
 
+            string definitions = plugin.Definitions.ToDefinitionString("\\;");
+            if (!string.IsNullOrEmpty(definitions))
+            {
+                //Because cmake will get rid of "s.
+                definitions = definitions.Replace("\"", "\\\"");
+                AddCmakeArg(cmakeArgs, "CUSTOM_DEFINES", definitions, "STRING");
+            }
+
             return cmakeArgs;
 		}
 

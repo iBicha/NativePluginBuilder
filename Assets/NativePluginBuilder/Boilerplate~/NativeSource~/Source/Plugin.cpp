@@ -1,4 +1,4 @@
-#include "../UnityPluginAPI/IUnityInterface.h"
+#include <IUnityInterface.h>
 
 extern "C" const char UNITY_INTERFACE_EXPORT * UNITY_INTERFACE_API GetPluginVersion () {
     //This is defined in CMAKE and passed to the source.

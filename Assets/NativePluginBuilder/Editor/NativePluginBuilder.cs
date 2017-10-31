@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.AnimatedValues;
 using UnityEngine;
-using UnityEngine.Events;
+using System.Linq;
 using System;
 
 namespace iBicha
@@ -295,8 +295,58 @@ namespace iBicha
             EditorGUILayout.LabelField("Misc", EditorStyles.boldLabel);
             EditorGUI.indentLevel++;
             plugin.includePluginAPI = EditorGUILayout.Toggle("Include Plugin API", plugin.includePluginAPI);
-
+            OnGuiDictionnary(plugin.Definitions);
             EditorGUILayout.Space();
+        }
+
+        void OnGuiDictionnary(CustomDefinitions definitions)
+        {
+            if(definitions.Count == 0)
+            {
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("Custom defines");
+
+                GUILayout.FlexibleSpace();
+                if (GUILayout.Button("Add", EditorStyles.miniButtonRight, GUILayout.Width(80)))
+                {
+                    definitions.Add("", "");
+                }
+                EditorGUILayout.Space();
+                EditorGUILayout.EndHorizontal();
+                return;
+            }
+
+            EditorGUILayout.LabelField("Custom defines");
+
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.BeginVertical();
+            EditorGUILayout.LabelField("Key");
+            for (int i = 0; i < definitions.Count; i++)
+            {
+                definitions[i] = EditorGUILayout.TextField(definitions[i]);
+            }
+            EditorGUILayout.EndVertical();
+            EditorGUILayout.BeginVertical();
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Value");
+            if (GUILayout.Button("+", EditorStyles.miniButtonRight, GUILayout.Width(20)))
+            {
+                definitions.Add("", "");
+            }
+            EditorGUILayout.EndHorizontal();
+            for (int i = 0; i < definitions.Count; i++)
+            {
+                EditorGUILayout.BeginHorizontal();
+                definitions[definitions[i]] = EditorGUILayout.TextField(definitions[definitions[i]]);
+                if (GUILayout.Button("-", EditorStyles.miniButtonRight, GUILayout.Width(20)))
+                {
+                    definitions.RemoveAt(i--);
+                }
+                EditorGUILayout.EndHorizontal();
+            }
+
+            EditorGUILayout.EndVertical();
+            EditorGUILayout.EndHorizontal();
         }
 
         void OnGuiBuildOptions (List<NativeBuildOptions> buildOptions)

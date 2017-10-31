@@ -13,13 +13,22 @@ add_definitions(-DPLUGIN_VERSION="${PLUGIN_VERSION}")
 #Plugin build number
 add_definitions(-DPLUGIN_BUILD_NUMBER=${PLUGIN_BUILD_NUMBER})
 
-# Find all .c, .cc and .cpp files in the source folder
-file(GLOB_RECURSE SOURCE_FILES "${SOURCE_FOLDER}/*.c" "${SOURCE_FOLDER}/*.cc" "${SOURCE_FOLDER}/*.cpp")
+#Custom definitions
+if(DEFINED CUSTOM_DEFINES)
+  set(CUSTOM_DEFINES ${CUSTOM_DEFINES})
+  foreach(definition ${CUSTOM_DEFINES})
+    message(STATUS ${definition})
+    add_definitions(-D${definition})
+  endforeach()
+endif()
 
 #Include Unity plugin API
 if(DEFINED INCLUDE_PLUGIN_API)
   include_directories(${INCLUDE_PLUGIN_API})
 endif()
+
+# Find all .c, .cc and .cpp files in the source folder
+file(GLOB_RECURSE SOURCE_FILES "${SOURCE_FOLDER}/*.c" "${SOURCE_FOLDER}/*.cc" "${SOURCE_FOLDER}/*.cpp")
 
 if(ANDROID)
   add_library(${PLUGIN_NAME} SHARED ${SOURCE_FILES})

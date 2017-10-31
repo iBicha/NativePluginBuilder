@@ -24,6 +24,8 @@ namespace iBicha
             plugin.buildOptions = new List<NativeBuildOptions> ();
 			plugin.buildOptions.Add (NativeBuildOptions.GetDefault (editorWindow));
 
+            plugin.Definitions = new CustomDefinitions();
+
             plugin.sectionAnimator = new AnimBool(false, editorWindow.Repaint);
             return plugin;
         }
@@ -36,7 +38,7 @@ namespace iBicha
 
 		public List<NativeBuildOptions> buildOptions;
 
-		public Dictionary<string, string> Definitions;
+        public CustomDefinitions Definitions;
 
 		public DefaultAsset pluginBinaryFolder;
         public string pluginBinaryFolderPath
