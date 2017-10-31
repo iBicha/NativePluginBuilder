@@ -60,16 +60,16 @@ namespace iBicha
 
 		public static string GetCMakeLocation()
         {
-            if (EditorPlatform == RuntimePlatform.WindowsEditor)
-            {
-                return "cmake";
-            }
-            if (EditorPlatform == RuntimePlatform.OSXEditor)
-            {
-                return "/usr/local/bin/cmake";
-            }
-            //TODO: temp hack
-            return "cmake";
+			//TODO: get cmake location consistently
+			switch (EditorPlatform) {
+			case RuntimePlatform.WindowsEditor:
+			case RuntimePlatform.LinuxEditor:
+				return "cmake";
+			case RuntimePlatform.OSXEditor:
+				return "/usr/local/bin/cmake";
+			default:
+				throw new PlatformNotSupportedException ();
+			}
         }
  
         public static RuntimePlatform EditorPlatform

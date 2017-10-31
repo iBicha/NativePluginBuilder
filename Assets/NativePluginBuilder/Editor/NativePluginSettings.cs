@@ -18,7 +18,6 @@ namespace iBicha
         {
             foreach (NativePlugin plugin in plugins)
             {
-                //TODO: recently created plugins must be saved instantly
                 if (plugin != null && EditorUtility.IsPersistent(plugin))
                 {
                     EditorUtility.SetDirty(plugin);

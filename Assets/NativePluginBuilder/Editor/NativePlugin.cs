@@ -78,7 +78,6 @@ namespace iBicha
 			//Refresh to detect changes
 			AssetDatabase.Refresh();
 
-			//TODO: Make relative to root folder?
             sourceFolder = Path.GetFullPath("Assets/" + Name + "/NativeSource~/Source");
             buildFolder = Path.GetFullPath("Assets/" + Name + "/NativeSource~/Build");
 			pluginBinaryFolder = AssetDatabase.LoadAssetAtPath<DefaultAsset>("Assets/" + Name + "/Plugins");

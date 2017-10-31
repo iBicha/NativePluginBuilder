@@ -29,7 +29,6 @@ namespace iBicha {
 
 			ProcessStartInfo startInfo = new ProcessStartInfo();
 			startInfo.FileName = CMakeHelper.GetCMakeLocation ();
-			//TODO: make clean first a BuildOption.
 			startInfo.Arguments = "--build . --target install --clean-first";
 			startInfo.WorkingDirectory = buildOptions.OutputDirectory;
 
