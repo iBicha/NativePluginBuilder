@@ -174,5 +174,20 @@ namespace iBicha {
 			}
 		}
 
-	}
+        public static Architecture EditorArchitecture
+        {
+            get
+            {
+#if !UNITY_EDITOR
+				throw new PlatformNotSupportedException ("Editor only");
+#endif
+#if UNITY_EDITOR_64
+                return Architecture.x86_64;
+#else
+                return Architecture.x86;
+#endif
+            }
+        }
+
+    }
 }

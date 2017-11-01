@@ -13,21 +13,24 @@ namespace iBicha
 		{
 			NativeBuildOptions buildOptions = new NativeBuildOptions();
 
-			switch (PluginBuilderBase.EditorPlatform) {
-			case RuntimePlatform.WindowsEditor:
-				buildOptions.BuildPlatform = BuildPlatform.Windows;
-				break;
-			case RuntimePlatform.OSXEditor:
-				buildOptions.BuildPlatform = BuildPlatform.OSX;
-				break;
-			case RuntimePlatform.LinuxEditor:
-				buildOptions.BuildPlatform = BuildPlatform.Linux;
-				break;
-			default:
-				break;
-			}
+            switch (PluginBuilderBase.EditorPlatform)
+            {
+                case RuntimePlatform.WindowsEditor:
+                    buildOptions.BuildPlatform = BuildPlatform.Windows;
+                    buildOptions.Architecture = PluginBuilderBase.EditorArchitecture;
+                    break;
+                case RuntimePlatform.OSXEditor:
+                    buildOptions.BuildPlatform = BuildPlatform.OSX;
+                    break;
+                case RuntimePlatform.LinuxEditor:
+                    buildOptions.BuildPlatform = BuildPlatform.Linux;
+                    buildOptions.Architecture = PluginBuilderBase.EditorArchitecture;
+                    break;
+                default:
+                    break;
+            }
 
-			buildOptions.isEnabled = true;
+            buildOptions.isEnabled = true;
 
 			buildOptions.foldoutAnimator = new AnimBool(false, editorWindow.Repaint);
 
