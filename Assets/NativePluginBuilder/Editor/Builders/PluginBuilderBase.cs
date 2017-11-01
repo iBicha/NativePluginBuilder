@@ -116,7 +116,18 @@ namespace iBicha {
 
         protected static string GetPluginAPILocation()
         {
-            return CombineFullPath(GetEditorLocation(), "PluginAPI");
+			switch (EditorPlatform)
+			{
+			case RuntimePlatform.WindowsEditor:
+				return CombineFullPath(GetEditorLocation(), "PluginAPI");
+			case RuntimePlatform.OSXEditor:
+				return CombineFullPath(EditorApplication.applicationPath, "Contents/PluginAPI");
+			case RuntimePlatform.LinuxEditor:
+				throw new NotImplementedException ();
+			default:
+				return Path.GetDirectoryName(EditorApplication.applicationPath);
+			}
+
         }
 
         protected static string GetEditorLocation()
