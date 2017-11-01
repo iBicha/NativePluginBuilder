@@ -65,12 +65,13 @@ var Helper = {
 function MergePlugin(plugin, prefix) {
     //prefix
     if (prefix) {
+        var prefixedPlugin = {};
         for (var key in plugin) {
             if (plugin.hasOwnProperty(key)) {
-                plugin[prefix + key] = plugin[key];
-                delete plugin[key];
+                prefixedPlugin[prefix + key] = plugin[key];
             }
         }
+        plugin = prefixedPlugin;
     }
     //helper
     if (Helper) {
