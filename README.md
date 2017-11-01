@@ -7,3 +7,12 @@ Multiple plugins with multiple builds are supported.
 These platforms are supported when available: Android, iOS, Standalone (Windows, OS X, Linux) and WebGL.
 
 More details coming soon.
+
+## The editor
+Using the editor you can create and define multiple plugins each with multiple build options.
+
+
+<img src="https://raw.github.com/iBicha/UnityNativePluginBuilder/master/Screenshots/screen1.png" height="500">
+
+
+
