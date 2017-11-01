@@ -181,6 +181,11 @@ namespace iBicha
                         PluginBuilderBase.EditorPlatform == RuntimePlatform.WindowsEditor ? "exe" : "");
                 CMakeHelper.CMakeLocation = file;
             }
+            if (GUILayout.Button("Download", EditorStyles.miniButton, GUILayout.Width(80)))
+            {
+                Application.OpenURL("https://cmake.org/download/");
+            }
+
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.Space();
