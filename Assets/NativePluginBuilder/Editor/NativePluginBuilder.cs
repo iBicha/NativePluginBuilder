@@ -35,6 +35,25 @@ namespace iBicha
 				return _foldoutBold;
 			}
 		}
+		private static GUIStyle _foldoutBoldDisabled;
+
+		private static GUIStyle foldoutBoldDisabled {
+			get {
+				if (_foldoutBoldDisabled == null) {
+					_foldoutBoldDisabled = new GUIStyle (EditorStyles.foldout);
+					_foldoutBoldDisabled.fontStyle = FontStyle.Bold;
+					_foldoutBoldDisabled.normal.textColor = Color.gray;
+					_foldoutBoldDisabled.active.textColor = Color.gray;
+					_foldoutBoldDisabled.hover.textColor = Color.gray;
+					_foldoutBoldDisabled.focused.textColor = Color.gray;
+					_foldoutBoldDisabled.onActive.textColor = Color.gray;
+					_foldoutBoldDisabled.onHover.textColor = Color.gray;
+					_foldoutBoldDisabled.onNormal.textColor = Color.gray;
+					//_foldoutBoldDisabled.onFocused.textColor = Color.gray;
+				}
+				return _foldoutBoldDisabled;
+			}
+		}
 
 		private static GUIStyle _categoryBox;
 
@@ -358,7 +377,7 @@ namespace iBicha
 			for (int i = 0; i < buildOptions.Count; i++) {
 
 				buildOptions [i].foldoutAnimator.target = EditorGUILayout.Foldout (buildOptions [i].foldoutAnimator.target, 
-					buildOptions [i].ShortName, true, foldoutBold);
+					buildOptions [i].ShortName, true, buildOptions [i].isEnabled ? foldoutBold : foldoutBoldDisabled);
 
 				if (EditorGUILayout.BeginFadeGroup (buildOptions [i].foldoutAnimator.faded)) {
 					EditorGUI.indentLevel++;
