@@ -36,7 +36,7 @@ namespace iBicha
                 }
             }
 
-			ProcessStartInfo startInfo = new ProcessStartInfo (GetCMakeLocation(), "--version");
+            ProcessStartInfo startInfo = new ProcessStartInfo (CMakeLocation, "--version");
 			BackgroundProcess process = new BackgroundProcess (startInfo);
 			process.Name = "Getting CMake version \"cmake --version\"";
 			process.Exited += (exitCode, outputData, errorData) => {
@@ -58,20 +58,36 @@ namespace iBicha
 			process.Start ();
         }
 
-		public static string GetCMakeLocation()
+		public static string CMakeLocation
         {
-			//TODO: get cmake location consistently
-			switch (EditorPlatform) {
-			case RuntimePlatform.WindowsEditor:
-			case RuntimePlatform.LinuxEditor:
-				return "cmake";
-			case RuntimePlatform.OSXEditor:
-				return "/usr/local/bin/cmake";
-			default:
-				throw new PlatformNotSupportedException ();
-			}
+            get
+            {
+                string cmake = EditorPrefs.GetString("CMakeLocation");
+                if (File.Exists(cmake))
+                {
+                    return cmake;
+                }
+                //TODO: get cmake location consistently
+                switch (EditorPlatform)
+                {
+                    case RuntimePlatform.WindowsEditor:
+                    case RuntimePlatform.LinuxEditor:
+                        return "cmake";
+                    case RuntimePlatform.OSXEditor:
+                        return "/usr/local/bin/cmake";
+                    default:
+                        throw new PlatformNotSupportedException();
+                }
+            }
+            set
+            {
+                if (File.Exists(value))
+                {
+                    EditorPrefs.SetString("CMakeLocation", value);
+                }
+            }
         }
- 
+
         public static RuntimePlatform EditorPlatform
         {
             get

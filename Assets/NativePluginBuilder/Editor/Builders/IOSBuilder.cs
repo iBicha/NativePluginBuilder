@@ -50,7 +50,7 @@ namespace iBicha
 			buildOptions.OutputDirectory = CombineFullPath (plugin.buildFolder, "iOS");
 
 			ProcessStartInfo startInfo = new ProcessStartInfo();
-			startInfo.FileName = CMakeHelper.GetCMakeLocation ();
+			startInfo.FileName = CMakeHelper.CMakeLocation;
 			startInfo.Arguments = cmakeArgs.ToString();
 			startInfo.WorkingDirectory = plugin.buildFolder;
 

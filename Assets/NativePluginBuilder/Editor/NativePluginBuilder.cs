@@ -5,6 +5,7 @@ using UnityEditor.AnimatedValues;
 using UnityEngine;
 using System.Linq;
 using System;
+using System.IO;
 
 namespace iBicha
 {
@@ -161,23 +162,80 @@ namespace iBicha
 		{
 			EditorGUILayout.Space ();
 
-			EditorGUILayout.BeginHorizontal ();
+            EditorGUILayout.LabelField("CMake", EditorStyles.boldLabel);
+            EditorGUILayout.BeginHorizontal ();
 			EditorGUILayout.LabelField ("CMake version", cmakeVersion);
-			if (GUILayout.Button ("Refresh", GUILayout.Width (110))) {
+			if (GUILayout.Button ("Refresh", EditorStyles.miniButton, GUILayout.Width (80))) {
 				CMakeHelper.GetCMakeVersion ((version) => {
 					cmakeVersion = version;
 				}, true);
 			}
+            EditorGUILayout.EndHorizontal ();
 
-			/*TODO:
-             * NDK location
-             * Visual Studio version
-             * mingw32-make.exe
-             */
+            EditorGUILayout.BeginHorizontal();
+            GUI.changed = false;
+            CMakeHelper.CMakeLocation = EditorGUILayout.TextField(new GUIContent("CMake location", "leave empty for default"), CMakeHelper.CMakeLocation);
+            if (GUILayout.Button("Browse", EditorStyles.miniButton, GUILayout.Width(80)))
+            {
+                string file = EditorUtility.OpenFilePanel("Select CMake location", Path.GetDirectoryName(CMakeHelper.CMakeLocation),
+                        PluginBuilderBase.EditorPlatform == RuntimePlatform.WindowsEditor ? "exe" : "");
+                CMakeHelper.CMakeLocation = file;
+            }
+            EditorGUILayout.EndHorizontal();
 
-			EditorGUILayout.EndHorizontal ();
+            EditorGUILayout.Space();
 
-			EditorGUILayout.Space ();
+            //TODO: if available
+            EditorGUILayout.LabelField("Android", EditorStyles.boldLabel);
+            EditorGUILayout.BeginHorizontal();
+            GUI.changed = false;
+            string ndk = EditorGUILayout.TextField(new GUIContent("NDK", "NDK location. leave empty to use default location."), AndroidBuilder.NDKLocation);
+            if (GUI.changed)
+            {
+                AndroidBuilder.NDKLocation = ndk;
+            }
+            if (GUILayout.Button("Browse", EditorStyles.miniButton, GUILayout.Width(80)))
+            {
+                string folder = EditorUtility.OpenFolderPanel("Select NDK location", Path.GetDirectoryName(AndroidBuilder.NDKLocation), "");
+                if (!string.IsNullOrEmpty(folder))
+                {
+                    AndroidBuilder.NDKLocation = folder;
+                }
+            }
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.Space();
+            if(PluginBuilderBase.EditorPlatform == RuntimePlatform.WindowsEditor)
+            {
+                EditorGUILayout.LabelField("WebGL", EditorStyles.boldLabel);
+                EditorGUILayout.BeginHorizontal();
+                GUI.changed = false;
+                string mingw32make = EditorGUILayout.TextField(new GUIContent("MinGW 32 Make", "mingw32-make.exe"), WebGLBuilder.MinGW32MakeLocation);
+                if (GUI.changed)
+                {
+                    WebGLBuilder.MinGW32MakeLocation = mingw32make;
+                }
+                if (GUILayout.Button("Browse", EditorStyles.miniButton, GUILayout.Width(80)))
+                {
+                    string file = EditorUtility.OpenFilePanel("Select MinGW 32 Make (mingw32-make.exe) location", WebGLBuilder.MinGW32MakeLocation,
+                        PluginBuilderBase.EditorPlatform == RuntimePlatform.WindowsEditor ? "exe" : "");
+                    WebGLBuilder.MinGW32MakeLocation = file;
+                }
+                EditorGUILayout.EndHorizontal();
+
+                EditorGUILayout.Space();
+
+                EditorGUILayout.LabelField("Windows", EditorStyles.boldLabel);
+                EditorGUILayout.BeginHorizontal();
+                WindowsBuilder.VisualStudioVersion = EditorGUILayout.IntPopup("Visual Studio",WindowsBuilder.VisualStudioVersion, 
+                    WindowsBuilder.InstalledVisualStudioNames, WindowsBuilder.InstalledVisualStudios);
+
+                EditorGUILayout.EndHorizontal();
+
+                EditorGUILayout.Space();
+            }
+
+            EditorGUILayout.Space ();
 		}
 
 
@@ -276,7 +334,7 @@ namespace iBicha
 
 			EditorGUILayout.BeginHorizontal ();
 			plugin.sourceFolder = EditorGUILayout.TextField ("Source Folder", plugin.sourceFolder);
-			if (GUILayout.Button ("Browse...", EditorStyles.miniButton, GUILayout.Width (80))) {
+			if (GUILayout.Button ("Browse", EditorStyles.miniButton, GUILayout.Width (80))) {
 				string folder = EditorUtility.OpenFolderPanel ("Select Source Folder", plugin.sourceFolder, "");
 				if (!string.IsNullOrEmpty (folder) && System.IO.Directory.Exists (folder)) {
 					plugin.sourceFolder = folder;
@@ -289,7 +347,7 @@ namespace iBicha
 
 			EditorGUILayout.BeginHorizontal ();
 			plugin.buildFolder = EditorGUILayout.TextField ("Build Folder", plugin.buildFolder);
-			if (GUILayout.Button ("Browse...", EditorStyles.miniButton, GUILayout.Width (80))) {
+			if (GUILayout.Button ("Browse", EditorStyles.miniButton, GUILayout.Width (80))) {
 				string folder = EditorUtility.OpenFolderPanel ("Select Build Folder", plugin.buildFolder, "");
 				if (!string.IsNullOrEmpty (folder) && System.IO.Directory.Exists (folder)) {
 					plugin.buildFolder = folder;

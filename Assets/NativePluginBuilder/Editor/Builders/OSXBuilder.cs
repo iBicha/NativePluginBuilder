@@ -54,8 +54,8 @@ namespace iBicha
 			buildOptions.OutputDirectory = CombineFullPath (plugin.buildFolder, "OSX");
 
 			ProcessStartInfo startInfo = new ProcessStartInfo();
-			startInfo.FileName = CMakeHelper.GetCMakeLocation ();
-			startInfo.Arguments = cmakeArgs.ToString();
+            startInfo.FileName = CMakeHelper.CMakeLocation;
+            startInfo.Arguments = cmakeArgs.ToString();
 			startInfo.WorkingDirectory = plugin.buildFolder;
 
 			BackgroundProcess process = new BackgroundProcess (startInfo);

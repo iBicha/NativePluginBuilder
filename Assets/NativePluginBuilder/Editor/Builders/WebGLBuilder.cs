@@ -22,7 +22,7 @@ namespace iBicha
 			base.PreBuild (plugin, buildOptions);
 
 			if (buildOptions.BuildPlatform != BuildPlatform.WebGL) {
-				throw new System.ArgumentException (string.Format(
+				throw new ArgumentException (string.Format(
 					"BuildPlatform mismatch: expected:\"{0}\", current:\"{1}\"", BuildPlatform.WebGL, buildOptions.BuildPlatform));
 			}
 				
@@ -31,13 +31,19 @@ namespace iBicha
 			}
 
 			if (buildOptions.BuildType != BuildType.Debug && buildOptions.BuildType != BuildType.Release) {
-				throw new System.NotSupportedException (string.Format(
+				throw new NotSupportedException (string.Format(
 					"BuildType not supported: only Debug and Release, current:\"{0}\"", buildOptions.BuildType));
 			}
 
 			//optimization level check
 
-			//if on windows, check MinGW32Make
+            if(EditorPlatform == RuntimePlatform.WindowsEditor)
+            {
+                if (!File.Exists(MinGW32MakeLocation))
+                {
+                    throw new ArgumentException("\"mingw32-make.exe\" not found. please check the settings.");
+                }
+            }
 		}
 
 		public override BackgroundProcess Build (NativePlugin plugin, NativeBuildOptions buildOptions)
@@ -52,7 +58,7 @@ namespace iBicha
 			if (EditorPlatform == RuntimePlatform.WindowsEditor)
 			{
 				cmakeArgs.AppendFormat(string.Format("-G {0} ", "\"MinGW Makefiles\""));
-				AddCmakeArg (cmakeArgs, "CMAKE_MAKE_PROGRAM", GetMinGW32MakeLocation(), "FILEPATH");
+				AddCmakeArg (cmakeArgs, "CMAKE_MAKE_PROGRAM", MinGW32MakeLocation, "FILEPATH");
 			}
 			else
 			{
@@ -70,8 +76,8 @@ namespace iBicha
 			buildOptions.OutputDirectory = CombineFullPath (plugin.buildFolder, "WebGL");
 
 			ProcessStartInfo startInfo = new ProcessStartInfo();
-			startInfo.FileName = CMakeHelper.GetCMakeLocation ();
-			startInfo.Arguments = cmakeArgs.ToString();
+            startInfo.FileName = CMakeHelper.CMakeLocation;
+            startInfo.Arguments = cmakeArgs.ToString();
 			startInfo.WorkingDirectory = plugin.buildFolder;
 
 			BackgroundProcess process = new BackgroundProcess (startInfo);
@@ -112,11 +118,20 @@ namespace iBicha
 			return CombineFullPath(GetEditorLocation(), "PlaybackEngines/WebGLSupport/BuildTools/Emscripten");
 		}
 
-		private static string GetMinGW32MakeLocation()
+		public static string MinGW32MakeLocation
 		{
-			//TODO
-			return "C:\\Users\\bhadriche\\Downloads\\mingw\\bin\\mingw32-make.exe";
-		}
+            get
+            {
+                return EditorPrefs.GetString("MinGW32MakeLocation");
+            }
+            set
+            {
+                if (File.Exists(value))
+                {
+                    EditorPrefs.SetString("MinGW32MakeLocation", value);
+                }
+            }
+        }
 
 
 		private static string RefreshEmscriptenConfig(string buildFolder)

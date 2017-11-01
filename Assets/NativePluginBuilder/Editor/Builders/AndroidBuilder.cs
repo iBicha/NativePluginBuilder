@@ -38,8 +38,8 @@ namespace iBicha
 					"BuildType not supported: only Debug and Release, current:\"{0}\"", buildOptions.BuildType));
 			}
 
-			if (string.IsNullOrEmpty(GetNDKLocation())) {
-				throw new System.Exception ("Missing Android NDK.");
+			if (string.IsNullOrEmpty(NDKLocation)) {
+				throw new System.Exception ("Missing Android NDK. Please check the settings.");
 			}
 		}
 
@@ -52,7 +52,7 @@ namespace iBicha
 			cmakeArgs.AppendFormat ("-G {0} ", "\"Unix Makefiles\"");
 			AddCmakeArg (cmakeArgs, "ANDROID", "ON", "BOOL");
 
-			string ndkLocation = GetNDKLocation();
+			string ndkLocation = NDKLocation;
 			AddCmakeArg (cmakeArgs, "ANDROID_NDK", ndkLocation, "PATH");
 
 			string toolchain = CombineFullPath(ndkLocation, "build/cmake/android.toolchain.cmake");
@@ -69,7 +69,7 @@ namespace iBicha
 			buildOptions.OutputDirectory = CombineFullPath (plugin.buildFolder, "Android", archName);
 
 			ProcessStartInfo startInfo = new ProcessStartInfo();
-			startInfo.FileName = CMakeHelper.GetCMakeLocation ();
+			startInfo.FileName = CMakeHelper.CMakeLocation;
 			startInfo.Arguments = cmakeArgs.ToString();
 			startInfo.WorkingDirectory = plugin.buildFolder;
 
@@ -125,18 +125,42 @@ namespace iBicha
             }
         }
 
-        private static string GetNDKLocation()
-		{
-			//Get the default location
-			string sdk = GetSDKLocation();
-			string ndk = CombineFullPath(sdk, "ndk-bundle");
-			if (Directory.Exists(ndk))
-			{
-				return ndk;
-			}
-			//Get ndk from Unity settings
-			return EditorPrefs.GetString("AndroidNdkRoot");
-		}
+        public static string NDKLocation
+        {
+            get
+            {
+                string ndk = EditorPrefs.GetString("NativePluginBuilderAndroidNdkRoot");
+                if (Directory.Exists(ndk))
+                {
+                    return ndk;
+                }
+
+                //Get ndk from Unity settings
+                ndk = EditorPrefs.GetString("AndroidNdkRoot");
+                if (Directory.Exists(ndk))
+                {
+                    return ndk;
+                }
+
+                //Get the default location
+                string sdk = GetSDKLocation();
+                ndk = CombineFullPath(sdk, "ndk-bundle");
+                if (Directory.Exists(ndk))
+                {
+                    return ndk;
+                }
+                return null;
+            }
+            set
+            {
+                if (Directory.Exists(value))
+                {
+                    //TODO: check if valid
+                    EditorPrefs.SetString("NativePluginBuilderAndroidNdkRoot", value);
+                }
+            }
+        }
+		
 
 		private static string GetSDKLocation()
 		{
