@@ -51,7 +51,8 @@ namespace iBicha
 					callback(outputData);
 
 				} else {
-					throw new System.Exception(errorData);
+                    errorData = "Not able to get CMake version. Are you sure CMake is installed?\n" + errorData;
+                    throw new Exception(errorData);
 				}
 			};
 
