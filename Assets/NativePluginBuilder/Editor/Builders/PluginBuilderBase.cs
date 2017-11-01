@@ -14,8 +14,11 @@ namespace iBicha {
 
         public virtual void PreBuild (NativePlugin plugin, NativeBuildOptions buildOptions){
 			//TODO: Check for cmake
-
-			if (!Directory.Exists(plugin.buildFolder)) {
+            if(string.IsNullOrEmpty(CMakeHelper.cmakeVersion))
+            {
+                throw new ArgumentNullException("CMake is not set. please check the settings.");
+            }
+            if (!Directory.Exists(plugin.buildFolder)) {
 				Directory.CreateDirectory (plugin.buildFolder);
 			}
 		}
