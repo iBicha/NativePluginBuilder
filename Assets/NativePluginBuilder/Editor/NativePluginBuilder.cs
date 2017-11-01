@@ -329,7 +329,7 @@ namespace iBicha
             EditorGUILayout.BeginVertical();
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Value");
-            if (GUILayout.Button("+", EditorStyles.miniButtonRight, GUILayout.Width(20)))
+			if (GUILayout.Button("+", EditorStyles.miniButton, GUILayout.Width(20)))
             {
                 definitions.Add("", "");
             }

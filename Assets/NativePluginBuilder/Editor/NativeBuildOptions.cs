@@ -27,6 +27,8 @@ namespace iBicha
 				break;
 			}
 
+			buildOptions.isEnabled = true;
+
 			buildOptions.foldoutAnimator = new AnimBool(false, editorWindow.Repaint);
 
 			return buildOptions;
