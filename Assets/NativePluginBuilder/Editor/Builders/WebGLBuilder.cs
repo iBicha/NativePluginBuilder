@@ -37,8 +37,6 @@ namespace iBicha
 
 			//optimization level check
 
-			//Check if webgl installed
-
 			//if on windows, check MinGW32Make
 		}
 
