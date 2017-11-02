@@ -39,7 +39,9 @@ namespace iBicha
 					"BuildType not supported: only Debug and Release, current:\"{0}\"", buildOptions.BuildType));
 			}
 
-			//Check Xcode?
+			if (!IsXCodeInstalled) {
+				throw new System.ArgumentException ("Xcode not found");
+			}
 		}
 
 		public override BackgroundProcess Build (NativePlugin plugin, NativeBuildOptions buildOptions)
@@ -96,6 +98,31 @@ namespace iBicha
 				pluginImporter.SaveAndReimport ();
 			}
 
+		}
+
+		private static bool isXCodeInstalled;
+		public static bool IsXCodeInstalled {
+			get{
+				if (isXCodeInstalled) {
+					return true;
+				}
+				if (EditorPlatform != RuntimePlatform.OSXEditor) {
+					return false;
+				}
+
+				ProcessStartInfo startInfo = new ProcessStartInfo();
+				startInfo.FileName = "xcodebuild";
+				startInfo.Arguments = "-version";
+
+				BackgroundProcess process = new BackgroundProcess (startInfo);
+				process.Name = "Checking XCode";
+				process.Start ();
+				//I know this is bad, but it shouldn't take more than few ms. And it will be cached.
+				//TODO: make async
+				process.process.WaitForExit ();
+				return isXCodeInstalled = process.process.ExitCode == 0;
+
+			} 
 		}
 
 	}

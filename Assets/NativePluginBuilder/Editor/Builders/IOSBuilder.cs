@@ -34,7 +34,9 @@ namespace iBicha
 					"BuildType not supported: only Debug and Release, current:\"{0}\"", buildOptions.BuildType));
 			}
 
-			//Check Xcode?
+			if (!OSXBuilder.IsXCodeInstalled) {
+				throw new System.ArgumentException ("Xcode not found");
+			}
 		}
 
 		public override BackgroundProcess Build (NativePlugin plugin, NativeBuildOptions buildOptions)
