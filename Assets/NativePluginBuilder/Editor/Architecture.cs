@@ -9,8 +9,10 @@ namespace iBicha
     {
 		AnyCPU, //AnyCPU
         ARMv7,
+        ARM = ARMv7,
         Universal,
         x86,
-        x86_64
+        x86_64,
+        x64 = x86_64
     }
 }

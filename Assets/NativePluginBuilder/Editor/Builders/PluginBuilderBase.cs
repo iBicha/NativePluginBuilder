@@ -35,7 +35,6 @@ namespace iBicha {
         }
 
         public virtual void PreBuild (NativePlugin plugin, NativeBuildOptions buildOptions){
-			//TODO: Check for cmake
             if(string.IsNullOrEmpty(CMakeHelper.cmakeVersion))
             {
                 throw new ArgumentNullException("CMake is not set. please check the settings.");
@@ -80,9 +79,11 @@ namespace iBicha {
 				return new OSXBuilder ();
 			case BuildPlatform.WebGL:
 				return new WebGLBuilder ();
-			case BuildPlatform.Windows:
-				return new WindowsBuilder ();
-			default:
+            case BuildPlatform.Windows:
+                return new WindowsBuilder();
+            case BuildPlatform.UniversalWindows:
+                return new UWPBuilder();
+             default:
 				throw new PlatformNotSupportedException();
 			}
 		}

@@ -43,25 +43,25 @@ public class #PLUGIN_NAME#
 #endif
 
     //Return plugin version.
-    [DllImport(libraryName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+    [DllImport(libraryName, CharSet = CharSet.Ansi)]
     private static extern IntPtr GetPluginVersion();
 
     //Return plugin build number.
-    [DllImport(libraryName, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(libraryName)]
     private static extern int GetPluginBuildNumber();
 
     //In this example, our c++ code returns 2.
-    [DllImport(libraryName, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(libraryName)]
     public static extern int GetTwo();
 
     //We pass a C# delegate which will be called from c++ with a result.
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void CallbackDelegate(int result);
-    [DllImport(libraryName, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(libraryName)]
     public static extern bool PassCallback(CallbackDelegate callback);
 
     //Pass an array to the c++ code, and fill it with 1s.
-    [DllImport(libraryName, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(libraryName)]
     public static extern void FillWithOnes(int[] array, int length);
 
 

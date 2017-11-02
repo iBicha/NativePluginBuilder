@@ -13,6 +13,7 @@ namespace iBicha
 		Linux,
 		OSX,
 		Windows,
+        UniversalWindows,
 		WebGL
 	}
 }
