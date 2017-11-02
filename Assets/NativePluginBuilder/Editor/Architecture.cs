@@ -8,10 +8,7 @@ namespace iBicha
     public enum Architecture
     {
 		AnyCPU, //AnyCPU, Universal
-        arm,
-        arm64,
-        mips,
-        mips64,
+        ARMv7,
         x86,
         x86_64
     }

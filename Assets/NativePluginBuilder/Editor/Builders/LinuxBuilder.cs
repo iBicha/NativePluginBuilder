@@ -64,13 +64,6 @@ namespace iBicha
 
 		}
 
-		public override BackgroundProcess Install (NativePlugin plugin, NativeBuildOptions buildOptions)
-		{
-			BackgroundProcess process = base.Install (plugin, buildOptions);
-			process.Name = string.Format ("Installing \"{0}\" for {1} ({2})", plugin.Name, "Linux", buildOptions.Architecture.ToString());
-			return process;
-		}
-
 		public override void PostBuild (NativePlugin plugin, NativeBuildOptions buildOptions)
 		{
 			base.PostBuild (plugin, buildOptions);

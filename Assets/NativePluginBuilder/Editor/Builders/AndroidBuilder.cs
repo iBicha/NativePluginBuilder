@@ -24,7 +24,7 @@ namespace iBicha
 					"BuildPlatform mismatch: expected:\"{0}\", current:\"{1}\"", BuildPlatform.Android, buildOptions.BuildPlatform));
 			}
 
-			if (buildOptions.Architecture != Architecture.arm && buildOptions.Architecture != Architecture.x86) {
+			if (buildOptions.Architecture != Architecture.ARMv7 && buildOptions.Architecture != Architecture.x86) {
 				throw new System.NotSupportedException (string.Format(
 					"Architecture not supported: only ARMv7 and x86, current:\"{0}\"", buildOptions.Architecture));
 			}
@@ -58,7 +58,7 @@ namespace iBicha
 			string toolchain = CombineFullPath(ndkLocation, "build/cmake/android.toolchain.cmake");
 			AddCmakeArg (cmakeArgs, "CMAKE_TOOLCHAIN_FILE", "\"" + toolchain + "\"", "FILEPATH");
 
-			string archName = buildOptions.Architecture == Architecture.arm ? "armeabi-v7a" : "x86";
+			string archName = buildOptions.Architecture == Architecture.ARMv7 ? "armeabi-v7a" : "x86";
 			AddCmakeArg (cmakeArgs, "ANDROID_ABI", archName);
 			cmakeArgs.AppendFormat ("-B{0}/{1} ", "Android", archName);
 			//Do we need to target a specific api?
@@ -79,20 +79,11 @@ namespace iBicha
 
 		}
 
-		public override BackgroundProcess Install (NativePlugin plugin, NativeBuildOptions buildOptions)
-		{
-			BackgroundProcess process = base.Install (plugin, buildOptions);
-			string archName = buildOptions.Architecture == Architecture.arm ? "armeabi-v7a" : "x86";
-			process.Name = string.Format ("Installing \"{0}\" for {1} ({2})", plugin.Name, "Android", archName);
-			return process;
-		}
-
-
 		public override void PostBuild (NativePlugin plugin, NativeBuildOptions buildOptions)
 		{
 			base.PostBuild (plugin, buildOptions);
 
-			string archName = buildOptions.Architecture == Architecture.arm ? "armeabi-v7a" : "x86";
+			string archName = buildOptions.Architecture == Architecture.ARMv7 ? "armeabi-v7a" : "x86";
 
 			string assetFile = CombinePath(
 				AssetDatabase.GetAssetPath (plugin.pluginBinaryFolder),
@@ -104,9 +95,7 @@ namespace iBicha
 			if (pluginImporter != null) {
 				pluginImporter.SetCompatibleWithAnyPlatform (false);
 				pluginImporter.SetCompatibleWithPlatform (BuildTarget.Android, true);
-
-                string editorArchName = buildOptions.Architecture == Architecture.arm ? "ARMv7" : "x86";
-                pluginImporter.SetEditorData("CPU", editorArchName);
+				pluginImporter.SetEditorData("CPU", buildOptions.Architecture.ToString());
 
                 pluginImporter.SetEditorData ("PLUGIN_NAME", plugin.Name);
 				pluginImporter.SetEditorData ("PLUGIN_VERSION", plugin.Version);

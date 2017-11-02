@@ -36,6 +36,9 @@ namespace iBicha {
 			startInfo.WorkingDirectory = buildOptions.OutputDirectory;
 
 			BackgroundProcess process = new BackgroundProcess (startInfo);
+			process.Name = string.Format("Installing \"{0}\" for {1} ({2})", 
+				plugin.Name, buildOptions.BuildPlatform.ToString(), buildOptions.Architecture.ToString());
+
 			return process;
 		}
 

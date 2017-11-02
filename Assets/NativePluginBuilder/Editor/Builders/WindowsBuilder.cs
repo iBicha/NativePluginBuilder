@@ -89,10 +89,7 @@ namespace iBicha
         public override BackgroundProcess Install(NativePlugin plugin, NativeBuildOptions buildOptions)
         {
             BackgroundProcess process = base.Install(plugin, buildOptions);
-            process.Name = string.Format("Installing \"{0}\" for {1} ({2})", plugin.Name, "Windows", buildOptions.Architecture.ToString());
-
             process.process.StartInfo.Arguments += " --config " + buildOptions.BuildType.ToString();
-
             return process;
         }
 
