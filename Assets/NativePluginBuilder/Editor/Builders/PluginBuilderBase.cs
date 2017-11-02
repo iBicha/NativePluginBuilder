@@ -6,11 +6,33 @@ using System;
 using System.Text;
 using UnityEditor;
 using System.Diagnostics;
-
+using System.Linq;
 
 namespace iBicha {
 	public abstract class PluginBuilderBase {
+
         public abstract bool IsAvailable { get; }
+
+
+        protected void SetSupportedArchitectures(params Architecture[] architectures)
+        {
+            SupportedArchitectures = architectures;
+            SupportedArchitectureStrings = SupportedArchitectures.Select(arch => arch.ToString()).ToArray();
+            SupportedArchitectureInts = SupportedArchitectures.Select(arch => (int) arch).ToArray();
+        }
+
+        public Architecture[] SupportedArchitectures;
+        public String[] SupportedArchitectureStrings;
+        public int[] SupportedArchitectureInts;
+
+        protected void ArchtectureCheck(NativeBuildOptions buildOptions)
+        {
+            if (!SupportedArchitectures.Contains(buildOptions.Architecture))
+            {
+                throw new NotSupportedException(string.Format(
+                    "Architecture not supported: [{0}] only , current:\"{1}\"", string.Join(" - ", SupportedArchitectures.Select(s => s.ToString()).ToArray()), buildOptions.Architecture));
+            }
+        }
 
         public virtual void PreBuild (NativePlugin plugin, NativeBuildOptions buildOptions){
 			//TODO: Check for cmake

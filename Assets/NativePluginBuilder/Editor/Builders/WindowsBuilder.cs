@@ -12,6 +12,12 @@ using System.Reflection;
 namespace iBicha
 {
     public class WindowsBuilder : PluginBuilderBase {
+
+        public WindowsBuilder()
+        {
+            SetSupportedArchitectures(Architecture.x86, Architecture.x86_64);
+        }
+
         public override bool IsAvailable
         {
             get
@@ -19,7 +25,7 @@ namespace iBicha
                 return EditorPlatform == RuntimePlatform.WindowsEditor;
             }
         }
-
+        
         public override void PreBuild(NativePlugin plugin, NativeBuildOptions buildOptions) {
             base.PreBuild(plugin, buildOptions);
 
@@ -28,12 +34,9 @@ namespace iBicha
                     "BuildPlatform mismatch: expected:\"{0}\", current:\"{1}\"", BuildPlatform.Windows, buildOptions.BuildPlatform));
             }
 
-            if (buildOptions.Architecture != Architecture.x86 && buildOptions.Architecture != Architecture.x86_64) {
-                throw new System.NotSupportedException(string.Format(
-                    "Architecture not supported: only x86 and x64, current:\"{0}\"", buildOptions.Architecture));
-            }
+            ArchtectureCheck(buildOptions);
 
-            if (buildOptions.BuildType == BuildType.DefaultBuild) {
+            if (buildOptions.BuildType == BuildType.Default) {
                 buildOptions.BuildType = EditorUserBuildSettings.development ? BuildType.Debug : BuildType.Release;
             }
 

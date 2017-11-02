@@ -10,6 +10,12 @@ using System.Diagnostics;
 namespace iBicha
 {
 	public class WebGLBuilder : PluginBuilderBase {
+
+        public WebGLBuilder()
+        {
+            SetSupportedArchitectures(Architecture.AnyCPU);
+        }
+
         public override bool IsAvailable
         {
             get
@@ -17,7 +23,7 @@ namespace iBicha
                 return Directory.Exists(GetEmscriptenLocation());
             }
         }
-
+        
         public override void PreBuild (NativePlugin plugin, NativeBuildOptions buildOptions){
 			base.PreBuild (plugin, buildOptions);
 
@@ -25,8 +31,10 @@ namespace iBicha
 				throw new ArgumentException (string.Format(
 					"BuildPlatform mismatch: expected:\"{0}\", current:\"{1}\"", BuildPlatform.WebGL, buildOptions.BuildPlatform));
 			}
-				
-			if (buildOptions.BuildType == BuildType.DefaultBuild) {
+
+            ArchtectureCheck(buildOptions);
+
+            if (buildOptions.BuildType == BuildType.Default) {
 				buildOptions.BuildType = EditorUserBuildSettings.development ? BuildType.Debug : BuildType.Release;
 			}
 

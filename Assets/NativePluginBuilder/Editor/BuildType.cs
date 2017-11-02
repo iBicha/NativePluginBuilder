@@ -7,7 +7,7 @@ namespace iBicha
 {
     public enum BuildType
     {
-        DefaultBuild,
+        Default,
         Debug,
         Release
         //RelWithDebInfo,

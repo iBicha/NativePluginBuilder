@@ -1,14 +1,17 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEditor;
 using System.Text;
 using System.Diagnostics;
-using System.IO;
 
 namespace iBicha
 {
 	public class IOSBuilder : PluginBuilderBase {
+
+        public IOSBuilder()
+        {
+            SetSupportedArchitectures(Architecture.Universal);
+        }
+
         public override bool IsAvailable
         {
             get
@@ -24,8 +27,10 @@ namespace iBicha
 				throw new System.ArgumentException (string.Format(
 					"BuildPlatform mismatch: expected:\"{0}\", current:\"{1}\"", BuildPlatform.iOS, buildOptions.BuildPlatform));
 			}
-				
-			if (buildOptions.BuildType == BuildType.DefaultBuild)  {
+
+            ArchtectureCheck(buildOptions);
+
+            if (buildOptions.BuildType == BuildType.Default)  {
 				buildOptions.BuildType = EditorUserBuildSettings.development ? BuildType.Debug : BuildType.Release;
 			}
 

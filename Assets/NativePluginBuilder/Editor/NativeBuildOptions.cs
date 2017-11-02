@@ -37,25 +37,6 @@ namespace iBicha
 			return buildOptions;
 		}
 
-		private static string[] availablePlatformStrings;
-		public static string[] AvailablePlatformStrings{
-			get {
-				if (availablePlatformStrings == null) {
-					List<string> platforms = new List<string>();
-
-					foreach (BuildPlatform platform in System.Enum.GetValues(typeof(BuildPlatform)))
-					{
-						PluginBuilderBase builder = PluginBuilderBase.GetBuilderForTarget (platform);
-						if (builder.IsAvailable) {
-							platforms.Add (platform.ToString());
-						}
-					}
-					availablePlatformStrings = platforms.ToArray ();
-				}
-				return availablePlatformStrings;
-			}
-		}
-
 		public string ShortName {
 			get {
 				return string.Format ("{0} ({1}) - {2}", BuildPlatform.ToString(), Architecture.ToString(), BuildType.ToString());
@@ -67,7 +48,7 @@ namespace iBicha
 		public string OutputDirectory;
 		//General
 		public Architecture Architecture = Architecture.AnyCPU;
-		public BuildType BuildType = BuildType.DefaultBuild;
+		public BuildType BuildType = BuildType.Default;
 		public BuildPlatform BuildPlatform;
 
 		//iOS only

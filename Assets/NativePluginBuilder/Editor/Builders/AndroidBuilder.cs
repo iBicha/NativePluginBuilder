@@ -1,13 +1,18 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
+﻿using UnityEditor;
 using System.IO;
 using System.Text;
 using System.Diagnostics;
+using System.Linq;
 
 namespace iBicha
 {
 	public class AndroidBuilder : PluginBuilderBase {
+
+        public AndroidBuilder()
+        {
+            SetSupportedArchitectures(Architecture.ARMv7, Architecture.x86);
+        }
+
         public override bool IsAvailable
         {
             get
@@ -24,12 +29,9 @@ namespace iBicha
 					"BuildPlatform mismatch: expected:\"{0}\", current:\"{1}\"", BuildPlatform.Android, buildOptions.BuildPlatform));
 			}
 
-			if (buildOptions.Architecture != Architecture.ARMv7 && buildOptions.Architecture != Architecture.x86) {
-				throw new System.NotSupportedException (string.Format(
-					"Architecture not supported: only ARMv7 and x86, current:\"{0}\"", buildOptions.Architecture));
-			}
+            ArchtectureCheck(buildOptions);
 
-			if (buildOptions.BuildType == BuildType.DefaultBuild) {
+            if (buildOptions.BuildType == BuildType.Default) {
 				buildOptions.BuildType = EditorUserBuildSettings.development ? BuildType.Debug : BuildType.Release;
 			}
 
@@ -149,9 +151,8 @@ namespace iBicha
                 }
             }
         }
-		
 
-		private static string GetSDKLocation()
+        private static string GetSDKLocation()
 		{
 			//Get the default location
 			return EditorPrefs.GetString("AndroidSdkRoot");

@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEditor;
 using System.Text;
 using System.Diagnostics;
@@ -8,6 +6,12 @@ using System.Diagnostics;
 namespace iBicha
 {
 	public class LinuxBuilder : PluginBuilderBase {
+
+        public LinuxBuilder()
+        {
+            SetSupportedArchitectures(Architecture.x86, Architecture.x86_64);
+        }
+
         public override bool IsAvailable
         {
             get
@@ -24,12 +28,9 @@ namespace iBicha
 					"BuildPlatform mismatch: expected:\"{0}\", current:\"{1}\"", BuildPlatform.Linux, buildOptions.BuildPlatform));
 			}
 
-			if (buildOptions.Architecture != Architecture.x86 && buildOptions.Architecture != Architecture.x86_64) {
-				throw new System.NotSupportedException (string.Format(
-					"Architecture not supported: only x86 and x64, current:\"{0}\"", buildOptions.Architecture));
-			}
+            ArchtectureCheck(buildOptions);
 
-			if (buildOptions.BuildType == BuildType.DefaultBuild) {
+            if (buildOptions.BuildType == BuildType.Default) {
 				buildOptions.BuildType = EditorUserBuildSettings.development ? BuildType.Debug : BuildType.Release;
 			}
 

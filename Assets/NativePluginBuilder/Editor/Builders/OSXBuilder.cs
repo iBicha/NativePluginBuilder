@@ -5,10 +5,17 @@ using UnityEditor;
 using System.Text;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 
 namespace iBicha
 {
 	public class OSXBuilder : PluginBuilderBase {
+
+        public OSXBuilder()
+        {
+            SetSupportedArchitectures(Architecture.Universal);
+        }
+
         public override bool IsAvailable
         {
             get
@@ -16,7 +23,7 @@ namespace iBicha
                 return EditorPlatform == RuntimePlatform.OSXEditor;
             }
         }
-
+        
         public override void PreBuild (NativePlugin plugin, NativeBuildOptions buildOptions){
 			base.PreBuild (plugin, buildOptions);
 
@@ -25,12 +32,9 @@ namespace iBicha
 					"BuildPlatform mismatch: expected:\"{0}\", current:\"{1}\"", BuildPlatform.OSX, buildOptions.BuildPlatform));
 			}
 
-			if (buildOptions.Architecture != Architecture.AnyCPU) {
-				throw new System.NotSupportedException (string.Format(
-					"Architecture not supported: only Universal, current:\"{0}\"", buildOptions.Architecture));
-			}
+            ArchtectureCheck(buildOptions);
 
-			if (buildOptions.BuildType == BuildType.DefaultBuild) {
+            if (buildOptions.BuildType == BuildType.Default) {
 				buildOptions.BuildType = EditorUserBuildSettings.development ? BuildType.Debug : BuildType.Release;
 			}
 

@@ -9,168 +9,191 @@ using System.IO;
 
 namespace iBicha
 {
-	public class NativePluginBuilder : EditorWindow
-	{
-		private static string[] tabs = new string[] { "Plugins", "Settings" };
-		int selectedTab;
+    public class NativePluginBuilder : EditorWindow
+    {
+        private static string[] tabs = new string[] { "Plugins", "Settings" };
+        int selectedTab;
 
-		private NativePlugin newPlugin;
+        private NativePlugin newPlugin;
 
-		private static AnimBool PluginsFoldoutAnimator;
-		private static AnimBool NewPluginFoldoutAnimator;
+        private static Dictionary<BuildPlatform, PluginBuilderBase> builders;
 
-		private static Vector2 scrollPos;
+        private static AnimBool PluginsFoldoutAnimator;
+        private static AnimBool NewPluginFoldoutAnimator;
 
-		private static string cmakeVersion;
+        private static Vector2 scrollPos;
 
-		private BackgroundProcessManager backgroundProcessManager;
+        private static string cmakeVersion;
 
-		private static GUIStyle _foldoutBold;
+        private BackgroundProcessManager backgroundProcessManager;
 
-		private static GUIStyle foldoutBold {
-			get {
-				if (_foldoutBold == null) {
-					_foldoutBold = new GUIStyle (EditorStyles.foldout);
-					_foldoutBold.fontStyle = FontStyle.Bold;
-				}
-				return _foldoutBold;
-			}
-		}
-		private static GUIStyle _foldoutBoldDisabled;
+        private static GUIStyle _foldoutBold;
 
-		private static GUIStyle foldoutBoldDisabled {
-			get {
-				if (_foldoutBoldDisabled == null) {
-					_foldoutBoldDisabled = new GUIStyle (EditorStyles.foldout);
-					_foldoutBoldDisabled.fontStyle = FontStyle.Bold;
-					_foldoutBoldDisabled.normal.textColor = Color.gray;
-					_foldoutBoldDisabled.active.textColor = Color.gray;
-					_foldoutBoldDisabled.hover.textColor = Color.gray;
-					_foldoutBoldDisabled.focused.textColor = Color.gray;
-					_foldoutBoldDisabled.onActive.textColor = Color.gray;
-					_foldoutBoldDisabled.onHover.textColor = Color.gray;
-					_foldoutBoldDisabled.onNormal.textColor = Color.gray;
-					//_foldoutBoldDisabled.onFocused.textColor = Color.gray;
-				}
-				return _foldoutBoldDisabled;
-			}
-		}
+        private static GUIStyle foldoutBold
+        {
+            get
+            {
+                if (_foldoutBold == null)
+                {
+                    _foldoutBold = new GUIStyle(EditorStyles.foldout);
+                    _foldoutBold.fontStyle = FontStyle.Bold;
+                }
+                return _foldoutBold;
+            }
+        }
+        private static GUIStyle _foldoutBoldDisabled;
 
-		private static GUIStyle _categoryBox;
+        private static GUIStyle foldoutBoldDisabled
+        {
+            get
+            {
+                if (_foldoutBoldDisabled == null)
+                {
+                    _foldoutBoldDisabled = new GUIStyle(EditorStyles.foldout);
+                    _foldoutBoldDisabled.fontStyle = FontStyle.Bold;
+                    _foldoutBoldDisabled.normal.textColor = Color.gray;
+                    _foldoutBoldDisabled.active.textColor = Color.gray;
+                    _foldoutBoldDisabled.hover.textColor = Color.gray;
+                    _foldoutBoldDisabled.focused.textColor = Color.gray;
+                    _foldoutBoldDisabled.onActive.textColor = Color.gray;
+                    _foldoutBoldDisabled.onHover.textColor = Color.gray;
+                    _foldoutBoldDisabled.onNormal.textColor = Color.gray;
+                    //_foldoutBoldDisabled.onFocused.textColor = Color.gray;
+                }
+                return _foldoutBoldDisabled;
+            }
+        }
 
-		public static GUIStyle categoryBox {
-			get {
-				if (_categoryBox == null) {
-					_categoryBox = new GUIStyle (GetStyle ("HelpBox"));
-					_categoryBox.padding.left = 14;
-				}
-				return _categoryBox;
-			}
-		}
+        private static GUIStyle _categoryBox;
 
-		[MenuItem ("Window/Native Plugin Builder")]
-		static void Init ()
-		{
-			// Get existing open window or if none, make a new one:
-			NativePluginBuilder window = (NativePluginBuilder)EditorWindow.GetWindow (typeof(NativePluginBuilder));
-			window.titleContent.text = "Native Plugin Builder";
-			window.Show ();
-		}
+        public static GUIStyle categoryBox
+        {
+            get
+            {
+                if (_categoryBox == null)
+                {
+                    _categoryBox = new GUIStyle(GetStyle("HelpBox"));
+                    _categoryBox.padding.left = 14;
+                }
+                return _categoryBox;
+            }
+        }
 
-		private void OnEnable ()
-		{
-			PluginsFoldoutAnimator = new AnimBool (true);
-			PluginsFoldoutAnimator.valueChanged.AddListener (Repaint);
+        [MenuItem("Window/Native Plugin Builder")]
+        static void Init()
+        {
+            // Get existing open window or if none, make a new one:
+            NativePluginBuilder window = (NativePluginBuilder)EditorWindow.GetWindow(typeof(NativePluginBuilder));
+            window.titleContent.text = "Native Plugin Builder";
+            window.Show();
+        }
 
-			NewPluginFoldoutAnimator = new AnimBool (false);
-			NewPluginFoldoutAnimator.valueChanged.AddListener (Repaint);
+        private void OnEnable()
+        {
+            PluginsFoldoutAnimator = new AnimBool(true);
+            PluginsFoldoutAnimator.valueChanged.AddListener(Repaint);
 
-			NativePluginSettings.Load ();
-			for (int i = 0; i < NativePluginSettings.plugins.Count; i++) {
-				NativePluginSettings.plugins [i].sectionAnimator.valueChanged.RemoveAllListeners ();
-				NativePluginSettings.plugins [i].sectionAnimator.valueChanged.AddListener (Repaint);
-				foreach (var options in NativePluginSettings.plugins[i].buildOptions) {
-					options.foldoutAnimator.valueChanged.RemoveAllListeners ();
-					options.foldoutAnimator.valueChanged.AddListener (Repaint);
-				}
-			}
-			if (newPlugin == null) {
-				newPlugin = NativePlugin.GetDefault (this);
-			}
-				
-			CMakeHelper.GetCMakeVersion ((version) => {
-				cmakeVersion = version;
-			});
+            NewPluginFoldoutAnimator = new AnimBool(false);
+            NewPluginFoldoutAnimator.valueChanged.AddListener(Repaint);
 
-			backgroundProcessManager = new BackgroundProcessManager (this);
-		}
+            NativePluginSettings.Load();
+            for (int i = 0; i < NativePluginSettings.plugins.Count; i++)
+            {
+                NativePluginSettings.plugins[i].sectionAnimator.valueChanged.RemoveAllListeners();
+                NativePluginSettings.plugins[i].sectionAnimator.valueChanged.AddListener(Repaint);
+                foreach (var options in NativePluginSettings.plugins[i].buildOptions)
+                {
+                    options.foldoutAnimator.valueChanged.RemoveAllListeners();
+                    options.foldoutAnimator.valueChanged.AddListener(Repaint);
+                }
+            }
+            if (newPlugin == null)
+            {
+                newPlugin = NativePlugin.GetDefault(this);
+            }
 
-		private void OnDisable ()
-		{
-			NativePluginSettings.Save ();
-		}
+            CMakeHelper.GetCMakeVersion((version) =>
+            {
+                cmakeVersion = version;
+            });
 
-		void OnGUI ()
-		{
+            backgroundProcessManager = new BackgroundProcessManager(this);
+        }
 
-			selectedTab = GUILayout.Toolbar (selectedTab, tabs);
-			scrollPos = EditorGUILayout.BeginScrollView (scrollPos);
+        private void OnDisable()
+        {
+            NativePluginSettings.Save();
+        }
 
-			switch (selectedTab) {
-			case 0:
-				OnGuiPlugins ();
+        void OnGUI()
+        {
 
-				if (NativePluginSettings.plugins.Count > 1) {
-					EditorGUILayout.BeginHorizontal ();
-					GUILayout.FlexibleSpace ();
-					GUI.enabled = !EditorApplication.isUpdating && !EditorApplication.isUpdating;
-					if (GUILayout.Button ("Build All", GUILayout.Width (120))) {
-						foreach (NativePlugin plugin in NativePluginSettings.plugins) {
-							plugin.Build ();
-						}
-					}
-					GUI.enabled = true;
-					if (GUILayout.Button ("Clean All", GUILayout.Width (120))) {
-						foreach (NativePlugin plugin in NativePluginSettings.plugins) {
-							plugin.Clean ();
-						}
-					}
-					GUILayout.FlexibleSpace ();
-					EditorGUILayout.EndHorizontal ();
-				}
+            selectedTab = GUILayout.Toolbar(selectedTab, tabs);
+            scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
 
-				OnGuiNewPlugin ();
-				break;
-			case 1:
-				OnGuiSettings ();
-				break;
-			default:
-				break;
-			}
-			GUILayout.FlexibleSpace ();
-			EditorGUILayout.EndScrollView ();
+            switch (selectedTab)
+            {
+                case 0:
+                    OnGuiPlugins();
 
-			OnGuiStatusBar ();
-		}
+                    if (NativePluginSettings.plugins.Count > 1)
+                    {
+                        EditorGUILayout.BeginHorizontal();
+                        GUILayout.FlexibleSpace();
+                        GUI.enabled = !EditorApplication.isUpdating && !EditorApplication.isUpdating;
+                        if (GUILayout.Button("Build All", GUILayout.Width(120)))
+                        {
+                            foreach (NativePlugin plugin in NativePluginSettings.plugins)
+                            {
+                                plugin.Build();
+                            }
+                        }
+                        GUI.enabled = true;
+                        if (GUILayout.Button("Clean All", GUILayout.Width(120)))
+                        {
+                            foreach (NativePlugin plugin in NativePluginSettings.plugins)
+                            {
+                                plugin.Clean();
+                            }
+                        }
+                        GUILayout.FlexibleSpace();
+                        EditorGUILayout.EndHorizontal();
+                    }
 
-		void OnGuiStatusBar ()
-		{
-			backgroundProcessManager.OnGUI ();
-		}
+                    OnGuiNewPlugin();
+                    break;
+                case 1:
+                    OnGuiSettings();
+                    break;
+                default:
+                    break;
+            }
+            GUILayout.FlexibleSpace();
+            EditorGUILayout.EndScrollView();
 
-		void OnGuiSettings ()
-		{
-			EditorGUILayout.Space ();
+            OnGuiStatusBar();
+        }
+
+        void OnGuiStatusBar()
+        {
+            backgroundProcessManager.OnGUI();
+        }
+
+        void OnGuiSettings()
+        {
+            EditorGUILayout.Space();
 
             EditorGUILayout.LabelField("CMake", EditorStyles.boldLabel);
-            EditorGUILayout.BeginHorizontal ();
-			EditorGUILayout.LabelField ("CMake version", cmakeVersion);
-			if (GUILayout.Button ("Refresh", EditorStyles.miniButton, GUILayout.Width (80))) {
-				CMakeHelper.GetCMakeVersion ((version) => {
-					cmakeVersion = version;
-				}, true);
-			}
-            EditorGUILayout.EndHorizontal ();
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("CMake version", cmakeVersion);
+            if (GUILayout.Button("Refresh", EditorStyles.miniButton, GUILayout.Width(80)))
+            {
+                CMakeHelper.GetCMakeVersion((version) =>
+                {
+                    cmakeVersion = version;
+                }, true);
+            }
+            EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
             GUI.changed = false;
@@ -191,182 +214,212 @@ namespace iBicha
             EditorGUILayout.Space();
 
             //TODO: if available
-            EditorGUILayout.LabelField("Android", EditorStyles.boldLabel);
-            EditorGUILayout.BeginHorizontal();
-            GUI.changed = false;
-            string ndk = EditorGUILayout.TextField(new GUIContent("NDK", "NDK location. leave empty to use default location."), AndroidBuilder.NDKLocation);
-            if (GUI.changed)
+            if (GetBuilder(BuildPlatform.Android).IsAvailable)
             {
-                AndroidBuilder.NDKLocation = ndk;
-            }
-            if (GUILayout.Button("Browse", EditorStyles.miniButton, GUILayout.Width(80)))
-            {
-                string folder = EditorUtility.OpenFolderPanel("Select NDK location", Path.GetDirectoryName(AndroidBuilder.NDKLocation), "");
-                if (!string.IsNullOrEmpty(folder))
-                {
-                    AndroidBuilder.NDKLocation = folder;
-                }
-            }
-            EditorGUILayout.EndHorizontal();
-
-            EditorGUILayout.Space();
-            if(PluginBuilderBase.EditorPlatform == RuntimePlatform.WindowsEditor)
-            {
-                EditorGUILayout.LabelField("WebGL", EditorStyles.boldLabel);
+                EditorGUILayout.LabelField("Android", EditorStyles.boldLabel);
                 EditorGUILayout.BeginHorizontal();
                 GUI.changed = false;
-                string mingw32make = EditorGUILayout.TextField(new GUIContent("MinGW 32 Make", "mingw32-make.exe"), WebGLBuilder.MinGW32MakeLocation);
+                string ndk = EditorGUILayout.TextField(new GUIContent("NDK", "NDK location. leave empty to use default location."), AndroidBuilder.NDKLocation);
                 if (GUI.changed)
                 {
-                    WebGLBuilder.MinGW32MakeLocation = mingw32make;
+                    AndroidBuilder.NDKLocation = ndk;
                 }
                 if (GUILayout.Button("Browse", EditorStyles.miniButton, GUILayout.Width(80)))
                 {
-                    string file = EditorUtility.OpenFilePanel("Select MinGW 32 Make (mingw32-make.exe) location", WebGLBuilder.MinGW32MakeLocation,
-                        PluginBuilderBase.EditorPlatform == RuntimePlatform.WindowsEditor ? "exe" : "");
-                    WebGLBuilder.MinGW32MakeLocation = file;
+                    string folder = EditorUtility.OpenFolderPanel("Select NDK location", Path.GetDirectoryName(AndroidBuilder.NDKLocation), "");
+                    if (!string.IsNullOrEmpty(folder))
+                    {
+                        AndroidBuilder.NDKLocation = folder;
+                    }
                 }
-                EditorGUILayout.EndHorizontal();
-
-                EditorGUILayout.Space();
-
-                EditorGUILayout.LabelField("Windows", EditorStyles.boldLabel);
-                EditorGUILayout.BeginHorizontal();
-                WindowsBuilder.VisualStudioVersion = EditorGUILayout.IntPopup("Visual Studio",WindowsBuilder.VisualStudioVersion, 
-                    WindowsBuilder.InstalledVisualStudioNames, WindowsBuilder.InstalledVisualStudios);
-
                 EditorGUILayout.EndHorizontal();
 
                 EditorGUILayout.Space();
             }
 
-            EditorGUILayout.Space ();
-		}
+            if (PluginBuilderBase.EditorPlatform == RuntimePlatform.WindowsEditor)
+            {
+                if (GetBuilder(BuildPlatform.WebGL).IsAvailable)
+                {
+                    EditorGUILayout.LabelField("WebGL", EditorStyles.boldLabel);
+                    EditorGUILayout.BeginHorizontal();
+                    GUI.changed = false;
+                    string mingw32make = EditorGUILayout.TextField(new GUIContent("MinGW 32 Make", "mingw32-make.exe"), WebGLBuilder.MinGW32MakeLocation);
+                    if (GUI.changed)
+                    {
+                        WebGLBuilder.MinGW32MakeLocation = mingw32make;
+                    }
+                    if (GUILayout.Button("Browse", EditorStyles.miniButton, GUILayout.Width(80)))
+                    {
+                        string file = EditorUtility.OpenFilePanel("Select MinGW 32 Make (mingw32-make.exe) location", WebGLBuilder.MinGW32MakeLocation,
+                            PluginBuilderBase.EditorPlatform == RuntimePlatform.WindowsEditor ? "exe" : "");
+                        WebGLBuilder.MinGW32MakeLocation = file;
+                    }
+                    EditorGUILayout.EndHorizontal();
+
+                    EditorGUILayout.Space();
+                }
+
+                if (GetBuilder(BuildPlatform.Windows).IsAvailable)
+                {
+                    EditorGUILayout.LabelField("Windows", EditorStyles.boldLabel);
+                    EditorGUILayout.BeginHorizontal();
+                    WindowsBuilder.VisualStudioVersion = EditorGUILayout.IntPopup("Visual Studio", WindowsBuilder.VisualStudioVersion,
+                        WindowsBuilder.InstalledVisualStudioNames, WindowsBuilder.InstalledVisualStudios);
+
+                    EditorGUILayout.EndHorizontal();
+
+                    EditorGUILayout.Space();
+
+                }
+            }
+
+            EditorGUILayout.Space();
+        }
 
 
-		void OnGuiPlugins ()
-		{
-			EditorGUILayout.Space ();
+        void OnGuiPlugins()
+        {
+            EditorGUILayout.Space();
 
-			PluginsFoldoutAnimator.target = EditorGUILayout.Foldout (PluginsFoldoutAnimator.target,
-				string.Format ("Plugins ({0})", NativePluginSettings.plugins.Count), true, foldoutBold);
+            PluginsFoldoutAnimator.target = EditorGUILayout.Foldout(PluginsFoldoutAnimator.target,
+                string.Format("Plugins ({0})", NativePluginSettings.plugins.Count), true, foldoutBold);
 
-			if (EditorGUILayout.BeginFadeGroup (PluginsFoldoutAnimator.faded)) {
-				EditorGUI.indentLevel++;
-				if (NativePluginSettings.plugins.Count == 0) {
-					EditorGUILayout.HelpBox ("You have no plugins yet. Start by creating a new one.", MessageType.Info);
-				} else {
-					for (int i = 0; i < NativePluginSettings.plugins.Count; i++) {
-						if (BeginSettingsBox (i, new GUIContent (NativePluginSettings.plugins [i].Name), NativePluginSettings.plugins [i])) {
-							NativePlugin plugin = NativePluginSettings.plugins [i];
-							OnGuiNativePlugin (plugin);
+            if (EditorGUILayout.BeginFadeGroup(PluginsFoldoutAnimator.faded))
+            {
+                EditorGUI.indentLevel++;
+                if (NativePluginSettings.plugins.Count == 0)
+                {
+                    EditorGUILayout.HelpBox("You have no plugins yet. Start by creating a new one.", MessageType.Info);
+                }
+                else
+                {
+                    for (int i = 0; i < NativePluginSettings.plugins.Count; i++)
+                    {
+                        if (BeginSettingsBox(i, new GUIContent(NativePluginSettings.plugins[i].Name), NativePluginSettings.plugins[i]))
+                        {
+                            NativePlugin plugin = NativePluginSettings.plugins[i];
+                            OnGuiNativePlugin(plugin);
                             OnGuiMisc(plugin);
-							OnGuiBuildOptions (plugin.buildOptions);
-							EditorGUILayout.BeginHorizontal ();
-							GUILayout.FlexibleSpace ();
-							GUI.enabled = !EditorApplication.isUpdating && !EditorApplication.isUpdating;
-							if (GUILayout.Button ("Build", GUILayout.Width (110))) {
-								plugin.Build ();
-							}
-							GUI.enabled = true;
-							if (GUILayout.Button ("Clean", GUILayout.Width (110))) {
-								plugin.Clean ();
-							}
-							if (GUILayout.Button ("Remove", GUILayout.Width (110))) {
-								if (EditorUtility.DisplayDialog ("Remove " + plugin.Name + "?", "This will remove the plugin and all the build options from the builder. Source files will not be deleted.", "Remove", "Cancel")) {
-									NativePluginSettings.plugins.Remove (plugin);
-									i--;
-									AssetDatabase.DeleteAsset (AssetDatabase.GetAssetPath (plugin));
-								} 
-							}
-							GUILayout.FlexibleSpace ();
-							EditorGUILayout.EndHorizontal ();
-							EditorGUILayout.Space ();
-						}
-						EndSettingsBox ();
-					}
-				}
-				EditorGUI.indentLevel--;
-			}
+                            OnGuiBuildOptions(plugin.buildOptions);
+                            EditorGUILayout.BeginHorizontal();
+                            GUILayout.FlexibleSpace();
+                            GUI.enabled = !EditorApplication.isUpdating && !EditorApplication.isUpdating;
+                            if (GUILayout.Button("Build", GUILayout.Width(110)))
+                            {
+                                plugin.Build();
+                            }
+                            GUI.enabled = true;
+                            if (GUILayout.Button("Clean", GUILayout.Width(110)))
+                            {
+                                plugin.Clean();
+                            }
+                            if (GUILayout.Button("Remove", GUILayout.Width(110)))
+                            {
+                                if (EditorUtility.DisplayDialog("Remove " + plugin.Name + "?", "This will remove the plugin and all the build options from the builder. Source files will not be deleted.", "Remove", "Cancel"))
+                                {
+                                    NativePluginSettings.plugins.Remove(plugin);
+                                    i--;
+                                    AssetDatabase.DeleteAsset(AssetDatabase.GetAssetPath(plugin));
+                                }
+                            }
+                            GUILayout.FlexibleSpace();
+                            EditorGUILayout.EndHorizontal();
+                            EditorGUILayout.Space();
+                        }
+                        EndSettingsBox();
+                    }
+                }
+                EditorGUI.indentLevel--;
+            }
 
-			EditorGUILayout.EndFadeGroup ();
+            EditorGUILayout.EndFadeGroup();
 
-			EditorGUILayout.Space ();
+            EditorGUILayout.Space();
 
-		}
+        }
 
-		void OnGuiNewPlugin ()
-		{
-			EditorGUILayout.Space ();
+        void OnGuiNewPlugin()
+        {
+            EditorGUILayout.Space();
 
-			NewPluginFoldoutAnimator.target = EditorGUILayout.Foldout (NewPluginFoldoutAnimator.target, "Create new plugin", true, foldoutBold);
+            NewPluginFoldoutAnimator.target = EditorGUILayout.Foldout(NewPluginFoldoutAnimator.target, "Create new plugin", true, foldoutBold);
 
-			//Extra block that can be toggled on and off.
-			if (EditorGUILayout.BeginFadeGroup (NewPluginFoldoutAnimator.faded)) {
-				EditorGUI.indentLevel++;
-				GUI.changed = false;
-				newPlugin.Name = EditorGUILayout.TextField ("Plugin name", newPlugin.Name);
-				if (GUI.changed) {
-					newPlugin.Name = SanitizeName (newPlugin.Name);
-				}
-				newPlugin.Version = EditorGUILayout.TextField ("Version", newPlugin.Version);
-				//Location for the plugin?
+            //Extra block that can be toggled on and off.
+            if (EditorGUILayout.BeginFadeGroup(NewPluginFoldoutAnimator.faded))
+            {
+                EditorGUI.indentLevel++;
+                GUI.changed = false;
+                newPlugin.Name = EditorGUILayout.TextField("Plugin name", newPlugin.Name);
+                if (GUI.changed)
+                {
+                    newPlugin.Name = SanitizeName(newPlugin.Name);
+                }
+                newPlugin.Version = EditorGUILayout.TextField("Version", newPlugin.Version);
+                //Location for the plugin?
 
-				EditorGUILayout.BeginHorizontal ();
-				GUILayout.FlexibleSpace ();
-				if (GUILayout.Button ("Create", GUILayout.Width (160))) {
-					newPlugin.Create ();
-					NativePluginSettings.plugins.Add (newPlugin);
-					newPlugin = NativePlugin.GetDefault (this);
-				}
-				GUILayout.FlexibleSpace ();
-				EditorGUILayout.EndHorizontal ();
+                EditorGUILayout.BeginHorizontal();
+                GUILayout.FlexibleSpace();
+                if (GUILayout.Button("Create", GUILayout.Width(160)))
+                {
+                    newPlugin.Create();
+                    NativePluginSettings.plugins.Add(newPlugin);
+                    newPlugin = NativePlugin.GetDefault(this);
+                }
+                GUILayout.FlexibleSpace();
+                EditorGUILayout.EndHorizontal();
 
-				EditorGUI.indentLevel--;
-			}
+                EditorGUI.indentLevel--;
+            }
 
-			EditorGUILayout.EndFadeGroup ();
+            EditorGUILayout.EndFadeGroup();
 
-			EditorGUILayout.Space ();
-		}
+            EditorGUILayout.Space();
+        }
 
-		void OnGuiNativePlugin (NativePlugin plugin)
-		{
-			GUI.changed = false;
+        void OnGuiNativePlugin(NativePlugin plugin)
+        {
+            GUI.changed = false;
             EditorGUILayout.LabelField("Plugin name", plugin.Name);
-			plugin.Version = EditorGUILayout.TextField ("Version", plugin.Version);
-			plugin.BuildNumber = EditorGUILayout.IntField ("Build Number", plugin.BuildNumber);
+            plugin.Version = EditorGUILayout.TextField("Version", plugin.Version);
+            plugin.BuildNumber = EditorGUILayout.IntField("Build Number", plugin.BuildNumber);
 
-			EditorGUILayout.BeginHorizontal ();
-			plugin.sourceFolder = EditorGUILayout.TextField ("Source Folder", plugin.sourceFolder);
-			if (GUILayout.Button ("Browse", EditorStyles.miniButton, GUILayout.Width (80))) {
-				string folder = EditorUtility.OpenFolderPanel ("Select Source Folder", plugin.sourceFolder, "");
-				if (!string.IsNullOrEmpty (folder) && System.IO.Directory.Exists (folder)) {
-					plugin.sourceFolder = folder;
-				}
-			}
-			if (GUILayout.Button ("Reveal", EditorStyles.miniButton, GUILayout.Width (60))) {
-				EditorUtility.RevealInFinder (plugin.sourceFolder);
-			}
-			EditorGUILayout.EndHorizontal ();
+            EditorGUILayout.BeginHorizontal();
+            plugin.sourceFolder = EditorGUILayout.TextField("Source Folder", plugin.sourceFolder);
+            if (GUILayout.Button("Browse", EditorStyles.miniButton, GUILayout.Width(80)))
+            {
+                string folder = EditorUtility.OpenFolderPanel("Select Source Folder", plugin.sourceFolder, "");
+                if (!string.IsNullOrEmpty(folder) && System.IO.Directory.Exists(folder))
+                {
+                    plugin.sourceFolder = folder;
+                }
+            }
+            if (GUILayout.Button("Reveal", EditorStyles.miniButton, GUILayout.Width(60)))
+            {
+                EditorUtility.RevealInFinder(plugin.sourceFolder);
+            }
+            EditorGUILayout.EndHorizontal();
 
-			EditorGUILayout.BeginHorizontal ();
-			plugin.buildFolder = EditorGUILayout.TextField ("Build Folder", plugin.buildFolder);
-			if (GUILayout.Button ("Browse", EditorStyles.miniButton, GUILayout.Width (80))) {
-				string folder = EditorUtility.OpenFolderPanel ("Select Build Folder", plugin.buildFolder, "");
-				if (!string.IsNullOrEmpty (folder) && System.IO.Directory.Exists (folder)) {
-					plugin.buildFolder = folder;
-				}
-			}
-			if (GUILayout.Button ("Reveal", EditorStyles.miniButton, GUILayout.Width (60))) {
-				EditorUtility.RevealInFinder (plugin.buildFolder);
-			}
-			EditorGUILayout.EndHorizontal ();
+            EditorGUILayout.BeginHorizontal();
+            plugin.buildFolder = EditorGUILayout.TextField("Build Folder", plugin.buildFolder);
+            if (GUILayout.Button("Browse", EditorStyles.miniButton, GUILayout.Width(80)))
+            {
+                string folder = EditorUtility.OpenFolderPanel("Select Build Folder", plugin.buildFolder, "");
+                if (!string.IsNullOrEmpty(folder) && System.IO.Directory.Exists(folder))
+                {
+                    plugin.buildFolder = folder;
+                }
+            }
+            if (GUILayout.Button("Reveal", EditorStyles.miniButton, GUILayout.Width(60)))
+            {
+                EditorUtility.RevealInFinder(plugin.buildFolder);
+            }
+            EditorGUILayout.EndHorizontal();
 
-			plugin.pluginBinaryFolder = (DefaultAsset)EditorGUILayout.ObjectField ("Plugins folder", plugin.pluginBinaryFolder, typeof(DefaultAsset), false);
-		
-			EditorGUILayout.Space ();
-		}
+            plugin.pluginBinaryFolder = (DefaultAsset)EditorGUILayout.ObjectField("Plugins folder", plugin.pluginBinaryFolder, typeof(DefaultAsset), false);
+
+            EditorGUILayout.Space();
+        }
 
         void OnGuiMisc(NativePlugin plugin)
         {
@@ -380,7 +433,7 @@ namespace iBicha
 
         void OnGuiDictionnary(CustomDefinitions definitions)
         {
-            if(definitions.Count == 0)
+            if (definitions.Count == 0)
             {
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Custom defines");
@@ -408,7 +461,7 @@ namespace iBicha
             EditorGUILayout.BeginVertical();
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Value");
-			if (GUILayout.Button("+", EditorStyles.miniButton, GUILayout.Width(20)))
+            if (GUILayout.Button("+", EditorStyles.miniButton, GUILayout.Width(20)))
             {
                 definitions.Add("", "");
             }
@@ -428,145 +481,206 @@ namespace iBicha
             EditorGUILayout.EndHorizontal();
         }
 
-        void OnGuiBuildOptions (List<NativeBuildOptions> buildOptions)
-		{
-			EditorGUI.indentLevel--;
-			EditorGUILayout.LabelField (string.Format ("Build Options ({0})", buildOptions.Count), EditorStyles.boldLabel);
-			EditorGUI.indentLevel++;
-		
-			for (int i = 0; i < buildOptions.Count; i++) {
+        void OnGuiBuildOptions(List<NativeBuildOptions> buildOptions)
+        {
+            EditorGUI.indentLevel--;
+            EditorGUILayout.LabelField(string.Format("Build Options ({0})", buildOptions.Count), EditorStyles.boldLabel);
+            EditorGUI.indentLevel++;
 
-				buildOptions [i].foldoutAnimator.target = EditorGUILayout.Foldout (buildOptions [i].foldoutAnimator.target, 
-					buildOptions [i].ShortName, true, buildOptions [i].isEnabled ? foldoutBold : foldoutBoldDisabled);
+            for (int i = 0; i < buildOptions.Count; i++)
+            {
 
-				if (EditorGUILayout.BeginFadeGroup (buildOptions [i].foldoutAnimator.faded)) {
-					EditorGUI.indentLevel++;
+                buildOptions[i].foldoutAnimator.target = EditorGUILayout.Foldout(buildOptions[i].foldoutAnimator.target,
+                    buildOptions[i].ShortName, true, buildOptions[i].isEnabled ? foldoutBold : foldoutBoldDisabled);
 
-					buildOptions [i].isEnabled = EditorGUILayout.Toggle ("Enabled", buildOptions [i].isEnabled);
+                if (EditorGUILayout.BeginFadeGroup(buildOptions[i].foldoutAnimator.faded))
+                {
+                    EditorGUI.indentLevel++;
 
-					//Platform
-					GUI.changed = false;
-					int PlatformIndex = Array.IndexOf (NativeBuildOptions.AvailablePlatformStrings, buildOptions [i].BuildPlatform.ToString ());
-					PlatformIndex = EditorGUILayout.Popup ("Platform", PlatformIndex, NativeBuildOptions.AvailablePlatformStrings);
-					if (GUI.changed) {
-						buildOptions [i].BuildPlatform = (BuildPlatform)Enum.Parse (typeof(BuildPlatform), 
-							NativeBuildOptions.AvailablePlatformStrings [PlatformIndex], true);
-					}
+                    buildOptions[i].isEnabled = EditorGUILayout.Toggle("Enabled", buildOptions[i].isEnabled);
 
-					//Arch
-					//TODO: show only valid arch for platform
-					GUI.changed = false;
-					buildOptions [i].Architecture = (Architecture)EditorGUILayout.EnumPopup ("Architecture", buildOptions [i].Architecture);
+                    //Platform
+                    GUI.changed = false;
+                    int PlatformIndex = Array.IndexOf(AvailablePlatformStrings, buildOptions[i].BuildPlatform.ToString());
+                    PlatformIndex = EditorGUILayout.Popup("Platform", PlatformIndex, AvailablePlatformStrings);
+                    if (GUI.changed)
+                    {
+                        buildOptions[i].BuildPlatform = (BuildPlatform)Enum.Parse(typeof(BuildPlatform),
+                            AvailablePlatformStrings[PlatformIndex], true);
+                        if (!GetBuilder(buildOptions[i].BuildPlatform).SupportedArchitectures.Contains(buildOptions[i].Architecture))
+                            buildOptions[i].Architecture = GetBuilder(buildOptions[i].BuildPlatform).SupportedArchitectures[0];
+                    }
 
-					buildOptions [i].BuildType = (BuildType)EditorGUILayout.EnumPopup ("Build Type", buildOptions [i].BuildType);
+                    //Arch
+                    GUI.changed = false;
+                    buildOptions[i].Architecture = (Architecture)EditorGUILayout.IntPopup("Architecture", (int)buildOptions[i].Architecture,
+                        GetBuilder(buildOptions[i].BuildPlatform).SupportedArchitectureStrings,
+                        GetBuilder(buildOptions[i].BuildPlatform).SupportedArchitectureInts);
 
-					EditorGUILayout.Space ();
-					//Platform specific
-					EditorGUI.indentLevel--;
+                    buildOptions[i].BuildType = (BuildType)EditorGUILayout.EnumPopup("Build Type", buildOptions[i].BuildType);
 
-					switch (buildOptions [i].BuildPlatform) {
-					case BuildPlatform.iOS:
-						EditorGUILayout.LabelField ("iOS options", EditorStyles.boldLabel);
-						buildOptions [i].IsSimulatorBuild = EditorGUILayout.Toggle ("Simulator build", buildOptions [i].IsSimulatorBuild);
-						break;
-					case BuildPlatform.Android:
-						EditorGUILayout.LabelField ("Android options", EditorStyles.boldLabel);
-						buildOptions [i].AndroidSdkVersion = EditorGUILayout.IntField (new GUIContent("SDK version", "(0=default)") , buildOptions [i].AndroidSdkVersion);
-						break;
-					default:
-						break;
-					}
-					EditorGUI.indentLevel++;
+                    EditorGUILayout.Space();
+                    //Platform specific
+                    EditorGUI.indentLevel--;
 
-					EditorGUILayout.BeginHorizontal ();
-					GUILayout.FlexibleSpace ();
-					if (GUILayout.Button ("Remove", EditorStyles.miniButton, GUILayout.Width (70))) {
-						buildOptions.RemoveAt (i--);
-					}
-					GUILayout.Space (10);
-					EditorGUILayout.EndHorizontal ();
+                    switch (buildOptions[i].BuildPlatform)
+                    {
+                        case BuildPlatform.iOS:
+                            if (GetBuilder(BuildPlatform.iOS).IsAvailable)
+                            {
+                                EditorGUILayout.LabelField("iOS options", EditorStyles.boldLabel);
+                                buildOptions[i].IsSimulatorBuild = EditorGUILayout.Toggle("Simulator build", buildOptions[i].IsSimulatorBuild);
 
-					EditorGUI.indentLevel--;
-				}
-				 
-				EditorGUILayout.EndFadeGroup ();
-				EditorGUILayout.Space ();
+                            }
+                            break;
+                        case BuildPlatform.Android:
+                            if (GetBuilder(BuildPlatform.Android).IsAvailable)
+                            {
+                                EditorGUILayout.LabelField("Android options", EditorStyles.boldLabel);
+                                buildOptions[i].AndroidSdkVersion = EditorGUILayout.IntField(new GUIContent("SDK version", "(0=default)"), buildOptions[i].AndroidSdkVersion);
 
-			}
-			EditorGUILayout.Space ();
-			EditorGUILayout.BeginHorizontal ();
-			GUILayout.FlexibleSpace ();
-			if (GUILayout.Button ("Add Build Option", EditorStyles.miniButton, GUILayout.Width (100))) {
-				buildOptions.Add (NativeBuildOptions.GetDefault (this));
-			}
-			GUILayout.Space (20);
-			EditorGUILayout.EndHorizontal ();
-			EditorGUILayout.Space ();
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                    EditorGUI.indentLevel++;
 
-		}
+                    EditorGUILayout.BeginHorizontal();
+                    GUILayout.FlexibleSpace();
+                    if (GUILayout.Button("Remove", EditorStyles.miniButton, GUILayout.Width(70)))
+                    {
+                        buildOptions.RemoveAt(i--);
+                    }
+                    GUILayout.Space(10);
+                    EditorGUILayout.EndHorizontal();
 
-		private static string SanitizeName (string s)
-		{
-			//s = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(s);
-			bool isValid = Microsoft.CSharp.CSharpCodeProvider.CreateProvider ("C#").IsValidIdentifier (s);
+                    EditorGUI.indentLevel--;
+                }
 
-			if (!isValid) { 
-				// File name contains invalid chars, remove them
-				System.Text.RegularExpressions.Regex regex = 
-					new System.Text.RegularExpressions.Regex (@"[^\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}\p{Nl}\p{Mn}\p{Mc}\p{Cf}\p{Pc}\p{Lm}]");
-				s = regex.Replace (s, "");
+                EditorGUILayout.EndFadeGroup();
+                EditorGUILayout.Space();
 
-				// Class name doesn't begin with a letter, insert an underscore
-				if (!char.IsLetter (s, 0)) {
-					s = s.Insert (0, "_");
-				}
-			}
+            }
+            EditorGUILayout.Space();
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+            if (GUILayout.Button("Add Build Option", EditorStyles.miniButton, GUILayout.Width(100)))
+            {
+                buildOptions.Add(NativeBuildOptions.GetDefault(this));
+            }
+            GUILayout.Space(20);
+            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.Space();
 
-			return s.Replace (" ", string.Empty);
-		}
+        }
 
-		private bool BeginSettingsBox (int nr, GUIContent header, NativePlugin plugin)
-		{
-			GUI.changed = false;
-			bool enabled = GUI.enabled;
-			GUI.enabled = true;
-			EditorGUILayout.BeginVertical (categoryBox, new GUILayoutOption[0]);
-			Rect rect = GUILayoutUtility.GetRect (20f, 18f);
-			rect.x += 3f;
-			rect.width += 6f;
-			plugin.isSelected = GUI.Toggle (rect, plugin.isSelected, header, GetStyle ("IN TitleText"));
-			if (GUI.changed) {
-				plugin.sectionAnimator.target = plugin.isSelected;
-				if (plugin.isSelected) {
-					for (int i = 0; i < NativePluginSettings.plugins.Count; i++) {
-						if (NativePluginSettings.plugins [i] != plugin) {
-							NativePluginSettings.plugins [i].isSelected = false;
-							NativePluginSettings.plugins [i].sectionAnimator.target = false;
-						}
-					}
-				}
-			}
-			GUI.enabled = enabled;
-			return EditorGUILayout.BeginFadeGroup (plugin.sectionAnimator.faded);
-		}
+        private static string SanitizeName(string s)
+        {
+            //s = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(s);
+            bool isValid = Microsoft.CSharp.CSharpCodeProvider.CreateProvider("C#").IsValidIdentifier(s);
 
-		private void EndSettingsBox ()
-		{
-			EditorGUILayout.EndFadeGroup ();
-			EditorGUILayout.EndVertical ();
-		}
+            if (!isValid)
+            {
+                // File name contains invalid chars, remove them
+                System.Text.RegularExpressions.Regex regex =
+                    new System.Text.RegularExpressions.Regex(@"[^\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}\p{Nl}\p{Mn}\p{Mc}\p{Cf}\p{Pc}\p{Lm}]");
+                s = regex.Replace(s, "");
 
-		private static GUIStyle GetStyle (string styleName)
-		{
-			GUIStyle gUIStyle = GUI.skin.FindStyle (styleName);
-			if (gUIStyle == null) {
-				gUIStyle = EditorGUIUtility.GetBuiltinSkin (EditorSkin.Inspector).FindStyle (styleName);
-			}
-			if (gUIStyle == null) {
-				Debug.LogError ("Missing built-in guistyle " + styleName);
-			}
-			return gUIStyle;
-		}
-	}
+                // Class name doesn't begin with a letter, insert an underscore
+                if (!char.IsLetter(s, 0))
+                {
+                    s = s.Insert(0, "_");
+                }
+            }
+
+            return s.Replace(" ", string.Empty);
+        }
+
+        private static string[] availablePlatformStrings;
+        public static string[] AvailablePlatformStrings
+        {
+            get
+            {
+                if (availablePlatformStrings == null)
+                {
+                    List<string> platforms = new List<string>();
+
+                    foreach (BuildPlatform platform in Enum.GetValues(typeof(BuildPlatform)))
+                    {
+                        if (GetBuilder(platform).IsAvailable)
+                        {
+                            platforms.Add(platform.ToString());
+                        }
+                    }
+                    availablePlatformStrings = platforms.ToArray();
+                }
+                return availablePlatformStrings;
+            }
+        }
+
+        private static PluginBuilderBase GetBuilder(BuildPlatform buildPlatform)
+        {
+            if (builders == null)
+            {
+                builders = new Dictionary<BuildPlatform, PluginBuilderBase>();
+            }
+            if (!builders.ContainsKey(buildPlatform))
+            {
+                builders[buildPlatform] = PluginBuilderBase.GetBuilderForTarget(buildPlatform);
+            }
+
+            return builders[buildPlatform];
+        }
+
+        private bool BeginSettingsBox(int nr, GUIContent header, NativePlugin plugin)
+        {
+            GUI.changed = false;
+            bool enabled = GUI.enabled;
+            GUI.enabled = true;
+            EditorGUILayout.BeginVertical(categoryBox, new GUILayoutOption[0]);
+            Rect rect = GUILayoutUtility.GetRect(20f, 18f);
+            rect.x += 3f;
+            rect.width += 6f;
+            plugin.isSelected = GUI.Toggle(rect, plugin.isSelected, header, GetStyle("IN TitleText"));
+            if (GUI.changed)
+            {
+                plugin.sectionAnimator.target = plugin.isSelected;
+                if (plugin.isSelected)
+                {
+                    for (int i = 0; i < NativePluginSettings.plugins.Count; i++)
+                    {
+                        if (NativePluginSettings.plugins[i] != plugin)
+                        {
+                            NativePluginSettings.plugins[i].isSelected = false;
+                            NativePluginSettings.plugins[i].sectionAnimator.target = false;
+                        }
+                    }
+                }
+            }
+            GUI.enabled = enabled;
+            return EditorGUILayout.BeginFadeGroup(plugin.sectionAnimator.faded);
+        }
+
+        private void EndSettingsBox()
+        {
+            EditorGUILayout.EndFadeGroup();
+            EditorGUILayout.EndVertical();
+        }
+
+        private static GUIStyle GetStyle(string styleName)
+        {
+            GUIStyle gUIStyle = GUI.skin.FindStyle(styleName);
+            if (gUIStyle == null)
+            {
+                gUIStyle = EditorGUIUtility.GetBuiltinSkin(EditorSkin.Inspector).FindStyle(styleName);
+            }
+            if (gUIStyle == null)
+            {
+                Debug.LogError("Missing built-in guistyle " + styleName);
+            }
+            return gUIStyle;
+        }
+    }
 
 }
