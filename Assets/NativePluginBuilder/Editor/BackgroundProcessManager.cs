@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using System;
+
 namespace iBicha
 {
     public class BackgroundProcessManager
@@ -54,53 +56,43 @@ namespace iBicha
         {
             if (BackgroundProcesses.Count == 0)
             {
-                EditorGUILayout.BeginVertical(NativePluginBuilder.categoryBox, new GUILayoutOption[0]);
-                GUILayout.Label("Idle.");
-                EditorGUILayout.EndVertical();
+                StatusBox("Idle.","");
                 return;
             }
 
-            if (!expandGui && BackgroundProcesses.Count > 2)
+            if (expandGui)
             {
-                EditorGUILayout.BeginVertical(NativePluginBuilder.categoryBox, new GUILayoutOption[0]);
-                EditorGUILayout.BeginHorizontal();
-                GUILayout.Label(string.Format("{0} Processes running in the background", BackgroundProcesses.Count), EditorStyles.boldLabel);
-                if (GUILayout.Button("Show", GUILayout.Width(80)))
+                for (int i = 0; i < BackgroundProcesses.Count; i++)
                 {
-                    expandGui = true;
+                    StatusBox(BackgroundProcesses[i].Name, BackgroundProcesses[i].lastLine, "Stop", BackgroundProcesses[i].Stop);
                 }
-                EditorGUILayout.EndHorizontal();
-                EditorGUILayout.EndVertical();
-
-                return;
             }
 
             if (BackgroundProcesses.Count > 2)
             {
-                EditorGUILayout.BeginVertical(NativePluginBuilder.categoryBox, new GUILayoutOption[0]);
-                EditorGUILayout.BeginHorizontal();
-                GUILayout.Label(string.Format("{0} Processes running in the background", BackgroundProcesses.Count), EditorStyles.boldLabel);
-                if (GUILayout.Button("Hide", GUILayout.Width(80)))
-                {
-                    expandGui = false;
-                }
-                EditorGUILayout.EndHorizontal();
-                EditorGUILayout.EndVertical();
+                StatusBox(string.Format("{0} Processes running in the background", BackgroundProcesses.Count), null,
+                    expandGui ? "Hide" : "Show", () => { expandGui = !expandGui; });
             }
+        }
 
-            for (int i = 0; i < BackgroundProcesses.Count; i++)
+        void StatusBox(string title, string details, string buttonCaption = null, Action onClick = null)
+        {
+            EditorGUILayout.BeginVertical(NativePluginBuilder.categoryBox, new GUILayoutOption[0]);
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Label(title, EditorStyles.boldLabel);
+            if (!string.IsNullOrEmpty(buttonCaption))
             {
-                EditorGUILayout.BeginVertical(NativePluginBuilder.categoryBox, new GUILayoutOption[0]);
-                EditorGUILayout.BeginHorizontal();
-                GUILayout.Label(BackgroundProcesses[i].Name, EditorStyles.boldLabel);
-                if (GUILayout.Button("Stop", GUILayout.Width(60)))
+                if (GUILayout.Button(buttonCaption, GUILayout.Width(80)))
                 {
-                    BackgroundProcesses[i].Stop();
+                    onClick();
                 }
-                EditorGUILayout.EndHorizontal();
-                GUILayout.Label(BackgroundProcesses[i].lastLine, EditorStyles.miniLabel);
-                EditorGUILayout.EndVertical();
             }
+            EditorGUILayout.EndHorizontal();
+            if (!string.IsNullOrEmpty(details))
+            {
+                GUILayout.Label(details, EditorStyles.miniLabel);
+            }
+            EditorGUILayout.EndVertical();
         }
     }
 
