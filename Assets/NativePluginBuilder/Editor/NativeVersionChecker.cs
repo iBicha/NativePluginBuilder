@@ -19,7 +19,7 @@ namespace iBicha
 				if (plugin != null) {
 					string version = pluginImporter.GetEditorData ("PLUGIN_VERSION");
 					if (plugin.Version != version) {
-						warningStringBuilder.AppendFormat (@"Plugin version number mismatch: ""{0}"" is set to ""{1}"", while ""{2}"" was built with ""{3}""", 
+						warningStringBuilder.AppendFormat (@"Plugin version number mismatch: ""{0}"" is set to ""{1}"", while ""{2}"" was built with ""{3}""" + '\n', 
 							plugin.Name, plugin.Version, target.ToString(), version);
 					}
 
@@ -27,7 +27,7 @@ namespace iBicha
 					int buildNumber;
 					if(int.TryParse(buildNumberStr, out buildNumber)){
 						if (plugin.BuildNumber != buildNumber) {
-							warningStringBuilder.AppendFormat (@"Plugin build number mismatch: ""{0}"" is set to ""{1}"", while ""{2}"" was built with ""{3}""", 
+							warningStringBuilder.AppendFormat (@"Plugin build number mismatch: ""{0}"" is set to ""{1}"", while ""{2}"" was built with ""{3}""" + '\n', 
 							plugin.Name, plugin.BuildNumber, target.ToString(), buildNumber);
 						}
 					}
@@ -36,7 +36,7 @@ namespace iBicha
 					BuildType buildType = (BuildType) Enum.Parse(typeof(BuildType), buildTypeStr, true);
 					if ((EditorUserBuildSettings.development && buildType == BuildType.Release) ||
 						(!EditorUserBuildSettings.development && buildType == BuildType.Debug)) {
-						warningStringBuilder.AppendFormat (@"Plugin build type mismatch: current build is set to development=""{0}"", while plugin ""{0}"" for ""{0}"" is ""{0}"".\n", 
+						warningStringBuilder.AppendFormat (@"Plugin build type mismatch: current build is set to development=""{0}"", while plugin ""{1}"" for ""{2}"" is ""{3}""." + '\n', 
 							EditorUserBuildSettings.development, plugin.Name, target, buildType);
 						
 					}
