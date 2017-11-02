@@ -25,7 +25,7 @@ We are looking into supporting more platforms (Universal Windows, Console, etc)
 4. Go to the plugins tab, and create a new plugin
 5. A new folder is now created. Add the `MyPluginExample.cs` script to a `GameObject`
 6. Build the plugin for the Editor (The default build options should work for the editor)
-7.Hit play!
+7. Hit play!
 
 ## The editor
 Using the editor you can create and define multiple plugins each with multiple build options.
