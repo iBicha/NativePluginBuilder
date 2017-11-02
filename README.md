@@ -22,10 +22,10 @@ We are looking into supporting more platforms (Universal Windows, Console, etc)
 1. Added NativePluginBuilder to your `Assets` folder
 2. Go to `Window -> Native Plugin Builder`
 3. Go to the settings tab, and make sure that there is a CMake verion in the editor.
-3. Go to the plugins tab, and create a new plugin
-4. A new folder is now created. Add the `MyPluginExample.cs` script to a `GameObject`
-5. Build the plugin for the Editor (The default build options should work for the editor)  
-6.Hit play!
+4. Go to the plugins tab, and create a new plugin
+5. A new folder is now created. Add the `MyPluginExample.cs` script to a `GameObject`
+6. Build the plugin for the Editor (The default build options should work for the editor)
+7.Hit play!
 
 ## The editor
 Using the editor you can create and define multiple plugins each with multiple build options.
