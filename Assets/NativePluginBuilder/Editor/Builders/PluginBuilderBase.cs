@@ -17,7 +17,7 @@ namespace iBicha {
         protected void SetSupportedArchitectures(params Architecture[] architectures)
         {
             SupportedArchitectures = architectures;
-            SupportedArchitectureStrings = SupportedArchitectures.Select(arch => arch.ToString()).ToArray();
+            SupportedArchitectureStrings = SupportedArchitectures.Select(arch => ObjectNames.NicifyVariableName(Enum.GetName(typeof(Architecture), arch))).ToArray();
             SupportedArchitectureInts = SupportedArchitectures.Select(arch => (int) arch).ToArray();
         }
 

@@ -18,6 +18,9 @@ namespace iBicha
 
         private static Dictionary<BuildPlatform, PluginBuilderBase> builders;
 
+        public static string[] AvailablePlatformStrings;
+        public static int[] AvailablePlatformInts;
+
         private static AnimBool PluginsFoldoutAnimator;
         private static AnimBool NewPluginFoldoutAnimator;
 
@@ -118,6 +121,21 @@ namespace iBicha
             });
 
             backgroundProcessManager = new BackgroundProcessManager(this);
+
+            List<string> platformStrings = new List<string>();
+            List<int> platforms = new List<int>();
+
+            foreach (BuildPlatform platform in Enum.GetValues(typeof(BuildPlatform)))
+            {
+                if (GetBuilder(platform).IsAvailable)
+                {
+                    platforms.Add((int)platform);
+                    platformStrings.Add(ObjectNames.NicifyVariableName(Enum.GetName(typeof(BuildPlatform), platform)));
+                }
+            }
+            AvailablePlatformStrings = platformStrings.ToArray();
+            AvailablePlatformInts= platforms.ToArray();
+
         }
 
         private void OnDisable()
@@ -501,12 +519,12 @@ namespace iBicha
 
                     //Platform
                     GUI.changed = false;
-                    int PlatformIndex = Array.IndexOf(AvailablePlatformStrings, buildOptions[i].BuildPlatform.ToString());
-                    PlatformIndex = EditorGUILayout.Popup("Platform", PlatformIndex, AvailablePlatformStrings);
+
+                    buildOptions[i].BuildPlatform = (BuildPlatform)EditorGUILayout.IntPopup("Platform", 
+                        (int)buildOptions[i].BuildPlatform, AvailablePlatformStrings, AvailablePlatformInts);
+
                     if (GUI.changed)
                     {
-                        buildOptions[i].BuildPlatform = (BuildPlatform)Enum.Parse(typeof(BuildPlatform),
-                            AvailablePlatformStrings[PlatformIndex], true);
                         if (!GetBuilder(buildOptions[i].BuildPlatform).SupportedArchitectures.Contains(buildOptions[i].Architecture))
                             buildOptions[i].Architecture = GetBuilder(buildOptions[i].BuildPlatform).SupportedArchitectures[0];
                     }
@@ -595,28 +613,6 @@ namespace iBicha
             }
 
             return s.Replace(" ", string.Empty);
-        }
-
-        private static string[] availablePlatformStrings;
-        public static string[] AvailablePlatformStrings
-        {
-            get
-            {
-                if (availablePlatformStrings == null)
-                {
-                    List<string> platforms = new List<string>();
-
-                    foreach (BuildPlatform platform in Enum.GetValues(typeof(BuildPlatform)))
-                    {
-                        if (GetBuilder(platform).IsAvailable)
-                        {
-                            platforms.Add(platform.ToString());
-                        }
-                    }
-                    availablePlatformStrings = platforms.ToArray();
-                }
-                return availablePlatformStrings;
-            }
         }
 
         private static PluginBuilderBase GetBuilder(BuildPlatform buildPlatform)

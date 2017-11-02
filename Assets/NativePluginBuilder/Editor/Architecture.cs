@@ -8,11 +8,11 @@ namespace iBicha
     public enum Architecture
     {
 		AnyCPU, //AnyCPU
-        ARMv7,
-        ARM = ARMv7,
+        ARMv7, //Android
+        ARM, //UWP
         Universal,
         x86,
-        x86_64,
-        x64 = x86_64
+        x86_64, //Standalone
+        x64 //UWP
     }
 }
