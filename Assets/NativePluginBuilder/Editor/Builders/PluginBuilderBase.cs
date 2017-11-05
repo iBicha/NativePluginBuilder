@@ -97,9 +97,13 @@ namespace iBicha {
 			AddCmakeArg (cmakeArgs, "SOURCE_FOLDER", plugin.sourceFolder, "PATH");
 			AddCmakeArg (cmakeArgs, "PLUGIN_BINARY_FOLDER", plugin.pluginBinaryFolderPath, "PATH");
 
-            if (plugin.includePluginAPI)
-            {
-                AddCmakeArg(cmakeArgs, "INCLUDE_PLUGIN_API", GetPluginAPILocation(), "PATH");
+			if (plugin.includePluginAPI)
+            {  
+				if (Directory.Exists(GetPluginAPILocation())) {
+					AddCmakeArg(cmakeArgs, "INCLUDE_PLUGIN_API", GetPluginAPILocation(), "PATH");
+				} else {
+					UnityEngine.Debug.LogWarning("Unity plugin API folder was not found. include folder skipped.");
+				}
             }
 
             string definitions = plugin.Definitions.ToDefinitionString("\\;");
@@ -152,9 +156,10 @@ namespace iBicha {
 			case RuntimePlatform.OSXEditor:
 				return CombineFullPath(EditorApplication.applicationPath, "Contents/PluginAPI");
 			case RuntimePlatform.LinuxEditor:
-				throw new NotImplementedException ();
+				//It's not available?
+				return null;
 			default:
-				return Path.GetDirectoryName(EditorApplication.applicationPath);
+				throw new PlatformNotSupportedException("Unknown platform");
 			}
 
         }
@@ -163,10 +168,13 @@ namespace iBicha {
         {
             switch (EditorPlatform)
             {
-                case RuntimePlatform.WindowsEditor:
-                    return CombineFullPath(Path.GetDirectoryName(EditorApplication.applicationPath), "Data");
-                default:
-                    return Path.GetDirectoryName(EditorApplication.applicationPath);
+			case RuntimePlatform.WindowsEditor:
+			case RuntimePlatform.LinuxEditor:
+					return CombineFullPath(Path.GetDirectoryName(EditorApplication.applicationPath), "Data");
+			case RuntimePlatform.OSXEditor:
+				return Path.GetDirectoryName(EditorApplication.applicationPath);
+            default:
+				throw new PlatformNotSupportedException("Unknown platform");
             }
         }
 
@@ -175,12 +183,10 @@ namespace iBicha {
 			switch (EditorPlatform)
 			{
 			case RuntimePlatform.WindowsEditor:
-				return CombineFullPath(GetEditorLocation(), "Tools");
+			case RuntimePlatform.LinuxEditor:
+					return CombineFullPath(GetEditorLocation(), "Tools");
 			case RuntimePlatform.OSXEditor:
 				return CombineFullPath(EditorApplication.applicationPath, "Contents/Tools");
-			case RuntimePlatform.LinuxEditor:
-				//TODO:
-				throw new NotImplementedException();
 			default:
 				throw new PlatformNotSupportedException("Unknown platform");
 			}

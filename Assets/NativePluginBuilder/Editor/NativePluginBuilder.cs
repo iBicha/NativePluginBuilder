@@ -231,7 +231,6 @@ namespace iBicha
 
             EditorGUILayout.Space();
 
-            //TODO: if available
             if (GetBuilder(BuildPlatform.Android).IsAvailable)
             {
                 EditorGUILayout.LabelField("Android", EditorStyles.boldLabel);
