@@ -40,7 +40,7 @@ namespace iBicha
 					"BuildType not supported: only Debug and Release, current:\"{0}\"", buildOptions.BuildType));
 			}
 
-			if (string.IsNullOrEmpty(NDKLocation)) {
+			if (!IsValidNDKLocation(NDKLocation)) {
 				throw new System.Exception ("Missing Android NDK. Please check the settings.");
 			}
 		}
@@ -128,7 +128,7 @@ namespace iBicha
 
                 //Get ndk from Unity settings
                 ndk = EditorPrefs.GetString("AndroidNdkRoot");
-                if (Directory.Exists(ndk))
+                if (IsValidNDKLocation(ndk))
                 {
                     return ndk;
                 }
@@ -136,7 +136,7 @@ namespace iBicha
                 //Get the default location
                 string sdk = GetSDKLocation();
                 ndk = CombineFullPath(sdk, "ndk-bundle");
-                if (Directory.Exists(ndk))
+                if (IsValidNDKLocation(ndk))
                 {
                     return ndk;
                 }
@@ -144,12 +144,16 @@ namespace iBicha
             }
             set
             {
-                if (Directory.Exists(value))
+                if (IsValidNDKLocation(value))
                 {
-                    //TODO: check if valid
                     EditorPrefs.SetString("NativePluginBuilderAndroidNdkRoot", value);
                 }
             }
+        }
+
+        private static bool IsValidNDKLocation(string location)
+        {
+            return File.Exists(CombineFullPath(location, "build/cmake/android.toolchain.cmake"));
         }
 
         private static string GetSDKLocation()

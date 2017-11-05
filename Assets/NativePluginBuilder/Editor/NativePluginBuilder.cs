@@ -244,11 +244,7 @@ namespace iBicha
                 }
                 if (GUILayout.Button("Browse", EditorStyles.miniButton, GUILayout.Width(80)))
                 {
-                    string folder = EditorUtility.OpenFolderPanel("Select NDK location", Path.GetDirectoryName(AndroidBuilder.NDKLocation), "");
-                    if (!string.IsNullOrEmpty(folder))
-                    {
-                        AndroidBuilder.NDKLocation = folder;
-                    }
+                    AndroidBuilder.NDKLocation = EditorUtility.OpenFolderPanel("Select NDK location", Path.GetDirectoryName(AndroidBuilder.NDKLocation), "");
                 }
                 EditorGUILayout.EndHorizontal();
 
