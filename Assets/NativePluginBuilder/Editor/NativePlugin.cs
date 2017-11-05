@@ -58,7 +58,24 @@ namespace iBicha
 
         #region GUI vars
         public AnimBool sectionAnimator;
-        public bool isSelected;
+		public bool IsSelected {
+			get	{
+				return sectionAnimator.target;
+			}
+			set {
+				if (value != sectionAnimator.target) {
+					sectionAnimator.target = value;
+					if (sectionAnimator.target) {
+						for (int i = 0; i < NativePluginSettings.plugins.Count; i++) {
+							if (NativePluginSettings.plugins [i] != this) {
+								NativePluginSettings.plugins [i].sectionAnimator.target = false;
+							}
+						}
+					}
+				}
+			}
+		}
+
         #endregion
         public void Create()
         {

@@ -633,22 +633,7 @@ namespace iBicha
             Rect rect = GUILayoutUtility.GetRect(20f, 18f);
             rect.x += 3f;
             rect.width += 6f;
-            plugin.isSelected = GUI.Toggle(rect, plugin.isSelected, header, GetStyle("IN TitleText"));
-            if (GUI.changed)
-            {
-                plugin.sectionAnimator.target = plugin.isSelected;
-                if (plugin.isSelected)
-                {
-                    for (int i = 0; i < NativePluginSettings.plugins.Count; i++)
-                    {
-                        if (NativePluginSettings.plugins[i] != plugin)
-                        {
-                            NativePluginSettings.plugins[i].isSelected = false;
-                            NativePluginSettings.plugins[i].sectionAnimator.target = false;
-                        }
-                    }
-                }
-            }
+			plugin.IsSelected = GUI.Toggle(rect, plugin.IsSelected, header, GetStyle("IN TitleText"));
             GUI.enabled = enabled;
             return EditorGUILayout.BeginFadeGroup(plugin.sectionAnimator.faded);
         }
