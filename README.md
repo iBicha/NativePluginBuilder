@@ -20,7 +20,7 @@ These platforms are supported (when available):
 We are looking into supporting more platforms (Universal Windows, Console, etc)
 
 ## Getting started
-1. Added NativePluginBuilder to your `Assets` folder
+1. Added NativePluginBuilder to your `Assets` folder (or add as git submodule)
 2. Go to `Window -> Native Plugin Builder`
 3. Go to the settings tab, and make sure that there is a CMake verion in the editor.
 4. Go to the plugins tab, and create a new plugin
@@ -31,7 +31,7 @@ We are looking into supporting more platforms (Universal Windows, Console, etc)
 ## The editor
 Using the editor you can create and define multiple plugins each with multiple build options.
 
-<img src="https://raw.github.com/iBicha/UnityNativePluginBuilder/master/Screenshots/screen1.png" height="500">
+<img src="https://raw.github.com/iBicha/UnityNativePluginBuilder/master/NativePluginBuilder/Screenshots/screen1.png" height="500">
 
 * The name of the plugin will be used as the name of the library and the name of the C# class. Make sure it's a valid indentifier. It can only be set in creation time.
 * The version and the build number are accessible to your c++ code through `PLUGIN_VERSION` and `PLUGIN_BUILD_NUMBER` defines
