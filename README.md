@@ -14,6 +14,7 @@ These platforms are supported (when available):
 * Android
 * iOS
 * Standalone (Windows, OS X, Linux)
+* Universal Windows Platform
 * WebGL
 
 We are looking into supporting more platforms (Universal Windows, Console, etc)
