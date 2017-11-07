@@ -51,14 +51,8 @@ namespace iBicha
 		public BuildType BuildType = BuildType.Default;
 		public BuildPlatform BuildPlatform;
 
-		//iOS only
-		public bool IsSimulatorBuild;
-
 		//Android only
 		public int AndroidSdkVersion; //"android-XX", default 0
-
-		//WebGL only
-		public int OptimizationLevel;
 
 		#region GUI vars
 		public bool isEnabled;

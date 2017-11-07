@@ -538,14 +538,6 @@ namespace iBicha
 
                     switch (buildOptions[i].BuildPlatform)
                     {
-                        case BuildPlatform.iOS:
-                            if (GetBuilder(BuildPlatform.iOS).IsAvailable)
-                            {
-                                EditorGUILayout.LabelField("iOS options", EditorStyles.boldLabel);
-                                buildOptions[i].IsSimulatorBuild = EditorGUILayout.Toggle("Simulator build", buildOptions[i].IsSimulatorBuild);
-
-                            }
-                            break;
                         case BuildPlatform.Android:
                             if (GetBuilder(BuildPlatform.Android).IsAvailable)
                             {

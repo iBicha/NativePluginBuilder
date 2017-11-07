@@ -52,7 +52,6 @@ namespace iBicha
 
 			AddCmakeArg (cmakeArgs, "IOS", "ON", "BOOL");
 			cmakeArgs.AppendFormat ("-B{0} ", "iOS");
-			AddCmakeArg (cmakeArgs, "SIMULATOR", buildOptions.IsSimulatorBuild ? "ON" : "OFF", "BOOL");
 
 			buildOptions.OutputDirectory = CombineFullPath (plugin.buildFolder, "iOS");
 
@@ -85,7 +84,6 @@ namespace iBicha
 				pluginImporter.SetEditorData ("PLUGIN_VERSION", plugin.Version);
 				pluginImporter.SetEditorData ("PLUGIN_BUILD_NUMBER", plugin.BuildNumber.ToString());
 				pluginImporter.SetEditorData ("BUILD_TYPE", buildOptions.BuildType.ToString());
-				pluginImporter.SetEditorData ("SIMULATOR", buildOptions.IsSimulatorBuild.ToString());
 
 				pluginImporter.SaveAndReimport ();
 			}
