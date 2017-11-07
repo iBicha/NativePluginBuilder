@@ -60,7 +60,7 @@ namespace iBicha
                 return;
             }
 
-            if (expandGui)
+			if (expandGui || BackgroundProcesses.Count <= 2)
             {
                 for (int i = 0; i < BackgroundProcesses.Count; i++)
                 {
