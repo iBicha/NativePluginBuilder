@@ -20,7 +20,7 @@ These platforms are supported (when available):
 We are looking into supporting more platforms (Universal Windows, Console, etc)
 
 ## Getting started
-1. Added NativePluginBuilder to your `Assets` folder (or add as git submodule)
+1. Add NativePluginBuilder to your `Assets` folder (or add as git submodule)
 2. Go to `Window -> Native Plugin Builder`
 3. Go to the settings tab, and make sure that there is a CMake verion in the editor.
 4. Go to the plugins tab, and create a new plugin
