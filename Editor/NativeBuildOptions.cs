@@ -21,7 +21,8 @@ namespace iBicha
                     break;
                 case RuntimePlatform.OSXEditor:
                     buildOptions.BuildPlatform = BuildPlatform.OSX;
-                    break;
+					buildOptions.Architecture = Architecture.Universal;
+					break;
                 case RuntimePlatform.LinuxEditor:
                     buildOptions.BuildPlatform = BuildPlatform.Linux;
                     buildOptions.Architecture = PluginBuilderBase.EditorArchitecture;
