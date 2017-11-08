@@ -67,7 +67,25 @@ namespace iBicha {
 			AssetDatabase.Refresh ();
 		}
 			
-		public static PluginBuilderBase GetBuilderForTarget(BuildPlatform target){
+        protected static void SetPluginBaseInfo(NativePlugin plugin, NativeBuildOptions buildOptions, PluginImporter pluginImporter)
+        {
+            pluginImporter.SetEditorData("PLUGIN_NAME", plugin.Name);
+            pluginImporter.SetEditorData("PLUGIN_VERSION", plugin.Version);
+            pluginImporter.SetEditorData("PLUGIN_BUILD_NUMBER", plugin.BuildNumber.ToString());
+            BuildType buildType;
+            if (buildOptions.BuildType == BuildType.Default)
+            {
+                buildType = EditorUserBuildSettings.development ? BuildType.Debug : BuildType.Release;
+            }
+            else
+            {
+                buildType = buildOptions.BuildType;
+            }
+            pluginImporter.SetEditorData("BUILD_TYPE", buildType.ToString());
+
+        }
+
+        public static PluginBuilderBase GetBuilderForTarget(BuildPlatform target){
 			switch (target) {
 			case BuildPlatform.Android:
 				return new AndroidBuilder ();

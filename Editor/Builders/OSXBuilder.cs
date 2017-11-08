@@ -34,15 +34,6 @@ namespace iBicha
 
             ArchtectureCheck(buildOptions);
 
-            if (buildOptions.BuildType == BuildType.Default) {
-				buildOptions.BuildType = EditorUserBuildSettings.development ? BuildType.Debug : BuildType.Release;
-			}
-
-			if (buildOptions.BuildType != BuildType.Debug && buildOptions.BuildType != BuildType.Release) {
-				throw new System.NotSupportedException (string.Format(
-					"BuildType not supported: only Debug and Release, current:\"{0}\"", buildOptions.BuildType));
-			}
-
 			if (!IsXCodeInstalled) {
 				throw new System.ArgumentException ("Xcode not found");
 			}
@@ -52,9 +43,18 @@ namespace iBicha
 		{
 			StringBuilder cmakeArgs = GetBasePluginCMakeArgs (plugin);
 
-			AddCmakeArg (cmakeArgs, "CMAKE_BUILD_TYPE", buildOptions.BuildType.ToString());
+            BuildType buildType;
+            if (buildOptions.BuildType == BuildType.Default)
+            {
+                buildType = EditorUserBuildSettings.development ? BuildType.Debug : BuildType.Release;
+            }
+            else
+            {
+                buildType = buildOptions.BuildType;
+            }
+            AddCmakeArg(cmakeArgs, "CMAKE_BUILD_TYPE", buildType.ToString());
 
-			AddCmakeArg (cmakeArgs, "OSX", "ON", "BOOL");
+            AddCmakeArg(cmakeArgs, "OSX", "ON", "BOOL");
 			cmakeArgs.AppendFormat ("-B{0} ", "OSX");
 
 			buildOptions.OutputDirectory = CombineFullPath (plugin.buildFolder, "OSX");
@@ -81,17 +81,14 @@ namespace iBicha
 
 			PluginImporter pluginImporter = PluginImporter.GetAtPath((assetFile)) as PluginImporter;
 			if (pluginImporter != null) {
-				pluginImporter.SetCompatibleWithAnyPlatform (false);
+                SetPluginBaseInfo(plugin, buildOptions, pluginImporter);
+
+                pluginImporter.SetCompatibleWithAnyPlatform (false);
 				pluginImporter.SetCompatibleWithEditor (true);
 				pluginImporter.SetCompatibleWithPlatform (BuildTarget.StandaloneOSXUniversal, true);
 				pluginImporter.SetEditorData ("OS", "OSX");
 
-				pluginImporter.SetEditorData ("PLUGIN_NAME", plugin.Name);
-				pluginImporter.SetEditorData ("PLUGIN_VERSION", plugin.Version);
-				pluginImporter.SetEditorData ("PLUGIN_BUILD_NUMBER", plugin.BuildNumber.ToString());
-				pluginImporter.SetEditorData ("BUILD_TYPE", buildOptions.BuildType.ToString());
-
-				pluginImporter.SaveAndReimport ();
+                pluginImporter.SaveAndReimport ();
 			}
 
 		}

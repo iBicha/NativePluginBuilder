@@ -31,15 +31,6 @@ namespace iBicha
 
             ArchtectureCheck(buildOptions);
 
-            if (buildOptions.BuildType == BuildType.Default) {
-				buildOptions.BuildType = EditorUserBuildSettings.development ? BuildType.Debug : BuildType.Release;
-			}
-
-			if (buildOptions.BuildType != BuildType.Debug && buildOptions.BuildType != BuildType.Release) {
-				throw new System.NotSupportedException (string.Format(
-					"BuildType not supported: only Debug and Release, current:\"{0}\"", buildOptions.BuildType));
-			}
-
 			if (!IsValidNDKLocation(NDKLocation)) {
 				throw new System.Exception ("Missing Android NDK. Please check the settings.");
 			}
@@ -49,7 +40,16 @@ namespace iBicha
 		{
 			StringBuilder cmakeArgs = GetBasePluginCMakeArgs (plugin);
 
-			AddCmakeArg (cmakeArgs, "CMAKE_BUILD_TYPE", buildOptions.BuildType.ToString());
+            BuildType buildType;
+            if(buildOptions.BuildType == BuildType.Default)
+            {
+                buildType = EditorUserBuildSettings.development ? BuildType.Debug : BuildType.Release;
+            }
+            else
+            {
+                buildType = buildOptions.BuildType;
+            }
+            AddCmakeArg (cmakeArgs, "CMAKE_BUILD_TYPE", buildType.ToString());
 
 			cmakeArgs.AppendFormat ("-G {0} ", "\"Unix Makefiles\"");
 			AddCmakeArg (cmakeArgs, "ANDROID", "ON", "BOOL");
@@ -95,15 +95,12 @@ namespace iBicha
 
 			PluginImporter pluginImporter = PluginImporter.GetAtPath((assetFile)) as PluginImporter;
 			if (pluginImporter != null) {
-				pluginImporter.SetCompatibleWithAnyPlatform (false);
+                SetPluginBaseInfo(plugin, buildOptions, pluginImporter);
+
+                pluginImporter.SetCompatibleWithAnyPlatform (false);
 				pluginImporter.SetCompatibleWithPlatform (BuildTarget.Android, true);
 				pluginImporter.SetEditorData("CPU", buildOptions.Architecture.ToString());
-
-                pluginImporter.SetEditorData ("PLUGIN_NAME", plugin.Name);
-				pluginImporter.SetEditorData ("PLUGIN_VERSION", plugin.Version);
-				pluginImporter.SetEditorData ("PLUGIN_BUILD_NUMBER", plugin.BuildNumber.ToString());
-				pluginImporter.SetEditorData ("BUILD_TYPE", buildOptions.BuildType.ToString());
-				pluginImporter.SetEditorData ("ANDROID_SDK_VERSION", buildOptions.AndroidSdkVersion.ToString());
+                pluginImporter.SetEditorData ("ANDROID_SDK_VERSION", buildOptions.AndroidSdkVersion.ToString());
 
 				pluginImporter.SaveAndReimport ();
 			}

@@ -36,15 +36,6 @@ namespace iBicha
 
             ArchtectureCheck(buildOptions);
 
-            if (buildOptions.BuildType == BuildType.Default) {
-                buildOptions.BuildType = EditorUserBuildSettings.development ? BuildType.Debug : BuildType.Release;
-            }
-
-            if (buildOptions.BuildType != BuildType.Debug && buildOptions.BuildType != BuildType.Release) {
-                throw new System.NotSupportedException(string.Format(
-                    "BuildType not supported: only Debug and Release, current:\"{0}\"", buildOptions.BuildType));
-            }
-
             if (InstalledVisualStudios.Length == 1)
             {
                 throw new System.InvalidOperationException("Could not find Visual Studio.");
@@ -56,7 +47,17 @@ namespace iBicha
             StringBuilder cmakeArgs = GetBasePluginCMakeArgs(plugin);
 
             AddCmakeArg(cmakeArgs, "CMAKE_CONFIGURATION_TYPES", "Debug;Release");
-            AddCmakeArg(cmakeArgs, "CMAKE_BUILD_TYPE", buildOptions.BuildType.ToString());
+
+            BuildType buildType;
+            if (buildOptions.BuildType == BuildType.Default)
+            {
+                buildType = EditorUserBuildSettings.development ? BuildType.Debug : BuildType.Release;
+            }
+            else
+            {
+                buildType = buildOptions.BuildType;
+            }
+            AddCmakeArg(cmakeArgs, "CMAKE_BUILD_TYPE", buildType.ToString());
 
             AddCmakeArg(cmakeArgs, "WINDOWS", "ON", "BOOL");
             cmakeArgs.AppendFormat("-B{0}/{1} ", "Windows", buildOptions.Architecture.ToString());
@@ -92,7 +93,16 @@ namespace iBicha
         public override BackgroundProcess Install(NativePlugin plugin, NativeBuildOptions buildOptions)
         {
             BackgroundProcess process = base.Install(plugin, buildOptions);
-            process.process.StartInfo.Arguments += " --config " + buildOptions.BuildType.ToString();
+            BuildType buildType;
+            if (buildOptions.BuildType == BuildType.Default)
+            {
+                buildType = EditorUserBuildSettings.development ? BuildType.Debug : BuildType.Release;
+            }
+            else
+            {
+                buildType = buildOptions.BuildType;
+            }
+            process.process.StartInfo.Arguments += " --config " + buildType.ToString();
             return process;
         }
 
@@ -108,22 +118,21 @@ namespace iBicha
 
             PluginImporter pluginImporter = PluginImporter.GetAtPath((assetFile)) as PluginImporter;
             if (pluginImporter != null) {
+                SetPluginBaseInfo(plugin, buildOptions, pluginImporter);
+
                 pluginImporter.SetCompatibleWithAnyPlatform(false);
+                if (buildOptions.Architecture == Architecture.x86)
+                {
+                    pluginImporter.SetCompatibleWithPlatform(BuildTarget.StandaloneWindows, true);
+                }
+                else
+                {
+                    pluginImporter.SetCompatibleWithPlatform(BuildTarget.StandaloneWindows64, true);
+                }
                 pluginImporter.SetCompatibleWithEditor(true);
                 pluginImporter.SetEditorData("OS", "Windows");
                 pluginImporter.SetEditorData("CPU", buildOptions.Architecture.ToString());
-
-                if (buildOptions.Architecture == Architecture.x86) {
-                    pluginImporter.SetCompatibleWithPlatform(BuildTarget.StandaloneWindows, true);
-                } else {
-                    pluginImporter.SetCompatibleWithPlatform(BuildTarget.StandaloneWindows64, true);
-                }
-
-                pluginImporter.SetEditorData("PLUGIN_NAME", plugin.Name);
-                pluginImporter.SetEditorData("PLUGIN_VERSION", plugin.Version);
-                pluginImporter.SetEditorData("PLUGIN_BUILD_NUMBER", plugin.BuildNumber.ToString());
-                pluginImporter.SetEditorData("BUILD_TYPE", buildOptions.BuildType.ToString());
-
+                        
                 pluginImporter.SaveAndReimport();
             }
         }
