@@ -17,7 +17,7 @@ These platforms are supported (when available):
 * Universal Windows Platform
 * WebGL
 
-We are looking into supporting more platforms (Universal Windows, Console, etc)
+We are looking into supporting more platforms (Console, etc)
 
 ## Getting started
 1. Add the content of the repo to your project in `Assets/NativePluginBuilder` folder (or add as git submodule)
