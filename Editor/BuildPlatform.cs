@@ -8,12 +8,13 @@ namespace iBicha
 {
 	public enum BuildPlatform
 	{
-		Android = 1, 
-		iOS, 
-		Linux,
-		OSX,
-		Windows,
+        Android = 1,
+        iOS,
+        Linux,
+        OSX,
+        Tizen,
         UniversalWindows,
-		WebGL
-	}
+        WebGL,
+        Windows
+    }
 }
