@@ -84,16 +84,17 @@ namespace iBicha
 					throw new Exception("Plugin name \"" + Name + "\" already exists.");
 				}	
 			}
-
 			if (Directory.Exists ("Assets/" + Name)) {
 				throw new Exception("Assets/" + Name + " already exists.");
 			}
 
             FileUtil.CopyFileOrDirectory("Assets/NativePluginBuilder/Boilerplate~", "Assets/" + Name);
 
-            FileUtil.MoveFileOrDirectory("Assets/" + Name + "/Plugin.cs", "Assets/" + Name + "/" + Name + ".cs");
+            FileUtil.MoveFileOrDirectory("Assets/" + Name + "/Plugin.asmdef", "Assets/" + Name + "/" + Name + ".asmdef");
             FileUtil.MoveFileOrDirectory("Assets/" + Name + "/PluginExample.cs", "Assets/" + Name + "/" + Name + "Example.cs");
+            FileUtil.MoveFileOrDirectory("Assets/" + Name + "/Plugin.cs", "Assets/" + Name + "/" + Name + ".cs");
 
+            ProcessTemplateFile("Assets/" + Name + "/" + Name + ".asmdef");
             ProcessTemplateFile("Assets/" + Name + "/" + Name + ".cs");
             ProcessTemplateFile("Assets/" + Name + "/" + Name + "Example.cs");
             ProcessTemplateFile("Assets/" + Name + "/Plugins/WebGL/PluginJS.jslib");
@@ -116,8 +117,9 @@ namespace iBicha
             content = content.Replace("#PLUGIN_NAME#", Name);
             File.WriteAllText(filename, content);
         }
+
 		public void Clean() {
-			System.IO.DirectoryInfo directory = new DirectoryInfo(buildFolder);
+			DirectoryInfo directory = new DirectoryInfo(buildFolder);
 			if (!directory.Exists) {
 				return;
 			}
@@ -143,14 +145,7 @@ namespace iBicha
 				builder.PreBuild (this, options);
 
 				BackgroundProcess buildProcess = builder.Build (this, options);
-				/*buildProcess.OutputLine += (string str) => {
-				Debug.Log(str);
-				};
-				buildProcess.ErrorLine += (string str) => {
-					Debug.LogError(str);
-				};*/
 				buildProcess.Exited += (exitCode, outputData, errorData) => {
-
 					if(!string.IsNullOrEmpty(outputData)){
 						Debug.Log(string.Format("{0}:\n{1}", buildProcess.Name, outputData));
 					}
@@ -167,17 +162,8 @@ namespace iBicha
 				};
 
 				BackgroundProcess installProcess = builder.Install (this, options);
-				/*installProcess.OutputLine += (string str) => {
-				Debug.Log(str);
-				};
-				installProcess.ErrorLine += (string str) => {
-					Debug.LogError(str);
-				};*/
-
 				installProcess.StartAfter (buildProcess);
-
 				installProcess.Exited += (exitCode, outputData, errorData) => {
-
 					if(!string.IsNullOrEmpty(outputData)){
 						Debug.Log(string.Format("{0}:\n{1}", installProcess.Name, outputData));
 					}
