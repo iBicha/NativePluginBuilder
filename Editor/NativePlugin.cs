@@ -132,8 +132,8 @@ namespace iBicha
 				dir.Delete(true); 
 			}
 		}
-        public void Build()
-        {
+		public void Build()
+		{
 			bool nothingToBuild = true;
 			foreach (NativeBuildOptions options in buildOptions) {
 				if (!options.isEnabled) {
@@ -145,38 +145,50 @@ namespace iBicha
 				builder.PreBuild (this, options);
 
 				BackgroundProcess buildProcess = builder.Build (this, options);
+
 				buildProcess.Exited += (exitCode, outputData, errorData) => {
+
 					if(!string.IsNullOrEmpty(outputData)){
-						Debug.Log(string.Format("{0}:\n{1}", buildProcess.Name, outputData));
+						string log = string.Format("{0}:\n{1}", buildProcess.Name, outputData);
+						File.WriteAllText(PluginBuilderBase.CombineFullPath(options.OutputDirectory, "Build_StdOut.log"),log);
+						Debug.Log(log);
 					}
 
-					if(exitCode == 0) {
-						if(!string.IsNullOrEmpty(errorData)){
-							Debug.LogWarning(string.Format("{0}:\n{1}", buildProcess.Name, errorData));
-						}
-					} else {
-						if(!string.IsNullOrEmpty(errorData)){
-							Debug.LogError(string.Format("{0}:\n{1}", buildProcess.Name, errorData));
+					if(!string.IsNullOrEmpty(errorData)){
+						string log = string.Format("{0}:\n{1}", buildProcess.Name, errorData);
+						File.WriteAllText(PluginBuilderBase.CombineFullPath(options.OutputDirectory, "Build_StdErr.log"),log);
+						if(exitCode == 0) {
+							Debug.LogWarning(log);
+						} else {
+							Debug.LogError(log);
 						}
 					}
 				};
 
 				BackgroundProcess installProcess = builder.Install (this, options);
+
 				installProcess.StartAfter (buildProcess);
+
 				installProcess.Exited += (exitCode, outputData, errorData) => {
+
 					if(!string.IsNullOrEmpty(outputData)){
-						Debug.Log(string.Format("{0}:\n{1}", installProcess.Name, outputData));
+						string log = string.Format("{0}:\n{1}", installProcess.Name, outputData);
+						File.WriteAllText(PluginBuilderBase.CombineFullPath(options.OutputDirectory, "Install_StdOut.log"),log);
+						Debug.Log(log);
+					}
+
+					if(!string.IsNullOrEmpty(errorData)){
+						string log = string.Format("{0}:\n{1}", installProcess.Name, errorData);
+						File.WriteAllText(PluginBuilderBase.CombineFullPath(options.OutputDirectory, "Install_StdErr.log"),log);
+						if(exitCode == 0) {
+							Debug.LogWarning(log);
+						} else {
+							Debug.LogError(log);
+						}
 					}
 
 					if(exitCode == 0) {
-						if(!string.IsNullOrEmpty(errorData)){
-							Debug.LogWarning(string.Format("{0}:\n{1}", installProcess.Name, errorData));
-						}
 						builder.PostBuild(this,options);
-					} else {
-						if(!string.IsNullOrEmpty(errorData)){
-							Debug.LogError(string.Format("{0}:\n{1}", installProcess.Name, errorData));
-						}
 					}
 				};
 
@@ -187,6 +199,6 @@ namespace iBicha
 			if (nothingToBuild) {
 				Debug.Log (string.Format ("{0}: Nothing to build.", Name));
 			}
-        }
-    }
+		}
+	}
 }

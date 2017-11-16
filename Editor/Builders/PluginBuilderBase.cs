@@ -148,7 +148,7 @@ namespace iBicha {
 			}
 		}
 
-		protected static string CombinePath(params string[] components)
+		public static string CombinePath(params string[] components)
 		{
 			if (components.Length < 1)
 			{
@@ -162,7 +162,7 @@ namespace iBicha {
 			return text.Replace('\\', '/');
 		}
 
-		protected static string CombineFullPath(params string[] components)
+		public static string CombineFullPath(params string[] components)
 		{
 			return Path.GetFullPath(CombinePath(components)).Replace('\\', '/');
 		}
