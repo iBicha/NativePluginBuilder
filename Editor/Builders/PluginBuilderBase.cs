@@ -95,8 +95,6 @@ namespace iBicha {
 				return new LinuxBuilder ();
 			case BuildPlatform.OSX:
 				return new OSXBuilder ();
-            case BuildPlatform.Tizen:
-                return new TizenBuilder();
                 case BuildPlatform.UniversalWindows:
                 return new UWPBuilder();
                 case BuildPlatform.WebGL:

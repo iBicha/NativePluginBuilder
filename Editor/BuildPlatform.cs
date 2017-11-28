@@ -12,7 +12,6 @@ namespace iBicha
         iOS,
         Linux,
         OSX,
-        Tizen,
         UniversalWindows,
         WebGL,
         Windows
