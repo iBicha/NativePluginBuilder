@@ -130,6 +130,11 @@ namespace iBicha {
                 //Because cmake will get rid of "s.
                 definitions = definitions.Replace("\"", "\\\"");
                 AddCmakeArg(cmakeArgs, "CUSTOM_DEFINES", definitions, "STRING");
+
+                for (int i = 0; i < plugin.Definitions.Count; i++)
+                {
+                    AddCmakeArg(cmakeArgs, plugin.Definitions.GetKey(i), plugin.Definitions.GetValue(i), "STRING");
+                }
             }
 
             return cmakeArgs;

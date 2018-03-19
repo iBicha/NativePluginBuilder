@@ -97,5 +97,16 @@ namespace iBicha
                 values[index] = value;
             }
         }
+
+        public T GetKey(int index)
+        {
+            return keys[index];
+        }
+
+        public Y GetValue(int index)
+        {
+            return values[index];
+        }
+
     }
 }
