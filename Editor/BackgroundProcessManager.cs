@@ -64,7 +64,7 @@ namespace iBicha
             {
                 for (int i = 0; i < BackgroundProcesses.Count; i++)
                 {
-                    StatusBox(BackgroundProcesses[i].Name, BackgroundProcesses[i].lastLine, "Stop", BackgroundProcesses[i].Stop);
+                    StatusBox(BackgroundProcesses[i].Name, BackgroundProcesses[i].LastLine, "Stop", BackgroundProcesses[i].Stop);
                 }
             }
 

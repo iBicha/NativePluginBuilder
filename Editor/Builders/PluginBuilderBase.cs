@@ -56,11 +56,11 @@ namespace iBicha {
             startInfo.Arguments = "--build . --target install --clean-first";
 			startInfo.WorkingDirectory = buildOptions.OutputDirectory;
 
-			BackgroundProcess process = new BackgroundProcess (startInfo);
-			process.Name = string.Format("Installing \"{0}\" for {1} ({2})", 
+			BackgroundProcess backgroundProcess = new BackgroundProcess (startInfo);
+			backgroundProcess.Name = string.Format("Installing \"{0}\" for {1} ({2})", 
 				plugin.Name, buildOptions.BuildPlatform.ToString(), buildOptions.Architecture.ToString());
 
-			return process;
+			return backgroundProcess;
 		}
 
 		public virtual void PostBuild (NativePlugin plugin, NativeBuildOptions buildOptions){

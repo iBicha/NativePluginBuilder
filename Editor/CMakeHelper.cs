@@ -37,9 +37,9 @@ namespace iBicha
             }
 
             ProcessStartInfo startInfo = new ProcessStartInfo (CMakeLocation, "--version");
-			BackgroundProcess process = new BackgroundProcess (startInfo);
-			process.Name = "Getting CMake version \"cmake --version\"";
-			process.Exited += (exitCode, outputData, errorData) => {
+			BackgroundProcess backgroundProcess = new BackgroundProcess (startInfo);
+			backgroundProcess.Name = "Getting CMake version \"cmake --version\"";
+			backgroundProcess.Exited += (exitCode, outputData, errorData) => {
 				if(exitCode == 0) {
 					outputData = outputData.ToLower();
 					if (outputData.Contains("version"))
@@ -56,7 +56,7 @@ namespace iBicha
 				}
 			};
 
-			process.Start ();
+			backgroundProcess.Start ();
         }
 
 		public static string CMakeLocation

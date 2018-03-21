@@ -9,55 +9,55 @@ namespace iBicha
 {
 	public class BackgroundProcess {
 
-		public string Name;
+		public string Name { get; set; }
 
-		public delegate void ExitedDelegate(int exitCode, string outputData, string errorData);
+        public delegate void ExitedDelegate(int exitCode, string outputData, string errorData);
 		public event ExitedDelegate Exited;
 
 		public event Action<string> OutputLine;
 		public event Action<string> ErrorLine;
 
-		public StringBuilder outputData;
-		public StringBuilder errorData;
+        public StringBuilder OutputData { get; private set; }
+        public StringBuilder ErrorData { get; private set; }
 
-		public Process process;
-        public string lastLine;
+        public Process Process { get; private set; }
+        public string LastLine { get; private set; }
 
-		public BackgroundProcess nextProcess;
-		public bool nextStopOnError;
+        public BackgroundProcess nextProcess { get; private set; }
+        private bool nextStopOnError;
 
 		public BackgroundProcess(ProcessStartInfo startInfo) {
-			outputData = new StringBuilder ();
-			errorData = new StringBuilder ();
-			process = new Process ();
-			process.StartInfo = startInfo;
-			process.StartInfo.UseShellExecute = false;
-			process.StartInfo.CreateNoWindow = true;
-			process.StartInfo.RedirectStandardOutput = true;
-			process.StartInfo.RedirectStandardError = true;
+			OutputData = new StringBuilder ();
+			ErrorData = new StringBuilder ();
+			Process = new Process ();
+			Process.StartInfo = startInfo;
+			Process.StartInfo.UseShellExecute = false;
+			Process.StartInfo.CreateNoWindow = true;
+			Process.StartInfo.RedirectStandardOutput = true;
+			Process.StartInfo.RedirectStandardError = true;
 
-			process.EnableRaisingEvents = true;
+			Process.EnableRaisingEvents = true;
 
-			process.OutputDataReceived += Process_OutputDataReceived;
-			process.ErrorDataReceived += Process_ErrorDataReceived;
-			process.Exited += Process_Exited;
+			Process.OutputDataReceived += Process_OutputDataReceived;
+			Process.ErrorDataReceived += Process_ErrorDataReceived;
+			Process.Exited += Process_Exited;
 		}
 
 		void Process_Exited (object sender, System.EventArgs e)
 		{
-			if (process.ExitCode != 0) {
-				errorData.Insert (0, string.Format ("Exit code: {0}\n", process.ExitCode));
+			if (Process.ExitCode != 0) {
+				ErrorData.Insert (0, string.Format ("Exit code: {0}\n", Process.ExitCode));
 			}
 
 			ExitedDelegate ExitedHandler = Exited;
 			if (ExitedHandler != null) {
 				EditorMainThread.Run (()=>{
-					ExitedHandler(process.ExitCode, outputData.ToString().Trim(), errorData.ToString().Trim());
+					ExitedHandler(Process.ExitCode, OutputData.ToString().Trim(), ErrorData.ToString().Trim());
 				});
 			}
 
 			if (nextProcess != null) {
-				if (process.ExitCode == 0 || !nextStopOnError) {
+				if (Process.ExitCode == 0 || !nextStopOnError) {
 					nextProcess.Start ();
 				}
 			}
@@ -65,8 +65,8 @@ namespace iBicha
 
 		void Process_ErrorDataReceived (object sender, DataReceivedEventArgs e)
 		{
-			errorData.AppendLine (e.Data);
-            lastLine = e.Data;
+			ErrorData.AppendLine (e.Data);
+            LastLine = e.Data;
 			Action<string> ErrorLineHandler = ErrorLine;
 			if (ErrorLineHandler != null) {
 				EditorMainThread.Run (()=>{
@@ -78,8 +78,8 @@ namespace iBicha
 
 		void Process_OutputDataReceived (object sender, DataReceivedEventArgs e)
 		{
-            lastLine = e.Data;
-			outputData.AppendLine (e.Data);
+            LastLine = e.Data;
+			OutputData.AppendLine (e.Data);
 			Action<string> OutputLineHandler = OutputLine;
 			if (OutputLineHandler != null) {
 				EditorMainThread.Run (()=>{
@@ -89,21 +89,21 @@ namespace iBicha
 		}
 
 		public BackgroundProcess(Process process) {
-			this.process = process;
+			this.Process = process;
 		}
 
 		public void Start() {
 			try {
-				process.Start ();
+				Process.Start ();
 
-				process.BeginOutputReadLine();
-				process.BeginErrorReadLine();
+				Process.BeginOutputReadLine();
+				Process.BeginErrorReadLine();
 
 				BackgroundProcessManager.Add(this);
 
 			} catch (Exception ex) {
 				string err = string.Format ("Could not start process: {0}", ex.ToString ());
-				errorData.AppendLine (err);
+				ErrorData.AppendLine (err);
 				Action<string> ErrorLineHandler = ErrorLine;
 				if (ErrorLineHandler != null) {
 					EditorMainThread.Run (()=>{
@@ -114,7 +114,7 @@ namespace iBicha
 		}
 
 		public void Stop() {
-			process.Kill ();
+			Process.Kill ();
 		}
         
 		public void StartAfter(BackgroundProcess backgroundProcess, bool stopOnError = true) {

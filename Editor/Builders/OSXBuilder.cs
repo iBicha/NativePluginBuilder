@@ -64,9 +64,9 @@ namespace iBicha
             startInfo.Arguments = cmakeArgs.ToString();
 			startInfo.WorkingDirectory = plugin.buildFolder;
 
-			BackgroundProcess process = new BackgroundProcess (startInfo);
-			process.Name = string.Format ("Building \"{0}\" for {1}", plugin.Name, "OSX");
-			return process;
+			BackgroundProcess backgroundProcess = new BackgroundProcess (startInfo);
+			backgroundProcess.Name = string.Format ("Building \"{0}\" for {1}", plugin.Name, "OSX");
+			return backgroundProcess;
 
 		}
 
@@ -107,13 +107,13 @@ namespace iBicha
 				startInfo.FileName = "xcodebuild";
 				startInfo.Arguments = "-version";
 
-				BackgroundProcess process = new BackgroundProcess (startInfo);
-				process.Name = "Checking XCode";
-				process.Start ();
+				BackgroundProcess backgroundProcess = new BackgroundProcess (startInfo);
+				backgroundProcess.Name = "Checking XCode";
+				backgroundProcess.Start ();
 				//I know this is bad, but it shouldn't take more than few ms. And it will be cached.
 				//TODO: make async
-				process.process.WaitForExit ();
-				return isXCodeInstalled = process.process.ExitCode == 0;
+				backgroundProcess.Process.WaitForExit ();
+				return isXCodeInstalled = backgroundProcess.Process.ExitCode == 0;
 
 			} 
 		}

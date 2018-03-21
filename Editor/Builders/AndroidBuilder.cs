@@ -75,9 +75,9 @@ namespace iBicha
 			startInfo.Arguments = cmakeArgs.ToString();
 			startInfo.WorkingDirectory = plugin.buildFolder;
 
-			BackgroundProcess process = new BackgroundProcess (startInfo);
-			process.Name = string.Format ("Building \"{0}\" for {1} ({2})", plugin.Name, "Android", archName);
-			return process;
+			BackgroundProcess backgroundProcess = new BackgroundProcess (startInfo);
+			backgroundProcess.Name = string.Format ("Building \"{0}\" for {1} ({2})", plugin.Name, "Android", archName);
+			return backgroundProcess;
 
 		}
 

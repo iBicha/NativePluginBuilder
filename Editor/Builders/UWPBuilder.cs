@@ -91,14 +91,14 @@ namespace iBicha
             startInfo.Arguments = cmakeArgs.ToString();
             startInfo.WorkingDirectory = plugin.buildFolder;
 
-            BackgroundProcess process = new BackgroundProcess(startInfo);
-            process.Name = string.Format("Building \"{0}\" for {1} ({2})", plugin.Name, "Universal Windows", buildOptions.Architecture.ToString());
-            return process;
+            BackgroundProcess backgroundProcess = new BackgroundProcess(startInfo);
+            backgroundProcess.Name = string.Format("Building \"{0}\" for {1} ({2})", plugin.Name, "Universal Windows", buildOptions.Architecture.ToString());
+            return backgroundProcess;
         }
 
         public override BackgroundProcess Install(NativePlugin plugin, NativeBuildOptions buildOptions)
         {
-            BackgroundProcess process = base.Install(plugin, buildOptions);
+            BackgroundProcess backgroundProcess = base.Install(plugin, buildOptions);
             BuildType buildType;
             if (buildOptions.BuildType == BuildType.Default)
             {
@@ -108,8 +108,8 @@ namespace iBicha
             {
                 buildType = buildOptions.BuildType;
             }
-            process.process.StartInfo.Arguments += " --config " + buildType.ToString();
-            return process;
+            backgroundProcess.Process.StartInfo.Arguments += " --config " + buildType.ToString();
+            return backgroundProcess;
         }
 
         public override void PostBuild(NativePlugin plugin, NativeBuildOptions buildOptions)
