@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Text;
-using UnityEngine;
 
 namespace CMake.Instructions
 {
+    [Serializable]
     public class GenericInstruction : Instruction {
 
         public virtual string Command { get; set; }    

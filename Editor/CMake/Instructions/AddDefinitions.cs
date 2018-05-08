@@ -1,12 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
 using System.Text;
-using UnityEngine;
+using iBicha;
 
 namespace CMake.Instructions
 {
-
+    [Serializable]
     public class AddDefinitions : GenericInstruction {
         
         public static AddDefinitions Create(params object[] defines)
@@ -15,7 +14,7 @@ namespace CMake.Instructions
             if (count % 2 != 0)
                 count++;
             
-            Dictionary<string, string> definesDict = new Dictionary<string, string>();
+            SerializableDictionary<string, string> definesDict = new SerializableDictionary<string, string>();
             for (int i = 0; i < count; i+= 2)
             {
                 definesDict.Add(defines[i].ToString(), defines.Length > i+1 ? defines[i+1].ToString() : null);
@@ -27,7 +26,7 @@ namespace CMake.Instructions
             };
         }
 
-        public static AddDefinitions Create(Dictionary<string, string> defines)
+        public static AddDefinitions Create(SerializableDictionary<string, string> defines)
         {
             return new AddDefinitions()
             {
@@ -35,7 +34,7 @@ namespace CMake.Instructions
             };
         }
         
-        public Dictionary<string, string> Defines;
+        public SerializableDictionary<string, string> Defines;
 
         public override string Command 
         {

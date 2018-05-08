@@ -1,7 +1,8 @@
-﻿using System.Text;
+﻿using System;
 
 namespace CMake.Instructions
 {
+	[Serializable]
 	public class Set : GenericInstruction {
 
 		public string Var { get; set; }    

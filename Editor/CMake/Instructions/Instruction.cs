@@ -1,8 +1,10 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Text;
 
 namespace CMake.Instructions
 {
+    [Serializable]
     public abstract class Instruction
     {
         public static string IntentString = new string(' ', 2);

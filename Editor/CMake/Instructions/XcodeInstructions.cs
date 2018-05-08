@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace CMake.Instructions
+﻿namespace CMake.Instructions
 {
 	public static class XcodeInstructions
 	{

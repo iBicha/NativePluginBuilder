@@ -1,12 +1,12 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using UnityEngine;
 
 namespace CMake.Instructions
 {
 
+    [Serializable]
     public class IncludeDirectories : GenericInstruction {
         
         public static IncludeDirectories Create(params string[] directories)

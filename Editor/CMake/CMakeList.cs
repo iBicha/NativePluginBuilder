@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 using CMake.Instructions;
+using iBicha;
 
 namespace CMake
 {
+    [Serializable]
     public class CMakeList {
 
         public Version MinimumRequiredVersion { get; set; }
@@ -12,7 +14,7 @@ namespace CMake
         public Types.LibraryType LibraryType { get; set; }
         public Types.BuildType BuildType { get; set; }
         
-        public Dictionary<string, string> Defines = new Dictionary<string, string>();
+        public SerializableDictionary<string, string> Defines = new SerializableDictionary<string, string>();
 
         public List<string> IncludeDirs = new List<string>();
         public List<string> SourceFiles = new List<string>();

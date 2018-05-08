@@ -9,7 +9,7 @@ using UnityEngine;
 namespace iBicha
 {
     [Serializable]
-    public class SerializableDictionary<T, Y>
+    public class SerializableDictionary<T, Y> : IEnumerable<KeyValuePair<T, Y>>
     {
         [SerializeField] private List<T> keys;
         [SerializeField] private List<Y> values;
@@ -108,5 +108,49 @@ namespace iBicha
             return values[index];
         }
 
+        public List<T> Keys => keys;
+        public List<Y> Values => values;
+        
+
+        private class Enumerator : IEnumerator<KeyValuePair<T, Y>>
+        {
+            private SerializableDictionary<T, Y> _dictionary;
+            private int _index = -1;
+            public Enumerator(SerializableDictionary<T, Y> dictionary)
+            {
+                _dictionary = dictionary;
+            }
+
+            public void Dispose()
+            {
+                _dictionary = null;
+            }
+
+            public bool MoveNext()
+            {
+                _index++;
+                return _index < _dictionary.Count;
+            }
+
+            public void Reset()
+            {
+                _index = -1;
+            }
+
+            public KeyValuePair<T, Y> Current => new KeyValuePair<T, Y>(_dictionary.GetKey(_index), _dictionary.GetValue(_index));
+
+            object IEnumerator.Current => Current;
+        }
+
+
+        public IEnumerator<KeyValuePair<T, Y>> GetEnumerator()
+        {
+            return new Enumerator(this);
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
     }
 }

@@ -1,14 +1,12 @@
-﻿
-
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using CMake.Types;
 
 namespace CMake.Instructions
 {
-
+	[Serializable]
 	public class AddLibrary : GenericInstruction {
         
 		public static AddLibrary Create(string libraryName, LibraryType libraryType,  params string[] sourceFiles)

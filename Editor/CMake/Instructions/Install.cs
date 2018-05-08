@@ -1,9 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System;
 
 namespace CMake.Instructions
 {
+	[Serializable]
 	public class Install : GenericInstruction {
 
 		public static Install Create(string target, string destination)
