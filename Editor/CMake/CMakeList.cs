@@ -36,7 +36,11 @@ namespace CMake
         public override string ToString()
         {
             var sb = new StringBuilder();
-            foreach (var instruction in GenerateInstructions())
+            var instructions = GenerateInstructions();
+            if (instructions.Count == 0)
+                return "CMakeList: empty";
+            
+            foreach (var instruction in instructions)
             {
                 instruction.Write(sb);
                 sb.AppendLine();

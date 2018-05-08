@@ -56,15 +56,9 @@ namespace CMake.Instructions
 
                 return sb.ToString();
             }
-            set { }
         }
 
-        public override string Comment
-        {
-            get { return $"Including directories"; }
-            set { }
-        }
-
+        public override string Comment => $"Including directories";
     }
 
 }

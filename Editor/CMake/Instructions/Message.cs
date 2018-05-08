@@ -29,19 +29,9 @@ namespace CMake.Instructions
         public Mode mode { get; set; }
         public string message { get; set; }
         
-        
-        public override string Command 
-        {
-            get { return $"message ({(mode == Mode.None ? "" : mode.ToString().ToUpper())} \"{message}\")"; }
-            set { }
-        }
+        public override string Command => $"message ({(mode == Mode.None ? "" : mode.ToString().ToUpper())} \"{message}\")";
 
         //We probably don't need to comment on a log message...
-        public override string Comment
-        {
-            get { return null; }
-            set { }
-        }
-
+        public override string Comment => null;
     }
 }

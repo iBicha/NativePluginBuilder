@@ -58,15 +58,9 @@ namespace CMake.Instructions
 
 				return sb.ToString();
 			}
-			set { }
 		}
 
-		public override string Comment
-		{
-			get { return $"Library source files"; }
-			set { }
-		}
-
+		public override string Comment => $"Library source files";
 	}
 
 }

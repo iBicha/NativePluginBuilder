@@ -71,15 +71,9 @@ namespace CMake.Instructions
 
                 return sb.ToString();
             }
-            set { }
         }
 
-        public override string Comment
-        {
-            get { return $"Adding defines"; }
-            set { }
-        }
-
+        public override string Comment => "Adding defines";
     }
 
 }

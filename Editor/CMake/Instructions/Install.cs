@@ -18,19 +18,8 @@ namespace CMake.Instructions
 		public string Target { get; set; }
 		public string Destination { get; set; }
 
+		public override string Command => $"install (TARGETS {Target} DESTINATION \"{Destination}\")";
 
-		public override string Command 
-		{
-			get { return $"install (TARGETS {Target} DESTINATION \"{Destination}\")"; }
-			set { }
-		}
-
-		//We probably don't need to comment on a log message...
-		public override string Comment
-		{
-			get { return "Installing"; }
-			set { }
-		}
-
+		public override string Comment => "Installing";
 	}
 }
