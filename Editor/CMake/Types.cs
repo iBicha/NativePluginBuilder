@@ -31,7 +31,7 @@ namespace CMake.Types
 
     }
     
-    public enum ProjectType
+    public enum LibraryType
     {
         Application,
         Module,
