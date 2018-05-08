@@ -56,8 +56,8 @@ namespace CMake.Instructions
                             sb.Append($"={Define.Value}");
                     }
                     Intent--;
-                    sb.AppendLine();
-                    sb.Append(CurrentIntentString);
+//                    sb.AppendLine();
+//                    sb.Append(CurrentIntentString);
                 }
                 else
                 {

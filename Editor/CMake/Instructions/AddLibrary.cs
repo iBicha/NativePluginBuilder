@@ -50,8 +50,8 @@ namespace CMake.Instructions
 					sb.Append($"{CurrentIntentString}\"{file}\"");
 				}
 				Intent--;
-				sb.AppendLine();
-				sb.Append(CurrentIntentString);
+//				sb.AppendLine();
+//				sb.Append(CurrentIntentString);
 				sb.Append(")");
 
 				return sb.ToString();

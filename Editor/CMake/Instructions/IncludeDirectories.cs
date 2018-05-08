@@ -45,8 +45,8 @@ namespace CMake.Instructions
                         sb.Append($"{CurrentIntentString}\"{directory}\"");
                     }
                     Intent--;
-                    sb.AppendLine();
-                    sb.Append(CurrentIntentString);
+//                    sb.AppendLine();
+//                    sb.Append(CurrentIntentString);
                 }
                 else
                 {

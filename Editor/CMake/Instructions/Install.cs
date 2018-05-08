@@ -5,7 +5,7 @@ namespace CMake.Instructions
 	[Serializable]
 	public class Install : GenericInstruction {
 
-		public static Install Create(string target, string destination)
+		public new static Install Create(string target, string destination)
 		{
 			return new Install()
 			{

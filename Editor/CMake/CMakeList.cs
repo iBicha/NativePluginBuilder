@@ -21,7 +21,7 @@ namespace CMake
 
         public string OutputDir { get; set; }
 
-        public List<Instruction> GenerateInstructions()
+        public virtual List<Instruction> GenerateInstructions()
         {
             var list = new List<Instruction>();
             list.Add(GeneralInstructions.MinimumRequiredVersion(MinimumRequiredVersion));
