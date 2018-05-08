@@ -9,7 +9,10 @@ namespace CMake.Instructions
         
 		public override string Command 
 		{
-			get { return $"set ({Var} {Value})"; }
+			get
+			{
+				return string.IsNullOrEmpty(Var) ? null : $"set ({Var} {Value})";
+			}
 			set { }
 		}
 

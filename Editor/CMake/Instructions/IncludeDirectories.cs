@@ -17,6 +17,14 @@ namespace CMake.Instructions
             };
         }
         
+        public static IncludeDirectories Create(List<string> directories)
+        {
+            return new IncludeDirectories()
+            {
+                Directories = directories
+            };
+        }
+        
         public List<string> Directories;
 
         public override string Command 

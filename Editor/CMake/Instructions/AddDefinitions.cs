@@ -26,6 +26,14 @@ namespace CMake.Instructions
                 Defines = definesDict
             };
         }
+
+        public static AddDefinitions Create(Dictionary<string, string> defines)
+        {
+            return new AddDefinitions()
+            {
+                Defines = defines
+            };
+        }
         
         public Dictionary<string, string> Defines;
 
