@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace CMake
+namespace CMake.Instructions
 {
-	public class InstallInstruction : GenericInstruction {
+	public class Install : GenericInstruction {
 
-		public static InstallInstruction Install(string target, string destination)
+		public static Install Create(string target, string destination)
 		{
-			return new InstallInstruction()
+			return new Install()
 			{
 				Target = target,
 				Destination = destination

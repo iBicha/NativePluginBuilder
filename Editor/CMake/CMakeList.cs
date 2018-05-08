@@ -9,12 +9,10 @@ namespace CMake
         public string ProjectName { get; set; }
         public Types.LibraryType ProjectType { get; set; }
         public Types.BuildType BuildType { get; set; }
-        public Types.BuildPlatform BuildPlatform { get; set; }
         
         public Dictionary<string, string> Defines;
 
         public List<string> IncludeDirectories;
         public List<string> SourceFiles;
-
     }
 }

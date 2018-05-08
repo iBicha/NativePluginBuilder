@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace CMake
+namespace CMake.Instructions
 {
-    public class MessageInstruction : GenericInstruction {
+    public class Message : GenericInstruction {
         
         public enum Mode
         {
@@ -17,9 +17,9 @@ namespace CMake
             Deprication,
         }
 
-        public static MessageInstruction Log(string message, Mode mode = Mode.None)
+        public static Message Create(string message, Mode mode = Mode.None)
         {
-            return new MessageInstruction()
+            return new Message()
             {
                 message = message,
                 mode = mode

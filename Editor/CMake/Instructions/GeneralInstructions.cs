@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEditor;
 
-namespace CMake
+namespace CMake.Instructions
 {
     public static class GeneralInstructions
     {
@@ -28,12 +28,12 @@ namespace CMake
             };
         }
         
-        public static SetInstruction BuildType(Types.BuildType buildType)
+        public static Set BuildType(Types.BuildType buildType)
         {
             if(buildType == Types.BuildType.Default)
                 buildType = EditorUserBuildSettings.development ? Types.BuildType.Debug : Types.BuildType.Release;
             
-            return new SetInstruction()
+            return new Set()
             {
                 Var = "CMAKE_BUILD_TYPE",
                 Value = buildType.ToString()

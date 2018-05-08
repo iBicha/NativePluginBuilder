@@ -1,8 +1,8 @@
 ﻿using System.Text;
 
-namespace CMake
+namespace CMake.Instructions
 {
-	public class SetInstruction : GenericInstruction {
+	public class Set : GenericInstruction {
 
 		public string Var { get; set; }    
 		public string Value { get; set; }    

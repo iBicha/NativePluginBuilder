@@ -6,14 +6,14 @@ using System.Linq;
 using System.Text;
 using CMake.Types;
 
-namespace CMake
+namespace CMake.Instructions
 {
 
-	public class AddLibraryInstruction : GenericInstruction {
+	public class AddLibrary : GenericInstruction {
         
-		public static AddLibraryInstruction AddLibrary(string libraryName, LibraryType libraryType,  params string[] sourceFiles)
+		public static AddLibrary Create(string libraryName, LibraryType libraryType,  params string[] sourceFiles)
 		{
-			return new AddLibraryInstruction()
+			return new AddLibrary()
 			{
 				LibraryName = libraryName,
 				Type = libraryType,

@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using System.Text;
 
-namespace CMake
+namespace CMake.Instructions
 {
     public abstract class Instruction
     {

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
-namespace CMake
+namespace CMake.Instructions
 {
     public class GenericInstruction : Instruction {
 

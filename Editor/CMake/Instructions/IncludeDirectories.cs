@@ -4,14 +4,14 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace CMake
+namespace CMake.Instructions
 {
 
-    public class IncludeDirInstruction : GenericInstruction {
+    public class IncludeDirectories : GenericInstruction {
         
-        public static IncludeDirInstruction Include(params string[] directories)
+        public static IncludeDirectories Create(params string[] directories)
         {
-            return new IncludeDirInstruction()
+            return new IncludeDirectories()
             {
                 Directories = new List<string>(directories)
             };

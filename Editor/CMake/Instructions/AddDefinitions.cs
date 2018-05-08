@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace CMake
+namespace CMake.Instructions
 {
 
-    public class AddDefinitionsInstruction : GenericInstruction {
+    public class AddDefinitions : GenericInstruction {
         
-        public static AddDefinitionsInstruction AddDefinitions(params object[] defines)
+        public static AddDefinitions Create(params object[] defines)
         {
             var count = defines.Length;
             if (count % 2 != 0)
@@ -21,7 +21,7 @@ namespace CMake
                 definesDict.Add(defines[i].ToString(), defines.Length > i+1 ? defines[i+1].ToString() : null);
             }
             
-            return new AddDefinitionsInstruction()
+            return new AddDefinitions()
             {
                 Defines = definesDict
             };
