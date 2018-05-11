@@ -6,18 +6,19 @@ using iBicha;
 namespace CMake.Instructions
 {
     [Serializable]
-    public class SetTargetProperties : GenericInstruction {
-        
+    public class SetTargetProperties : GenericInstruction
+    {
         public static SetTargetProperties Create(string target, params object[] properties)
         {
             var count = properties.Length;
             if (count % 2 != 0)
                 count++;
-            
+
             SerializableDictionary<string, string> propertieDict = new SerializableDictionary<string, string>();
-            for (int i = 0; i < count; i+= 2)
+            for (int i = 0; i < count; i += 2)
             {
-                propertieDict.Add(properties[i].ToString(), properties.Length > i+1 ? properties[i+1].ToString() : null);
+                propertieDict.Add(properties[i].ToString(),
+                    properties.Length > i + 1 ? properties[i + 1].ToString() : null);
             }
 
             return SetTargetProperties.Create(target, propertieDict);
@@ -32,16 +33,16 @@ namespace CMake.Instructions
             };
         }
 
-        public string Target { get; set; }
-        public SerializableDictionary<string, string> Properties;
+        public string Target { get; private set; }
+        public SerializableDictionary<string, string> Properties { get; private set; }
 
-        public override string Command 
+        public override string Command
         {
             get
             {
                 if (Properties == null || Properties.Count == 0)
                     return null;
-                
+
                 var sb = new StringBuilder();
                 sb.Append($"set_target_properties ( {Target} PROPERTIES");
                 if (Properties.Count > 1)
@@ -51,9 +52,10 @@ namespace CMake.Instructions
                     {
                         sb.AppendLine();
                         sb.Append($"{CurrentIntentString}{property.Key}");
-                        if(!string.IsNullOrEmpty(property.Value))
+                        if (!string.IsNullOrEmpty(property.Value))
                             sb.Append($" \"{property.Value}\"");
                     }
+
                     Intent--;
 //                    sb.AppendLine();
 //                    sb.Append(CurrentIntentString);
@@ -62,9 +64,10 @@ namespace CMake.Instructions
                 {
                     sb.Append($" {Properties.Keys.First()}");
                     var val = Properties.Values.First();
-                    if(!string.IsNullOrEmpty(val))
+                    if (!string.IsNullOrEmpty(val))
                         sb.Append($" {val}");
                 }
+
                 sb.Append(")");
 
                 return sb.ToString();
@@ -73,5 +76,4 @@ namespace CMake.Instructions
 
         public override string Comment => "Setting properties";
     }
-
 }

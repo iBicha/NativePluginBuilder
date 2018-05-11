@@ -150,13 +150,13 @@ namespace iBicha
 
 					if(!string.IsNullOrEmpty(outputData)){
 						string log = string.Format("{0}:\n{1}", buildProcess.Name, outputData);
-						File.WriteAllText(PluginBuilderBase.CombineFullPath(options.OutputDirectory, "Build_StdOut.log"),log);
+						File.WriteAllText(Helpers.UnityEditor.CombineFullPath(options.OutputDirectory, "Build_StdOut.log"),log);
 						Debug.Log(log);
 					}
 
 					if(!string.IsNullOrEmpty(errorData)){
 						string log = string.Format("{0}:\n{1}", buildProcess.Name, errorData);
-						File.WriteAllText(PluginBuilderBase.CombineFullPath(options.OutputDirectory, "Build_StdErr.log"),log);
+						File.WriteAllText(Helpers.UnityEditor.CombineFullPath(options.OutputDirectory, "Build_StdErr.log"),log);
 						if(exitCode == 0) {
 							Debug.LogWarning(log);
 						} else {
@@ -173,13 +173,13 @@ namespace iBicha
 
 					if(!string.IsNullOrEmpty(outputData)){
 						string log = string.Format("{0}:\n{1}", installProcess.Name, outputData);
-						File.WriteAllText(PluginBuilderBase.CombineFullPath(options.OutputDirectory, "Install_StdOut.log"),log);
+						File.WriteAllText(Helpers.UnityEditor.CombineFullPath(options.OutputDirectory, "Install_StdOut.log"),log);
 						Debug.Log(log);
 					}
 
 					if(!string.IsNullOrEmpty(errorData)){
 						string log = string.Format("{0}:\n{1}", installProcess.Name, errorData);
-						File.WriteAllText(PluginBuilderBase.CombineFullPath(options.OutputDirectory, "Install_StdErr.log"),log);
+						File.WriteAllText(Helpers.UnityEditor.CombineFullPath(options.OutputDirectory, "Install_StdErr.log"),log);
 						if(exitCode == 0) {
 							Debug.LogWarning(log);
 						} else {

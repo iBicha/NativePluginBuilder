@@ -13,11 +13,11 @@ namespace iBicha
 		{
 			NativeBuildOptions buildOptions = new NativeBuildOptions();
 
-            switch (PluginBuilderBase.EditorPlatform)
+            switch (Helpers.UnityEditor.EditorPlatform)
             {
                 case RuntimePlatform.WindowsEditor:
                     buildOptions.BuildPlatform = BuildPlatform.Windows;
-                    buildOptions.Architecture = PluginBuilderBase.EditorArchitecture;
+                    buildOptions.Architecture =Helpers.UnityEditor.EditorArchitecture;
                     break;
                 case RuntimePlatform.OSXEditor:
                     buildOptions.BuildPlatform = BuildPlatform.OSX;
@@ -25,7 +25,7 @@ namespace iBicha
 					break;
                 case RuntimePlatform.LinuxEditor:
                     buildOptions.BuildPlatform = BuildPlatform.Linux;
-                    buildOptions.Architecture = PluginBuilderBase.EditorArchitecture;
+                    buildOptions.Architecture = Helpers.UnityEditor.EditorArchitecture;
                     break;
                 default:
                     break;

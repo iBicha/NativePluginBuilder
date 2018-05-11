@@ -16,14 +16,8 @@ namespace iBicha
             SetSupportedArchitectures(Architecture.x86, Architecture.x64, Architecture.ARM);
         }
 
-        public override bool IsAvailable
-        {
-            get
-            {
-                return EditorPlatform == RuntimePlatform.WindowsEditor &&  Directory.Exists(GetMetroSupportLocation());
-            }
-        }
-
+        public override bool IsAvailable => Helpers.UnityEditor.IsModuleInstalled(RuntimePlatform.WSAPlayerX86) &&
+                                            Directory.Exists(Helpers.UniversalWindows.MetroSupportLocation);
 
         public override void PreBuild(NativePlugin plugin, NativeBuildOptions buildOptions)
         {
@@ -31,13 +25,13 @@ namespace iBicha
 
             if (buildOptions.BuildPlatform != BuildPlatform.UniversalWindows)
             {
-                throw new System.ArgumentException(string.Format(
-                    "BuildPlatform mismatch: expected:\"{0}\", current:\"{1}\"", BuildPlatform.UniversalWindows, buildOptions.BuildPlatform));
+                throw new System.ArgumentException(
+                    $"BuildPlatform mismatch: expected:\"{BuildPlatform.UniversalWindows}\", current:\"{buildOptions.BuildPlatform}\"");
             }
 
             ArchtectureCheck(buildOptions);
 
-            if (WindowsBuilder.InstalledVisualStudios.Length == 1)
+            if (Helpers.VisualStudio.InstalledVisualStudios.Length == 1)
             {
                 throw new System.InvalidOperationException("Could not find Visual Studio.");
             }
@@ -45,7 +39,7 @@ namespace iBicha
 
         public override BackgroundProcess Build(NativePlugin plugin, NativeBuildOptions buildOptions)
         {
-            StringBuilder cmakeArgs = GetBasePluginCMakeArgs(plugin);
+            var cmakeArgs = GetBasePluginCMakeArgs(plugin);
 
             AddCmakeArg(cmakeArgs, "CMAKE_CONFIGURATION_TYPES", "Debug;Release");
 
@@ -58,6 +52,7 @@ namespace iBicha
             {
                 buildType = buildOptions.BuildType;
             }
+
             AddCmakeArg(cmakeArgs, "CMAKE_BUILD_TYPE", buildType.ToString());
 
             AddCmakeArg(cmakeArgs, "UWP", "ON", "BOOL");
@@ -68,37 +63,43 @@ namespace iBicha
             AddCmakeArg(cmakeArgs, "CMAKE_SYSTEM_NAME", "WindowsStore");
             AddCmakeArg(cmakeArgs, "CMAKE_SYSTEM_VERSION", "10.0");
 
-            int vsVersion = WindowsBuilder.VisualStudioVersion;
+            var vsVersion = WindowsBuilder.VisualStudioVersion;
             if (vsVersion == -1)
             {
-                vsVersion = WindowsBuilder.InstalledVisualStudios.Last<int>();
+                vsVersion = Helpers.VisualStudio.InstalledVisualStudios.Last<int>();
             }
+
             cmakeArgs.AppendFormat("-G \"{0} {1}\" ", "Visual Studio", vsVersion);
 
             //Default is x86
             if (buildOptions.Architecture == Architecture.x86_64)
             {
                 AddCmakeArg(cmakeArgs, "CMAKE_GENERATOR_PLATFORM", "x64", "STRING");
-            } else if (buildOptions.Architecture == Architecture.ARM)
+            }
+            else if (buildOptions.Architecture == Architecture.ARM)
             {
                 AddCmakeArg(cmakeArgs, "CMAKE_GENERATOR_PLATFORM", "ARM", "STRING");
             }
 
-            buildOptions.OutputDirectory = CombineFullPath(plugin.buildFolder, "UWP", buildOptions.Architecture.ToString());
+            buildOptions.OutputDirectory =
+                Helpers.UnityEditor.CombineFullPath(plugin.buildFolder, "UWP", buildOptions.Architecture.ToString());
 
-            ProcessStartInfo startInfo = new ProcessStartInfo();
-            startInfo.FileName = CMakeHelper.CMakeLocation;
-            startInfo.Arguments = cmakeArgs.ToString();
-            startInfo.WorkingDirectory = plugin.buildFolder;
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = CMakeHelper.CMakeLocation,
+                Arguments = cmakeArgs.ToString(),
+                WorkingDirectory = plugin.buildFolder
+            };
 
-            BackgroundProcess backgroundProcess = new BackgroundProcess(startInfo);
-            backgroundProcess.Name = string.Format("Building \"{0}\" for {1} ({2})", plugin.Name, "Universal Windows", buildOptions.Architecture.ToString());
-            return backgroundProcess;
+            return new BackgroundProcess(startInfo)
+            {
+                Name = $"Building \"{plugin.Name}\" for Universal Windows ({buildOptions.Architecture.ToString()})"
+            };
         }
 
         public override BackgroundProcess Install(NativePlugin plugin, NativeBuildOptions buildOptions)
         {
-            BackgroundProcess backgroundProcess = base.Install(plugin, buildOptions);
+            var backgroundProcess = base.Install(plugin, buildOptions);
             BuildType buildType;
             if (buildOptions.BuildType == BuildType.Default)
             {
@@ -108,6 +109,7 @@ namespace iBicha
             {
                 buildType = buildOptions.BuildType;
             }
+
             backgroundProcess.Process.StartInfo.Arguments += " --config " + buildType.ToString();
             return backgroundProcess;
         }
@@ -116,30 +118,21 @@ namespace iBicha
         {
             base.PostBuild(plugin, buildOptions);
 
-            string assetFile = CombinePath(
+            var assetFile = Helpers.UnityEditor.CombinePath(
                 AssetDatabase.GetAssetPath(plugin.pluginBinaryFolder),
                 "WSA",
                 buildOptions.Architecture.ToString(),
-                string.Format("{0}.dll", plugin.Name));
+                $"{plugin.Name}.dll");
 
-            PluginImporter pluginImporter = PluginImporter.GetAtPath((assetFile)) as PluginImporter;
-            if (pluginImporter != null)
-            {
-                SetPluginBaseInfo(plugin, buildOptions, pluginImporter);
+            PluginImporter pluginImporter = AssetImporter.GetAtPath((assetFile)) as PluginImporter;
+            if (pluginImporter == null) return;
+            SetPluginBaseInfo(plugin, buildOptions, pluginImporter);
 
-                pluginImporter.SetCompatibleWithAnyPlatform(false);
-                pluginImporter.SetCompatibleWithPlatform(BuildTarget.WSAPlayer, true);
-                pluginImporter.SetPlatformData(BuildTarget.WSAPlayer, "CPU", buildOptions.Architecture.ToString());
+            pluginImporter.SetCompatibleWithAnyPlatform(false);
+            pluginImporter.SetCompatibleWithPlatform(BuildTarget.WSAPlayer, true);
+            pluginImporter.SetPlatformData(BuildTarget.WSAPlayer, "CPU", buildOptions.Architecture.ToString());
 
-                pluginImporter.SaveAndReimport();
-            }
+            pluginImporter.SaveAndReimport();
         }
-
-        private static string GetMetroSupportLocation()
-        {
-            return CombineFullPath(GetEditorLocation(), "PlaybackEngines/MetroSupport");
-        }
-
-
     }
 }

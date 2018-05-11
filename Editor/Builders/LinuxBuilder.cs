@@ -5,35 +5,31 @@ using System.Diagnostics;
 
 namespace iBicha
 {
-	public class LinuxBuilder : PluginBuilderBase {
-
+    public class LinuxBuilder : PluginBuilderBase
+    {
         public LinuxBuilder()
         {
             SetSupportedArchitectures(Architecture.x86, Architecture.x86_64);
         }
 
-        public override bool IsAvailable
+        public override bool IsAvailable => Helpers.UnityEditor.IsModuleInstalled(RuntimePlatform.LinuxPlayer);
+
+        public override void PreBuild(NativePlugin plugin, NativeBuildOptions buildOptions)
         {
-            get
+            base.PreBuild(plugin, buildOptions);
+
+            if (buildOptions.BuildPlatform != BuildPlatform.Linux)
             {
-                return EditorPlatform == RuntimePlatform.LinuxEditor;
+                throw new System.ArgumentException(
+                    $"BuildPlatform mismatch: expected:\"{BuildPlatform.Linux}\", current:\"{buildOptions.BuildPlatform}\"");
             }
-        }
-
-        public override void PreBuild (NativePlugin plugin, NativeBuildOptions buildOptions){
-			base.PreBuild (plugin, buildOptions);
-
-			if (buildOptions.BuildPlatform != BuildPlatform.Linux) {
-				throw new System.ArgumentException (string.Format(
-					"BuildPlatform mismatch: expected:\"{0}\", current:\"{1}\"", BuildPlatform.Linux, buildOptions.BuildPlatform));
-			}
 
             ArchtectureCheck(buildOptions);
-		}
+        }
 
-		public override BackgroundProcess Build (NativePlugin plugin, NativeBuildOptions buildOptions)
-		{
-			StringBuilder cmakeArgs = GetBasePluginCMakeArgs (plugin);
+        public override BackgroundProcess Build(NativePlugin plugin, NativeBuildOptions buildOptions)
+        {
+            var cmakeArgs = GetBasePluginCMakeArgs(plugin);
 
             BuildType buildType;
             if (buildOptions.BuildType == BuildType.Default)
@@ -44,54 +40,55 @@ namespace iBicha
             {
                 buildType = buildOptions.BuildType;
             }
+
             AddCmakeArg(cmakeArgs, "CMAKE_BUILD_TYPE", buildType.ToString());
 
-            cmakeArgs.AppendFormat ("-G {0} ", "\"Unix Makefiles\"");
-			AddCmakeArg (cmakeArgs, "LINUX", "ON", "BOOL");
-			cmakeArgs.AppendFormat ("-B{0}/{1} ", "Linux", buildOptions.Architecture.ToString());
+            cmakeArgs.AppendFormat("-G {0} ", "\"Unix Makefiles\"");
+            AddCmakeArg(cmakeArgs, "LINUX", "ON", "BOOL");
+            cmakeArgs.AppendFormat("-B{0}/{1} ", "Linux", buildOptions.Architecture.ToString());
 
-			AddCmakeArg (cmakeArgs, "ARCH", buildOptions.Architecture.ToString(), "STRING");
+            AddCmakeArg(cmakeArgs, "ARCH", buildOptions.Architecture.ToString(), "STRING");
 
-			buildOptions.OutputDirectory = CombineFullPath (plugin.buildFolder, "Linux", buildOptions.Architecture.ToString ());
+            buildOptions.OutputDirectory =
+                Helpers.UnityEditor.CombineFullPath(plugin.buildFolder, "Linux", buildOptions.Architecture.ToString());
 
-			ProcessStartInfo startInfo = new ProcessStartInfo();
-            startInfo.FileName = CMakeHelper.CMakeLocation;
-            startInfo.Arguments = cmakeArgs.ToString();
-			startInfo.WorkingDirectory = plugin.buildFolder;
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = CMakeHelper.CMakeLocation,
+                Arguments = cmakeArgs.ToString(),
+                WorkingDirectory = plugin.buildFolder
+            };
 
-			BackgroundProcess backgroundProcess = new BackgroundProcess (startInfo);
-			backgroundProcess.Name = string.Format ("Building \"{0}\" for {1} ({2})", plugin.Name, "Linux", buildOptions.Architecture.ToString());
-			return backgroundProcess;
+            return new BackgroundProcess(startInfo)
+            {
+                Name = $"Building \"{plugin.Name}\" for Linux ({buildOptions.Architecture.ToString()})"
+            };
+        }
 
-		}
+        public override void PostBuild(NativePlugin plugin, NativeBuildOptions buildOptions)
+        {
+            base.PostBuild(plugin, buildOptions);
 
-		public override void PostBuild (NativePlugin plugin, NativeBuildOptions buildOptions)
-		{
-			base.PostBuild (plugin, buildOptions);
+            var assetFile = Helpers.UnityEditor.CombinePath(
+                AssetDatabase.GetAssetPath(plugin.pluginBinaryFolder),
+                "Linux",
+                buildOptions.Architecture.ToString(),
+                $"lib{plugin.Name}.so");
 
-			string assetFile = CombinePath(
-				AssetDatabase.GetAssetPath (plugin.pluginBinaryFolder),
-				"Linux", 
-				buildOptions.Architecture.ToString(),
-				string.Format("lib{0}.so", plugin.Name));
+            var pluginImporter = AssetImporter.GetAtPath((assetFile)) as PluginImporter;
+            if (pluginImporter == null) return;
+            SetPluginBaseInfo(plugin, buildOptions, pluginImporter);
 
-			PluginImporter pluginImporter = PluginImporter.GetAtPath((assetFile)) as PluginImporter;
-			if (pluginImporter != null) {
-                SetPluginBaseInfo(plugin, buildOptions, pluginImporter);
+            pluginImporter.SetCompatibleWithAnyPlatform(false);
+            pluginImporter.SetCompatibleWithEditor(true);
+            pluginImporter.SetEditorData("OS", "Linux");
+            pluginImporter.SetEditorData("CPU", buildOptions.Architecture.ToString());
+            pluginImporter.SetCompatibleWithPlatform(
+                buildOptions.Architecture == Architecture.x86
+                    ? BuildTarget.StandaloneLinux
+                    : BuildTarget.StandaloneLinux64, true);
 
-                pluginImporter.SetCompatibleWithAnyPlatform (false);
-				pluginImporter.SetCompatibleWithEditor (true);
-				pluginImporter.SetEditorData ("OS", "Linux");
-				pluginImporter.SetEditorData ("CPU", buildOptions.Architecture.ToString());
-				if (buildOptions.Architecture == Architecture.x86) {
-					pluginImporter.SetCompatibleWithPlatform (BuildTarget.StandaloneLinux, true);
-				} else {
-					pluginImporter.SetCompatibleWithPlatform (BuildTarget.StandaloneLinux64, true);
-				}
-
-                pluginImporter.SaveAndReimport ();
-			}
-		}
-
-	}
+            pluginImporter.SaveAndReimport();
+        }
+    }
 }

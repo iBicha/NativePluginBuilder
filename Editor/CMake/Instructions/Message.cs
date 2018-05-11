@@ -3,11 +3,11 @@
 namespace CMake.Instructions
 {
     [Serializable]
-    public class Message : GenericInstruction {
-        
+    public class Message : GenericInstruction
+    {
         public enum Mode
         {
-            None, 
+            None,
             Status,
             Warning,
             Author_Warning,
@@ -24,11 +24,12 @@ namespace CMake.Instructions
                 mode = mode
             };
         }
-        
+
         public Mode mode { get; set; }
         public string message { get; set; }
-        
-        public override string Command => $"message ({(mode == Mode.None ? "" : mode.ToString().ToUpper())} \"{message}\")";
+
+        public override string Command =>
+            $"message ({(mode == Mode.None ? "" : mode.ToString().ToUpper())} \"{message}\")";
 
         //We probably don't need to comment on a log message...
         public override string Comment => null;

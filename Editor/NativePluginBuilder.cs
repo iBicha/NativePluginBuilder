@@ -6,6 +6,9 @@ using UnityEngine;
 using System.Linq;
 using System;
 using System.IO;
+using CMake;
+using CMake.Instructions;
+using CMake.Types;
 
 namespace iBicha
 {
@@ -85,6 +88,23 @@ namespace iBicha
         [MenuItem("Window/Native Plugin Builder")]
         static void Init()
         {
+            var cmakelist = new CMakeList();
+            cmakelist.MinimumRequiredVersion = Version.Parse("3.2");
+            cmakelist.ProjectName = "MyPlugin";
+            cmakelist.BuildType = CMake.Types.BuildType.Default;
+            cmakelist.LibraryType = LibraryType.Shared;
+            cmakelist.Defines.Add("PLUGIN_BUILD_NUMBER", "5");
+            cmakelist.Defines.Add("PLUGIN_VERSION", "\"1.0.2.0\"");
+            cmakelist.IncludeDirs.Add("Folder1");
+            cmakelist.IncludeDirs.Add("Folder2");
+            
+            var addLib = CMake.Instructions.AddLibrary.Create("MyPlugin", LibraryType.Shared);
+            addLib.AddSourceFilesInFolder(Environment.CurrentDirectory, "*.cs", SearchOption.AllDirectories);
+            cmakelist.SourceFiles.AddRange(addLib.SourceFiles);
+
+            cmakelist.OutputDir = Environment.CurrentDirectory;
+            
+            Debug.Log(cmakelist);
             // Get existing open window or if none, make a new one:
             NativePluginBuilder window = (NativePluginBuilder)EditorWindow.GetWindow(typeof(NativePluginBuilder));
             window.titleContent.text = "Native Plugin Builder";
@@ -219,7 +239,7 @@ namespace iBicha
             if (GUILayout.Button("Browse", EditorStyles.miniButton, GUILayout.Width(80)))
             {
                 string file = EditorUtility.OpenFilePanel("Select CMake location", Path.GetDirectoryName(CMakeHelper.CMakeLocation),
-                        PluginBuilderBase.EditorPlatform == RuntimePlatform.WindowsEditor ? "exe" : "");
+                    Helpers.UnityEditor.EditorPlatform == RuntimePlatform.WindowsEditor ? "exe" : "");
                 CMakeHelper.CMakeLocation = file;
             }
             if (GUILayout.Button("Download", EditorStyles.miniButton, GUILayout.Width(80)))
@@ -236,37 +256,37 @@ namespace iBicha
                 EditorGUILayout.LabelField("Android", EditorStyles.boldLabel);
                 EditorGUILayout.BeginHorizontal();
                 GUI.changed = false;
-                string ndk = EditorGUILayout.TextField(new GUIContent("NDK", "NDK location. leave empty to use default location."), AndroidBuilder.NDKLocation);
+                string ndk = EditorGUILayout.TextField(new GUIContent("NDK", "NDK location. leave empty to use default location."), Helpers.Android.NdkLocation);
                 if (GUI.changed)
                 {
-                    AndroidBuilder.NDKLocation = ndk;
+                    Helpers.Android.NdkLocation = ndk;
                 }
                 if (GUILayout.Button("Browse", EditorStyles.miniButton, GUILayout.Width(80)))
                 {
-                    AndroidBuilder.NDKLocation = EditorUtility.OpenFolderPanel("Select NDK location", Path.GetDirectoryName(AndroidBuilder.NDKLocation), "");
+                    Helpers.Android.NdkLocation = EditorUtility.OpenFolderPanel("Select NDK location", Path.GetDirectoryName(Helpers.Android.NdkLocation), "");
                 }
                 EditorGUILayout.EndHorizontal();
 
                 EditorGUILayout.Space();
             }
 
-            if (PluginBuilderBase.EditorPlatform == RuntimePlatform.WindowsEditor)
+            if (Helpers.UnityEditor.EditorPlatform == RuntimePlatform.WindowsEditor)
             {
                 if (GetBuilder(BuildPlatform.WebGL).IsAvailable)
                 {
                     EditorGUILayout.LabelField("WebGL", EditorStyles.boldLabel);
                     EditorGUILayout.BeginHorizontal();
                     GUI.changed = false;
-                    string mingw32make = EditorGUILayout.TextField(new GUIContent("MinGW 32 Make", "mingw32-make.exe"), WebGLBuilder.MinGW32MakeLocation);
+                    string mingw32make = EditorGUILayout.TextField(new GUIContent("MinGW 32 Make", "mingw32-make.exe"), WebGLBuilder.MinGw32MakeLocation);
                     if (GUI.changed)
                     {
-                        WebGLBuilder.MinGW32MakeLocation = mingw32make;
+                        WebGLBuilder.MinGw32MakeLocation = mingw32make;
                     }
                     if (GUILayout.Button("Browse", EditorStyles.miniButton, GUILayout.Width(80)))
                     {
-                        string file = EditorUtility.OpenFilePanel("Select MinGW 32 Make (mingw32-make.exe) location", WebGLBuilder.MinGW32MakeLocation,
-                            PluginBuilderBase.EditorPlatform == RuntimePlatform.WindowsEditor ? "exe" : "");
-                        WebGLBuilder.MinGW32MakeLocation = file;
+                        string file = EditorUtility.OpenFilePanel("Select MinGW 32 Make (mingw32-make.exe) location", WebGLBuilder.MinGw32MakeLocation,
+                            Helpers.UnityEditor.EditorPlatform == RuntimePlatform.WindowsEditor ? "exe" : "");
+                        WebGLBuilder.MinGw32MakeLocation = file;
                     }
                     EditorGUILayout.EndHorizontal();
 
@@ -278,7 +298,7 @@ namespace iBicha
                     EditorGUILayout.LabelField("Windows", EditorStyles.boldLabel);
                     EditorGUILayout.BeginHorizontal();
                     WindowsBuilder.VisualStudioVersion = EditorGUILayout.IntPopup("Visual Studio", WindowsBuilder.VisualStudioVersion,
-                        WindowsBuilder.InstalledVisualStudioNames, WindowsBuilder.InstalledVisualStudios);
+                        Helpers.VisualStudio.InstalledVisualStudioNames, Helpers.VisualStudio.InstalledVisualStudios);
 
                     EditorGUILayout.EndHorizontal();
 

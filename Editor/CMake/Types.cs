@@ -33,9 +33,8 @@ namespace CMake.Types
         Release,
         RelWithDebInfo,
         MinSizeRel,
-
     }
-    
+
     public enum LibraryType
     {
         Application,

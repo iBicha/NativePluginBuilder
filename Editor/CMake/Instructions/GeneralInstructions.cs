@@ -13,7 +13,7 @@ namespace CMake.Instructions
                 Comment = "Specify the minimum version for CMake"
             };
         }
-        
+
         public static GenericInstruction MinimumRequiredVersion(Version version)
         {
             return MinimumRequiredVersion(version.ToString());
@@ -27,18 +27,17 @@ namespace CMake.Instructions
                 Comment = "Project's name"
             };
         }
-        
+
         public static Set BuildType(Types.BuildType buildType)
         {
-            if(buildType == Types.BuildType.Default)
+            if (buildType == Types.BuildType.Default)
                 buildType = EditorUserBuildSettings.development ? Types.BuildType.Debug : Types.BuildType.Release;
-            
+
             return new Set()
             {
                 Var = "CMAKE_BUILD_TYPE",
                 Value = buildType.ToString()
             };
         }
-
     }
 }

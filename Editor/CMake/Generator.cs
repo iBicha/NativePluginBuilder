@@ -1,6 +1,6 @@
 ﻿namespace CMake
 {
-    public class Generator {
-
+    public class Generator
+    {
     }
 }
