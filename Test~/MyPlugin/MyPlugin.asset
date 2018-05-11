@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba3b360fcee51e3409078f3802fb343d, type: 3}
+  m_Name: MyPlugin
+  m_EditorClassIdentifier: 
+  Name: MyPlugin
+  Version: 1.0.0.0
+  BuildNumber: 1
+  includePluginAPI: 1
+  buildOptions:
+  - Architecture: 1
+    BuildType: 0
+    BuildPlatform: 1
+    AndroidSdkVersion: 0
+    isEnabled: 0
+    foldoutAnimator:
+      m_Target: 0
+      speed: 2
+      m_Value: 0
+  - Architecture: 5
+    BuildType: 0
+    BuildPlatform: 7
+    AndroidSdkVersion: 0
+    isEnabled: 1
+    foldoutAnimator:
+      m_Target: 1
+      speed: 2
+      m_Value: 1
+  Definitions:
+    keys: []
+    values: []
+  pluginBinaryFolder: {fileID: 102900000, guid: 24c1cc8b78d3cdd4a8a227e58048edae,
+    type: 3}
+  sourceFolder: C:\Users\bhadriche\Desktop\UnityNativePluginBuilder\Assets\MyPlugin\NativeSource~\Source
+  buildFolder: C:\Users\bhadriche\Desktop\UnityNativePluginBuilder\Assets\MyPlugin\NativeSource~\Build
+  sectionAnimator:
+    m_Target: 1
+    speed: 2
+    m_Value: 1

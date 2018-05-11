@@ -33,3 +33,4 @@ sysinfo.txt
 *.apk
 *.unitypackage
 Assets/NativePluginBuilder/Boilerplate~/Build/
+Test~/MyPlugin/NativeSource~/Build/
