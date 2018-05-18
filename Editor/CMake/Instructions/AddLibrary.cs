@@ -61,5 +61,35 @@ namespace CMake.Instructions
         }
 
         public override string Comment => $"Library source files";
+     
+        public static bool Merge(out AddLibrary merged, params AddLibrary[] libs)
+        {
+            if (libs.Length == 0)
+            {
+                merged = null;
+                return false;
+            }
+            if (libs.Length == 1)
+            {
+                merged = libs[0];
+                return true;
+            }
+
+            for (int i = 0; i < libs.Length-1; i++)
+            {
+                if (libs[i].LibraryName != libs[i+1].LibraryName || libs[i].Type != libs[i+1].Type)
+                {
+                    merged = null;
+                    return false;
+                }
+            }
+
+            merged = Create(libs[0].LibraryName, libs[0].Type);
+            for (int i = 0; i < libs.Length; i++)
+            {
+                merged.SourceFiles.AddRange(libs[i].SourceFiles);
+            }
+            return true;
+        }
     }
 }
