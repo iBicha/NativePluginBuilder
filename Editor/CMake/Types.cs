@@ -42,4 +42,9 @@ namespace CMake.Types
         Shared,
         Static,
     }
+    
+    public enum Language
+    {
+        Csharp
+    }
 }

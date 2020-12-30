@@ -49,7 +49,7 @@ namespace iBicha
 		public string OutputDirectory;
 		//General
 		public Architecture Architecture = Architecture.AnyCPU;
-		public BuildType BuildType = BuildType.Default;
+		public CMake.Types.BuildType BuildType = CMake.Types.BuildType.Default;
 		public BuildPlatform BuildPlatform;
 
 		//Android only

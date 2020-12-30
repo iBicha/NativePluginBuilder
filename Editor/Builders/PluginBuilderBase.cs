@@ -83,10 +83,10 @@ namespace iBicha
             pluginImporter.SetEditorData("PLUGIN_NAME", plugin.Name);
             pluginImporter.SetEditorData("PLUGIN_VERSION", plugin.Version);
             pluginImporter.SetEditorData("PLUGIN_BUILD_NUMBER", plugin.BuildNumber.ToString());
-            BuildType buildType;
-            if (buildOptions.BuildType == BuildType.Default)
+            CMake.Types.BuildType buildType;
+            if (buildOptions.BuildType == CMake.Types.BuildType.Default)
             {
-                buildType = EditorUserBuildSettings.development ? BuildType.Debug : BuildType.Release;
+                buildType = EditorUserBuildSettings.development ? CMake.Types.BuildType.Debug : CMake.Types.BuildType.Release;
             }
             else
             {
@@ -122,38 +122,7 @@ namespace iBicha
         protected static StringBuilder GetBasePluginCMakeArgs(NativePlugin plugin)
         {
             var cmakeArgs = new StringBuilder();
-            cmakeArgs.AppendFormat("{0} ", "../CMake");
-            AddCmakeArg(cmakeArgs, "PLUGIN_NAME", plugin.Name, "STRING");
-            AddCmakeArg(cmakeArgs, "PLUGIN_VERSION", plugin.Version, "STRING");
-            AddCmakeArg(cmakeArgs, "PLUGIN_BUILD_NUMBER", plugin.BuildNumber.ToString(), "STRING");
-            AddCmakeArg(cmakeArgs, "SOURCE_FOLDER", plugin.sourceFolder, "PATH");
-            AddCmakeArg(cmakeArgs, "PLUGIN_BINARY_FOLDER", plugin.pluginBinaryFolderPath, "PATH");
-
-            if (plugin.includePluginAPI)
-            {
-                if (Directory.Exists(Helpers.UnityEditor.PluginApiLocation))
-                {
-                    AddCmakeArg(cmakeArgs, "INCLUDE_PLUGIN_API", Helpers.UnityEditor.PluginApiLocation, "PATH");
-                }
-                else
-                {
-                    UnityEngine.Debug.LogWarning("Unity plugin API folder was not found. include folder skipped.");
-                }
-            }
-
-            var definitions = plugin.Definitions.ToDefinitionString("\\;");
-            if (!string.IsNullOrEmpty(definitions))
-            {
-                //Because cmake will get rid of "s.
-                definitions = definitions.Replace("\"", "\\\"");
-                AddCmakeArg(cmakeArgs, "CUSTOM_DEFINES", definitions, "STRING");
-
-                for (var i = 0; i < plugin.Definitions.Count; i++)
-                {
-                    AddCmakeArg(cmakeArgs, plugin.Definitions.GetKey(i), plugin.Definitions.GetValue(i), "STRING");
-                }
-            }
-
+            cmakeArgs.AppendFormat("{0} ", plugin.buildFolder);
             return cmakeArgs;
         }
 

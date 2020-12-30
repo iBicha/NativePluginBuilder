@@ -2,6 +2,11 @@
 using UnityEditor;
 using System.Text;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using CMake;
+using CMake.Instructions;
+using CMake.Types;
 
 namespace iBicha
 {
@@ -34,25 +39,55 @@ namespace iBicha
 
         public override BackgroundProcess Build(NativePlugin plugin, NativeBuildOptions buildOptions)
         {
-            var cmakeArgs = GetBasePluginCMakeArgs(plugin);
+            buildOptions.OutputDirectory = Helpers.UnityEditor.CombineFullPath(plugin.buildFolder, "iOS");
 
-            BuildType buildType;
-            if (buildOptions.BuildType == BuildType.Default)
+            if (!Directory.Exists(buildOptions.OutputDirectory))
             {
-                buildType = EditorUserBuildSettings.development ? BuildType.Debug : BuildType.Release;
+                Directory.CreateDirectory(buildOptions.OutputDirectory);
+            }
+            
+            CMake.Types.BuildType buildType;
+            if (buildOptions.BuildType == CMake.Types.BuildType.Default)
+            {
+                buildType = EditorUserBuildSettings.development ? CMake.Types.BuildType.Debug : CMake.Types.BuildType.Release;
             }
             else
             {
                 buildType = buildOptions.BuildType;
             }
 
-            AddCmakeArg(cmakeArgs, "CMAKE_BUILD_TYPE", buildType.ToString());
-
-            AddCmakeArg(cmakeArgs, "IOS", "ON", "BOOL");
+            var cmakeArgs = new StringBuilder();
+            cmakeArgs.AppendFormat("{0} ", buildOptions.OutputDirectory);
             cmakeArgs.AppendFormat("-B{0} ", "iOS");
 
-            buildOptions.OutputDirectory = Helpers.UnityEditor.CombineFullPath(plugin.buildFolder, "iOS");
+            
+            var cmakelist = new CMakeListIOS();
+            cmakelist.MinimumRequiredVersion = System.Version.Parse("3.2");
+            cmakelist.ProjectName = plugin.Name;
+            cmakelist.BuildType = buildType;
+            cmakelist.LibraryType = LibraryType.Static;
+            cmakelist.Defines.Add("PLUGIN_BUILD_NUMBER", plugin.BuildNumber.ToString());
+            cmakelist.Defines.Add("PLUGIN_VERSION", $"\"{plugin.Version}\"");
 
+            var addLib = AddLibrary.Create(plugin.Name, LibraryType.Static);
+            addLib.AddSourceFilesInFolder(plugin.sourceFolder, "*.cpp", SearchOption.AllDirectories);
+            cmakelist.SourceFiles.AddRange(addLib.SourceFiles);
+
+            var outDir = Path.Combine(plugin.pluginBinaryFolderPath, "iOS");
+            cmakelist.OutputDir = outDir;
+
+            cmakelist.BuildDir = buildOptions.OutputDirectory;
+
+            cmakelist.BindingsDir = Path.GetFullPath(Path.Combine(plugin.pluginBinaryFolderPath, "../Bindings"));
+            
+            var cmakeFileLocation = Path.Combine(buildOptions.OutputDirectory, "CMakeLists.txt");
+            File.WriteAllText(cmakeFileLocation, cmakelist.ToString());
+
+            var swigInterfaceLocation = Path.Combine(buildOptions.OutputDirectory, cmakelist.ProjectName + ".i");
+            var headerFile = Directory.GetFiles(plugin.sourceFolder, "*.h", SearchOption.AllDirectories).First();
+            var swigInterface = new Swig.SwigInterface(cmakelist.ProjectName + "Native", headerFile);
+            File.WriteAllText(swigInterfaceLocation, swigInterface.ToString());
+            
             var startInfo = new ProcessStartInfo
             {
                 FileName = CMakeHelper.CMakeLocation,

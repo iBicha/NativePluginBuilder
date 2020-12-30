@@ -13,6 +13,7 @@ namespace iBicha
         Universal,
         x86,
         x86_64, //Standalone
-        x64 //UWP
+        x64, //UWP
+        ARM64 //Android
     }
 }

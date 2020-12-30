@@ -5,6 +5,7 @@ using UnityEditor.Build;
 using UnityEditor;
 using System.Text;
 using System;
+using CMake.Types;
 
 namespace iBicha
 {

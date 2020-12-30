@@ -19,7 +19,7 @@ namespace CMake.Instructions
         }
 
         public virtual string Comment { get; set; }
-        public abstract void Write(StringBuilder sb);
+        public abstract bool Write(StringBuilder sb);
 
         public override string ToString()
         {

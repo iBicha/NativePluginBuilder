@@ -47,10 +47,10 @@ namespace iBicha
         {
             var cmakeArgs = GetBasePluginCMakeArgs(plugin);
 
-            BuildType buildType;
-            if (buildOptions.BuildType == BuildType.Default)
+            CMake.Types.BuildType buildType;
+            if (buildOptions.BuildType == CMake.Types.BuildType.Default)
             {
-                buildType = EditorUserBuildSettings.development ? BuildType.Debug : BuildType.Release;
+                buildType = EditorUserBuildSettings.development ? CMake.Types.BuildType.Debug : CMake.Types.BuildType.Release;
             }
             else
             {

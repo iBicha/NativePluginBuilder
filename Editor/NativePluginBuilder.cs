@@ -88,23 +88,6 @@ namespace iBicha
         [MenuItem("Window/Native Plugin Builder")]
         static void Init()
         {
-            var cmakelist = new CMakeList();
-            cmakelist.MinimumRequiredVersion = Version.Parse("3.2");
-            cmakelist.ProjectName = "MyPlugin";
-            cmakelist.BuildType = CMake.Types.BuildType.Default;
-            cmakelist.LibraryType = LibraryType.Shared;
-            cmakelist.Defines.Add("PLUGIN_BUILD_NUMBER", "5");
-            cmakelist.Defines.Add("PLUGIN_VERSION", "\"1.0.2.0\"");
-            cmakelist.IncludeDirs.Add("Folder1");
-            cmakelist.IncludeDirs.Add("Folder2");
-            
-            var addLib = CMake.Instructions.AddLibrary.Create("MyPlugin", LibraryType.Shared);
-            addLib.AddSourceFilesInFolder(Environment.CurrentDirectory, "*.cs", SearchOption.AllDirectories);
-            cmakelist.SourceFiles.AddRange(addLib.SourceFiles);
-
-            cmakelist.OutputDir = Environment.CurrentDirectory;
-            
-            Debug.Log(cmakelist);
             // Get existing open window or if none, make a new one:
             NativePluginBuilder window = (NativePluginBuilder)EditorWindow.GetWindow(typeof(NativePluginBuilder));
             window.titleContent.text = "Native Plugin Builder";
@@ -550,7 +533,7 @@ namespace iBicha
                         GetBuilder(buildOptions[i].BuildPlatform).SupportedArchitectureStrings,
                         GetBuilder(buildOptions[i].BuildPlatform).SupportedArchitectureInts);
 
-                    buildOptions[i].BuildType = (BuildType)EditorGUILayout.EnumPopup("Build Type", buildOptions[i].BuildType);
+                    buildOptions[i].BuildType =  (CMake.Types.BuildType)EditorGUILayout.EnumPopup("Build Type", buildOptions[i].BuildType);
 
                     EditorGUILayout.Space();
                     //Platform specific

@@ -17,15 +17,16 @@ namespace CMake.Instructions
 
         public virtual string Command { get; set; }
 
-        public override void Write(StringBuilder sb)
+        public override bool Write(StringBuilder sb)
         {
             if (string.IsNullOrEmpty(Command))
-                return;
+                return false;
 
             if (!string.IsNullOrEmpty(Comment))
                 sb.AppendLine($"{CurrentIntentString}# {Comment}");
 
             sb.AppendLine($"{CurrentIntentString}{Command}");
+            return true;
         }
     }
 }

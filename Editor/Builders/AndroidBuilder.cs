@@ -1,8 +1,12 @@
-﻿using UnityEditor;
+﻿using System;
+using UnityEditor;
 using System.IO;
 using System.Text;
 using System.Diagnostics;
 using System.Linq;
+using CMake;
+using CMake.Instructions;
+using CMake.Types;
 using UnityEngine;
 
 namespace iBicha
@@ -11,7 +15,7 @@ namespace iBicha
     {
         public AndroidBuilder()
         {
-            SetSupportedArchitectures(Architecture.ARMv7, Architecture.x86);
+            SetSupportedArchitectures(Architecture.ARMv7, Architecture.x86, Architecture.ARM64);
         }
 
         public override bool IsAvailable => Helpers.UnityEditor.IsModuleInstalled(RuntimePlatform.Android);
@@ -36,22 +40,42 @@ namespace iBicha
 
         public override BackgroundProcess Build(NativePlugin plugin, NativeBuildOptions buildOptions)
         {
-            var cmakeArgs = GetBasePluginCMakeArgs(plugin);
-
-            BuildType buildType;
-            if (buildOptions.BuildType == BuildType.Default)
+            string archName = "";
+            switch (buildOptions.Architecture)
             {
-                buildType = EditorUserBuildSettings.development ? BuildType.Debug : BuildType.Release;
+                case Architecture.ARMv7:
+                    archName = "armeabi-v7a";
+                    break;
+                case Architecture.ARM64:
+                    archName = "arm64-v8a";
+                    break;
+                case Architecture.x86:
+                    archName = "x86";
+                    break;
+                default:
+                    break;
+            }
+
+            buildOptions.OutputDirectory = Helpers.UnityEditor.CombineFullPath(plugin.buildFolder, "Android", archName);
+            if (!Directory.Exists(buildOptions.OutputDirectory))
+            {
+                Directory.CreateDirectory(buildOptions.OutputDirectory);
+            }
+            
+            CMake.Types.BuildType buildType;
+            if (buildOptions.BuildType == CMake.Types.BuildType.Default)
+            {
+                buildType = EditorUserBuildSettings.development ? CMake.Types.BuildType.Debug : CMake.Types.BuildType.Release;
             }
             else
             {
                 buildType = buildOptions.BuildType;
             }
 
-            AddCmakeArg(cmakeArgs, "CMAKE_BUILD_TYPE", buildType.ToString());
+            var cmakeArgs = new StringBuilder();
+            cmakeArgs.AppendFormat("{0} ", buildOptions.OutputDirectory);
 
             cmakeArgs.AppendFormat("-G {0} ", "\"Unix Makefiles\"");
-            AddCmakeArg(cmakeArgs, "ANDROID", "ON", "BOOL");
 
             var ndkLocation = Helpers.Android.NdkLocation;
             AddCmakeArg(cmakeArgs, "ANDROID_NDK", ndkLocation, "PATH");
@@ -59,7 +83,6 @@ namespace iBicha
             var toolchain = Helpers.UnityEditor.CombineFullPath(ndkLocation, "build/cmake/android.toolchain.cmake");
             AddCmakeArg(cmakeArgs, "CMAKE_TOOLCHAIN_FILE", "\"" + toolchain + "\"", "FILEPATH");
 
-            var archName = buildOptions.Architecture == Architecture.ARMv7 ? "armeabi-v7a" : "x86";
             AddCmakeArg(cmakeArgs, "ANDROID_ABI", archName);
             cmakeArgs.AppendFormat("-B{0}/{1} ", "Android", archName);
             //Do we need to target a specific api?
@@ -68,8 +91,35 @@ namespace iBicha
                 AddCmakeArg(cmakeArgs, "ANDROID_PLATFORM", "android-" + buildOptions.AndroidSdkVersion);
             }
 
-            buildOptions.OutputDirectory = Helpers.UnityEditor.CombineFullPath(plugin.buildFolder, "Android", archName);
+            
+            var cmakelist = new CMakeListAndroid();
+            cmakelist.MinimumRequiredVersion = System.Version.Parse("3.2");
+            cmakelist.ProjectName = plugin.Name;
+            cmakelist.BuildType = buildType;
+            cmakelist.LibraryType = LibraryType.Static;
+            cmakelist.Defines.Add("PLUGIN_BUILD_NUMBER", plugin.BuildNumber.ToString());
+            cmakelist.Defines.Add("PLUGIN_VERSION", $"\"{plugin.Version}\"");
 
+            var addLib = AddLibrary.Create(plugin.Name, LibraryType.Static);
+            addLib.AddSourceFilesInFolder(plugin.sourceFolder, "*.cpp", SearchOption.AllDirectories);
+            cmakelist.SourceFiles.AddRange(addLib.SourceFiles);
+
+            var outDir = Path.Combine(plugin.pluginBinaryFolderPath, $"Android/{archName}");
+            cmakelist.OutputDir = outDir;
+
+            cmakelist.BuildDir = buildOptions.OutputDirectory;
+
+            cmakelist.BindingsDir = Path.GetFullPath(Path.Combine(plugin.pluginBinaryFolderPath, "../Bindings"));
+
+            var cmakeFileLocation = Path.Combine(buildOptions.OutputDirectory, "CMakeLists.txt");
+            File.WriteAllText(cmakeFileLocation, cmakelist.ToString());
+
+            var swigInterfaceLocation = Path.Combine(buildOptions.OutputDirectory, cmakelist.ProjectName + ".i");
+            var headerFile = Directory.GetFiles(plugin.sourceFolder, "*.h", SearchOption.AllDirectories).First();
+            var swigInterface = new Swig.SwigInterface(cmakelist.ProjectName + "Native", headerFile);
+            File.WriteAllText(swigInterfaceLocation, swigInterface.ToString());
+
+            
             var startInfo = new ProcessStartInfo
             {
                 FileName = CMakeHelper.CMakeLocation,
@@ -84,15 +134,31 @@ namespace iBicha
         {
             base.PostBuild(plugin, buildOptions);
 
-            var archName = buildOptions.Architecture == Architecture.ARMv7 ? "armeabi-v7a" : "x86";
+            string archName = "";
+            switch (buildOptions.Architecture)
+            {
+                case Architecture.ARMv7:
+                    archName = "armeabi-v7a";
+                    break;
+                case Architecture.ARM64:
+                    archName = "arm64-v8a";
+                    break;
+                case Architecture.x86:
+                    archName = "x86";
+                    break;
+                default:
+                    break;
+            }
 
             var assetFile = Helpers.UnityEditor.CombinePath(
                 AssetDatabase.GetAssetPath(plugin.pluginBinaryFolder),
                 "Android",
                 archName,
                 $"lib{plugin.Name}.so");
-
+            UnityEngine.Debug.Log(assetFile);
+            AssetDatabase.ImportAsset(assetFile);
             var pluginImporter = AssetImporter.GetAtPath((assetFile)) as PluginImporter;
+            UnityEngine.Debug.Log(pluginImporter);
             if (pluginImporter == null) return;
             SetPluginBaseInfo(plugin, buildOptions, pluginImporter);
 

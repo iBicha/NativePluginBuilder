@@ -44,10 +44,10 @@ namespace iBicha
 
             AddCmakeArg(cmakeArgs, "CMAKE_CONFIGURATION_TYPES", "Debug;Release");
 
-            BuildType buildType;
-            if (buildOptions.BuildType == BuildType.Default)
+            CMake.Types.BuildType buildType;
+            if (buildOptions.BuildType == CMake.Types.BuildType.Default)
             {
-                buildType = EditorUserBuildSettings.development ? BuildType.Debug : BuildType.Release;
+                buildType = EditorUserBuildSettings.development ? CMake.Types.BuildType.Debug : CMake.Types.BuildType.Release;
             }
             else
             {
@@ -95,10 +95,10 @@ namespace iBicha
         public override BackgroundProcess Install(NativePlugin plugin, NativeBuildOptions buildOptions)
         {
             var backgroundProcess = base.Install(plugin, buildOptions);
-            BuildType buildType;
-            if (buildOptions.BuildType == BuildType.Default)
+            CMake.Types.BuildType buildType;
+            if (buildOptions.BuildType == CMake.Types.BuildType.Default)
             {
-                buildType = EditorUserBuildSettings.development ? BuildType.Debug : BuildType.Release;
+                buildType = EditorUserBuildSettings.development ? CMake.Types.BuildType.Debug : CMake.Types.BuildType.Release;
             }
             else
             {

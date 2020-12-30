@@ -5,6 +5,15 @@ namespace CMake.Instructions
     [Serializable]
     public class Set : GenericInstruction
     {
+        public new static Set Create(string var, string value)
+        {
+            return new Set()
+            {
+                Var = var,
+                Value = value
+            };
+        }
+
         public string Var { get; set; }
         public string Value { get; set; }
 

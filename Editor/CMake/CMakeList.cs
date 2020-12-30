@@ -7,7 +7,7 @@ using iBicha;
 namespace CMake
 {
     [Serializable]
-    public class CMakeList
+    public abstract class CMakeList
     {
         public Version MinimumRequiredVersion { get; set; }
         public string ProjectName { get; set; }
@@ -20,21 +20,10 @@ namespace CMake
         public List<string> SourceFiles = new List<string>();
 
         public string OutputDir { get; set; }
+        public string BindingsDir { get; set; }
+        public string BuildDir { get; set; }
 
-        public virtual List<Instruction> GenerateInstructions()
-        {
-            return new List<Instruction>
-            {
-                GeneralInstructions.MinimumRequiredVersion(MinimumRequiredVersion),
-                GeneralInstructions.ProjectName(ProjectName),
-                GeneralInstructions.BuildType(BuildType),
-                AddDefinitions.Create(Defines),
-                IncludeDirectories.Create(IncludeDirs),
-                AddLibrary.Create(ProjectName, LibraryType, SourceFiles.ToArray()),
-                SetTargetProperties.Create(ProjectName, "COMPILE_FLAGS", "-m64", "LINK_FLAGS", "-m64"),
-                Install.Create(ProjectName, OutputDir)
-            };
-        }
+        public abstract List<Instruction> GenerateInstructions();
 
         public override string ToString()
         {
@@ -45,8 +34,10 @@ namespace CMake
 
             foreach (var instruction in instructions)
             {
-                instruction.Write(sb);
-                sb.AppendLine();
+                if (instruction.Write(sb))
+                {
+                    sb.AppendLine();
+                }
             }
 
             return sb.ToString();
